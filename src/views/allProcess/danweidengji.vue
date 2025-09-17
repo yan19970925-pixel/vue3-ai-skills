@@ -272,13 +272,13 @@
                     />
                   </template>
                 </el-table-column>
-                <el-table-column
+                <!-- <el-table-column
                   label="折扣"
                   prop="groupDiscount"
                   width="70"
                   align="center"
                   show-overflow-tooltip
-                />
+                /> -->
                 <el-table-column fixed="right" label="操作" align="center" width="60">
                   <template #default="scope">
                     <el-button
@@ -650,7 +650,8 @@ const handleDeleteItem = async (row, index) => {
     let res = await getPeItemAssembledList({
       pageNo: 1,
       pageSize: 10000000,
-      form: ''
+      form: '',
+      clinicFlag: 1
     })
     selectedCategory.value = '全部'
     allDataUnselect.value = res.records || []
@@ -782,7 +783,8 @@ const getItemUnselectList = async (setCode, form = '') => {
     pageNo: 1,
     pageSize: 10000000,
     // setCode: setCode || '',
-    form: form || ''
+    form: form || '',
+    clinicFlag: 1
   })
   allDataUnselect.value = res.records || []
   shaixuanAllDataList.value = res.records || []
@@ -841,13 +843,15 @@ const xuanzhongHandleItem = (item, checked) => {
   xuanzhongChecked.value = []
   if (item.isTaocan) {
     xuanzhongData.value = {}
+    allDataSelected.value.forEach((item) => {
+      item.isTaocan = false
+    })
   }
   shaixuanpeSetList.value = peSetList.value
   checkedPeSetListData.value = ''
   let num = 0
   allDataSelected.value.forEach((item) => {
     num += item.personPrice * 100
-    item.isTaocan = false
   })
   formInfo.totalCharges = (num / 100).toFixed(2)
 }
@@ -1117,7 +1121,8 @@ const choseRow = async (row) => {
   let res = await getPeItemAssembledList({
     pageNo: 1,
     pageSize: 10000000,
-    form: ''
+    form: '',
+    clinicFlag: 1
   })
   selectedCategory.value = '全部'
   allDataUnselect.value = res.records || []
@@ -1157,12 +1162,16 @@ const choseRow = async (row) => {
   }
   //项目
   if (row.itemListSelected && row.itemListSelected.length > 0) {
-    row.itemListSelected.forEach((item) => {
-      allDataSelected.value.unshift({
-        ...item,
-        isTaocan: false
-      })
-    })
+    // row.itemListSelected.forEach((item) => {
+    //   allDataSelected.value.unshift({
+    //     ...item,
+    //     isTaocan: false
+    //   })
+    // })
+    allDataSelected.value = mergeAndDeduplicateByitemAssemCode(
+      allDataSelected.value,
+      row.itemListSelected
+    )
   }
   if (allDataSelected.value && allDataSelected.value.length > 0) {
     let num = 0
@@ -1180,6 +1189,19 @@ const choseRow = async (row) => {
       })
     }
   }
+  console.log(allDataSelected.value, 'allDataSelected.value')
+}
+const mergeAndDeduplicateByitemAssemCode = (arr1, arr2) => {
+  const primaryCodes = new Set(arr1.map((item) => item.itemAssemCode))
+  const uniqueItems = arr2.filter((item) => !primaryCodes.has(item.itemAssemCode))
+  console.log(uniqueItems, 'uniqueItems')
+  if (uniqueItems && uniqueItems.length > 0) {
+    uniqueItems.forEach((item) => {
+      item.isTaocan = false
+    })
+  }
+  arr1.unshift(...uniqueItems)
+  return arr1
 }
 const selectUnitCodeVisiable = ref(false)
 const keyWord = ref('')

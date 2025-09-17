@@ -470,7 +470,8 @@ onMounted(async () => {
   let arr = await getPeItemAssembledList({
     pageNo: 1,
     pageSize: 10000000,
-    form: ''
+    form: '',
+    clinicFlag: 1
   })
   allDataSelected.value = arr.records
   let res = await getSystemDateTime()

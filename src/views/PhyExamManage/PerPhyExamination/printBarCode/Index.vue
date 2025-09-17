@@ -143,6 +143,9 @@
               "
               >{{ item.applyNo }}</div
             >
+            <div style="position: absolute; right: 0; top: 28px; font-size: 12px; zoom: 0.9">{{
+              item.cuvette
+            }}</div>
           </div>
           <div style="display: flex; flex-direction: column; align-items: center">
             <span style="font-size: 12px; line-height: 12px">

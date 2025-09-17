@@ -23,11 +23,11 @@
             class="select-item"
             filterable
             clearable
-            @change="getPerInfoMsg"
           >
             <el-option
               v-for="item in personList"
-              :label="item.name"
+              @click.stop="personChange(item)"
+              :label="item.name + '--' + item.peVisitId"
               :value="item.peId"
               :key="item.peId"
             />
@@ -763,7 +763,7 @@
     <el-dialog
       v-model="deptVisible"
       title="选择科室"
-      :show-close="false"
+      :show-close="true"
       :close-on-press-escape="false"
       :close-on-click-modal="false"
       top="25vh"
@@ -1118,6 +1118,10 @@ const getDoctorList = () => {
     // console.log(res, '医生列表')
     doctorList.value = res
   })
+}
+const personChange = async (row) => {
+  everySearchData.value = row
+  await getPerInfoMsg()
 }
 const everySearchData = ref({})
 const personDeptList = ref([])

@@ -1499,7 +1499,8 @@ const getItemUnselectList = async (setCode, form = '') => {
     pageNo: 1,
     pageSize: 10000000,
     // setCode: setCode || '',
-    form: form || ''
+    form: form || '',
+    clinicFlag: 1
   })
   allDataUnselect.value = res.records || []
   shaixuanAllDataList.value = res.records || []

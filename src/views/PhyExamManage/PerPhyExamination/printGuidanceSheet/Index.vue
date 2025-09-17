@@ -294,7 +294,7 @@
       <div class="print_content" v-for="(perItem, perIndex) in mediaPrintData" :key="perIndex">
         <div class="print_heard">
           <div class="hos_t">
-            <div>联勤保障部队北戴河疗养中心</div>
+            <div>北戴河疗养中心</div>
             <img :src="perItem.peVisitListRespVo.imgUrl" />
           </div>
           <div class="title">体检指引单</div>
@@ -342,8 +342,9 @@
           : ''
       }}</el-col
     > -->
-              <el-col :span="10">体检套餐：{{ perItem.peVisitListRespVo.setCode }}</el-col>
-              <el-col :span="10"
+              <el-col :span="4">优先级：{{ perItem.peVisitListRespVo.peLevel }}</el-col>
+              <el-col :span="7">体检套餐：{{ perItem.peVisitListRespVo.setCode }}</el-col>
+              <el-col :span="9"
                 >体检单位：{{
                   perItem.peVisitListRespVo.unitname ? perItem.peVisitListRespVo.unitname : ''
                 }}</el-col

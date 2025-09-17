@@ -641,7 +641,8 @@ const handleDeleteItem = async (row, index) => {
     let res = await getPeItemAssembledList({
       pageNo: 1,
       pageSize: 10000000,
-      form: ''
+      form: '',
+      clinicFlag: 1
     })
     allDataUnselect.value = res.records || []
     shaixuanAllDataList.value = res.records || []
@@ -795,7 +796,8 @@ const getItemUnselectList = async (setCode, form = '') => {
     pageNo: 1,
     pageSize: 10000000,
     setCode: setCode || '',
-    form: form || ''
+    form: form || '',
+    clinicFlag: 1
   })
   allDataUnselect.value = res.records || []
   // shaixuanAllDataList.value = res.records || []
@@ -1055,7 +1057,8 @@ const searchByUnitCode = async () => {
       let res = await getPeItemAssembledList({
         pageNo: 1,
         pageSize: 10000000,
-        form: ''
+        form: '',
+        clinicFlag: 1
       })
       allDataUnselect.value = res.records || []
       shaixuanAllDataList.value = res.records || []
@@ -1213,7 +1216,8 @@ const choseRow = async (row) => {
   let res = await getPeItemAssembledList({
     pageNo: 1,
     pageSize: 10000000,
-    form: ''
+    form: '',
+    clinicFlag: 1
   })
 
   // 重置所有相关数据
