@@ -1,0 +1,24 @@
+import request from '@/config/axios'
+
+// 路由
+export const getAsysNameRoutesApi = (data: string) => {
+  return request.get({ url: '/admin-api/system/auth/sysName-menus?sysName=' + data })
+}
+/**
+ *
+ * @param data 系统设置--检验组合项目对照
+ * @returns
+ */
+
+// 检查对照-检查类组合项目查询
+export const getPeAssemItemLab = (data) => {
+  return request.post({ url: '/health-api/health/assemItem/getPeAssemItemExam', data })
+}
+// 检查对照-检查类组合项目保存
+export const savePeAssemItemLab = (data) => {
+  return request.post({ url: '/health-api/health/assemItem/savePeAssemItemExam', data })
+}
+// 检查对照-检查类组合项目删除
+export const delPeAssemItemExam = (data) => {
+  return request.post({ url: '/health-api/health/assemItem/delPeAssemItemExam', data })
+}

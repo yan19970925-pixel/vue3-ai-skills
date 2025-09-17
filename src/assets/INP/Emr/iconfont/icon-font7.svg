@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: #fff;
+        opacity: 0;
+      }
+
+      .cls-2, .cls-4 {
+        fill: none;
+      }
+
+      .cls-2 {
+        stroke: #333;
+        stroke-width: 2px;
+      }
+
+      .cls-3 {
+        stroke: none;
+      }
+    </style>
+  </defs>
+  <g id="加粗" transform="translate(-77 -70)">
+    <rect id="矩形_1" data-name="矩形 1" class="cls-1" width="32" height="32" transform="translate(77 70)"></rect>
+    <g id="组_14" data-name="组 14" transform="translate(0 1.5)">
+      <g id="矩形_17" data-name="矩形 17" class="cls-2" transform="translate(86.5 75)">
+        <path class="cls-3" d="M0,0H6.776A5.224,5.224,0,0,1,12,5.224v0a5.224,5.224,0,0,1-5.224,5.224H0a0,0,0,0,1,0,0V0A0,0,0,0,1,0,0Z"></path>
+        <path class="cls-4" d="M1.469,1H6.776A4.224,4.224,0,0,1,11,5.224v0A4.224,4.224,0,0,1,6.776,9.448H1.469A.469.469,0,0,1,1,8.979V1.469A.469.469,0,0,1,1.469,1Z"></path>
+      </g>
+      <g id="矩形_18" data-name="矩形 18" class="cls-2" transform="translate(86.5 83.549)">
+        <path class="cls-3" d="M0,0H7.776A5.224,5.224,0,0,1,13,5.224v0a5.224,5.224,0,0,1-5.224,5.224H0a0,0,0,0,1,0,0V0A0,0,0,0,1,0,0Z"></path>
+        <path class="cls-4" d="M1.469,1H7.776A4.224,4.224,0,0,1,12,5.224v0A4.224,4.224,0,0,1,7.776,9.448H1.469A.469.469,0,0,1,1,8.979V1.469A.469.469,0,0,1,1.469,1Z"></path>
+      </g>
+    </g>
+  </g>
+</svg>

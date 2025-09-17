@@ -1,0 +1,175 @@
+@import './var.css';
+@import 'element-plus/theme-chalk/dark/css-vars.css';
+body,
+html {
+  font-family: 'Arial, sans-serif';
+}
+
+.reset-margin [class*='el-icon'] + span {
+  margin-left: 2px !important;
+}
+
+// 解决抽屉弹出时，body宽度变化的问题
+.el-popup-parent--hidden {
+  width: 100% !important;
+}
+
+/* nprogress 适配 element-plus 的主题色 */
+#nprogress {
+  & .bar {
+    background-color: var(--el-color-primary) !important;
+  }
+
+  & .peg {
+    box-shadow: 0 0 10px var(--el-color-primary), 0 0 5px var(--el-color-primary) !important;
+  }
+
+  & .spinner-icon {
+    border-top-color: var(--el-color-primary);
+    border-left-color: var(--el-color-primary);
+  }
+}
+* {
+  --el-menu-hover-bg-color: #234fd8 !important;
+  .el-button--primary.is-plain {
+    --el-button-text-color: var(--el-color-white) !important;
+  }
+}
+
+.el-scrollbar__bar.is-horizontal {
+  height: 14px !important;
+  border-radius: 32px;
+}
+
+.el-scrollbar__bar.is-vertical {
+  width: 14px !important;
+  border-radius: 32px;
+}
+
+::-webkit-scrollbar {
+  width: 12px;
+  height: 8px;
+}
+::-webkit-scrollbar:hover {
+  cursor: pointer;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #c7c7c9;
+  opacity: 0.3;
+  border-radius: 32px;
+  height: 18px;
+  width: 18px;
+}
+
+::-webkit-scrollbar-track {
+  background-color: #fff;
+  border-radius: 32px;
+}
+
+.el-table th.el-table__cell {
+  background-color: #eef1f5 !important;
+  color: #000000 !important;
+  font-weight: 400 !important;
+  text-align: center;
+}
+.el-table--border {
+  border-radius: 3px !important;
+}
+
+.ellipsis {
+  overflow: hidden !important;
+  white-space: nowrap !important;
+  text-overflow: ellipsis !important;
+}
+.table-checked-row-style {
+  background: #eaeffcff;
+  color: #3473d1 !important;
+}
+/* 在全局样式文件中添加 */
+.el-table .table-checked-row-style {
+  background-color: #ecf5ff !important;
+}
+.el-table__row.current-row {
+  background: #eaeffcff !important;
+  color: #3473d1 !important;
+}
+
+.el-table--default .el-table__cell {
+  padding: 2px 0 !important;
+}
+
+.el-input.is-disabled .el-input__inner {
+  color: #000 !important;
+  -webkit-text-fill-color: #000 !important;
+}
+.blDialog .el-dialog__body {
+  padding: 0 20px !important;
+}
+.el-dialog__header {
+  padding: 10px 20px !important;
+  margin-right: 0px;
+}
+.dialog-title {
+  font-size: 18px !important;
+  color: #000 !important;
+  font-weight: 500 !important;
+  span {
+    margin-top: 3px !important;
+  }
+}
+.el-dialog__headerbtn {
+  width: 48px !important;
+  height: 48px !important;
+  top: 0px !important;
+}
+.emr-box .el-dialog__body,
+.temp-div .el-dialog__body {
+  padding: 10px 20px !important;
+}
+img[src=''],
+img:not([src]) {
+  opacity: 1 !important;
+}
+
+.el-dialog__header {
+  background-color: #3473d1 !important;
+  color: white !important;
+}
+.el-dialog__header .dialog-title {
+  color: white !important;
+}
+.el-dialog__headerbtn .el-dialog__close {
+  color: white !important;
+}
+
+// 医生站病历小屏幕样式
+@media screen and (max-width: 1600px) {
+  // 病历右边展开
+  .emr-box .emr-right.rightBox {
+    width: 300px !important;
+  }
+  // 左边部分
+  // .emr-box .emr-center.rightBox {
+  //   width: calc(83.5% - 300px) !important;
+  // }
+  // 特殊字符
+  .special-div {
+    width: 200px !important;
+    padding: 10px 0;
+    .special-ul {
+      .special-bot {
+        height: 500px !important;
+        &.haveChose {
+          height: 0 !important;
+        }
+        .bot-span {
+          padding: 0 5px !important;
+        }
+      }
+    }
+  }
+  .special-btn.openClip {
+    right: 200px !important;
+  }
+}

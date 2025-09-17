@@ -1,0 +1,34 @@
+<svg fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 281 122" class="design-iconfont">
+  <rect width="281" height="122" rx="4" fill="url(#bc6ftzunm__paint0_linear_1119_10351)"/>
+  <mask id="bc6ftzunm__vkhmpykcka" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="0" y="0" width="279" height="122">
+    <rect width="279" height="122" rx="4" fill="url(#bc6ftzunm__paint1_linear_1119_10351)"/>
+  </mask>
+  <g mask="url(#bc6ftzunm__vkhmpykcka)">
+    <g filter="url(#bc6ftzunm__filter0_f_1119_10351)">
+      <path stroke="#fff" stroke-opacity=".1" stroke-width="20" d="M256 67A55 55 0 1 0 256 177A55 55 0 1 0 256 67Z"/>
+    </g>
+    <g filter="url(#bc6ftzunm__filter1_f_1119_10351)">
+      <path stroke="#fff" stroke-opacity=".1" stroke-width="20" d="M24 -41A55 55 0 1 0 24 69A55 55 0 1 0 24 -41Z"/>
+    </g>
+  </g>
+  <defs>
+    <linearGradient id="bc6ftzunm__paint0_linear_1119_10351" x1="0" y1="61" x2="281" y2="61" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#EE7D7D"/>
+      <stop offset="1" stop-color="#E62C2C"/>
+    </linearGradient>
+    <linearGradient id="bc6ftzunm__paint1_linear_1119_10351" x1="0" y1="61" x2="279" y2="61" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#54C3FF"/>
+      <stop offset="1" stop-color="#249BED"/>
+    </linearGradient>
+    <filter id="bc6ftzunm__filter0_f_1119_10351" x="187" y="53" width="138" height="138" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feFlood flood-opacity="0" result="BackgroundImageFix"/>
+      <feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"/>
+      <feGaussianBlur stdDeviation="2" result="effect1_foregroundBlur_1119_10351"/>
+    </filter>
+    <filter id="bc6ftzunm__filter1_f_1119_10351" x="-45" y="-55" width="138" height="138" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feFlood flood-opacity="0" result="BackgroundImageFix"/>
+      <feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"/>
+      <feGaussianBlur stdDeviation="2" result="effect1_foregroundBlur_1119_10351"/>
+    </filter>
+  </defs>
+</svg>

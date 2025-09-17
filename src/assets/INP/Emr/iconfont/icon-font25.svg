@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: #fff;
+        opacity: 0;
+      }
+
+      .cls-2 {
+        fill: none;
+        stroke: #333;
+        stroke-linecap: round;
+        stroke-width: 2px;
+      }
+    </style>
+  </defs>
+  <g id="字号_" data-name="字号+" transform="translate(-77 -70)">
+    <rect id="矩形_1" data-name="矩形 1" class="cls-1" width="32" height="32" transform="translate(77 70)"></rect>
+    <g id="组_12" data-name="组 12" transform="translate(-166.5 -541)">
+      <line id="直线_1" data-name="直线 1" class="cls-2" x1="7.646" y2="17" transform="translate(246.5 618.5)"></line>
+      <line id="直线_3" data-name="直线 3" class="cls-2" x1="9.499" transform="translate(249.498 630.032)"></line>
+      <line id="直线_4" data-name="直线 4" class="cls-2" x2="7.646" y2="17" transform="translate(254.148 618.5)"></line>
+      <line id="直线_5" data-name="直线 5" class="cls-2" x1="7.646" transform="translate(264.854 627)"></line>
+      <line id="直线_6" data-name="直线 6" class="cls-2" x1="7.646" transform="translate(268.677 623.177) rotate(90)"></line>
+    </g>
+  </g>
+</svg>

@@ -1,0 +1,290 @@
+.all-pe-container {
+  .process-flow-container {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+  }
+
+  .process-flow {
+    width: 100%;
+    max-width: 1200px;
+    padding: 20px;
+    background: white;
+    border-radius: 8px;
+  }
+
+  .process-diagram {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+  }
+
+  .main-process-line {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    position: relative;
+    left: 10%; /* 主流程线向右移动10% */
+  }
+
+  .process-step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    position: relative;
+    // margin: 10px 0;
+  }
+
+  .process-node {
+    min-width: 100px;
+    padding: 4px;
+    background: #f5f7fa;
+    border: 1px solid #dcdfe6;
+    border-radius: 4px;
+    text-align: center;
+    transition: all 0.3s ease;
+    z-index: 2;
+    position: relative;
+
+    &.clickable {
+      cursor: pointer;
+
+      &:hover {
+        background: #3473d1;
+        color: white;
+        border-color: #3473d1;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      }
+    }
+
+    .node-content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .node-title {
+      font-size: 14px;
+      font-weight: 500;
+    }
+  }
+
+  .vertical-arrow {
+    font-size: 24px;
+    color: #3473d1;
+    font-weight: bold;
+    margin: 2px 0;
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 40px;
+    color: #909399;
+  }
+
+  // 响应式设计
+  @media (max-width: 768px) {
+    .vertical-arrow {
+      margin: 10px 0;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .all-pe-container {
+      padding: 10px;
+    }
+
+    .process-flow {
+      padding: 15px;
+    }
+
+    .process-node {
+      padding: 12px;
+      min-width: 140px;
+      margin: 5px 0;
+    }
+
+    .node-title {
+      font-size: 13px;
+    }
+
+    .vertical-arrow {
+      font-size: 18px;
+    }
+  }
+}
+
+.horizontal-steps {
+  flex-direction: row !important;
+  justify-content: center;
+  gap: 20px;
+
+  .process-step-inline {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .horizontal-arrow {
+    font-size: 24px;
+    color: #3473d1;
+    font-weight: bold;
+    align-self: center;
+    margin: 0 10px;
+  }
+}
+
+// 响应式设计 - 在小屏幕上保持垂直排列
+@media (max-width: 768px) {
+  .horizontal-steps {
+    flex-direction: column !important;
+
+    .horizontal-arrow {
+      transform: rotate(90deg);
+      margin: 10px 0;
+    }
+  }
+}
+
+.main-with-branch {
+  flex-direction: row !important;
+  align-items: center;
+
+  .main-step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .branch-step {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin-right: 20px; /* 调整分支节点与主流程节点的间距 */
+
+    .horizontal-arrow {
+      font-size: 24px;
+      color: #3473d1;
+      font-weight: bold;
+      margin: 0 10px;
+    }
+  }
+}
+
+/* 响应式设计 - 在小屏幕上恢复垂直排列 */
+@media (max-width: 768px) {
+  .main-with-branch {
+    flex-direction: column !important;
+
+    .branch-step {
+      margin-right: 0;
+      margin-bottom: 10px;
+
+      .horizontal-arrow {
+        display: none;
+      }
+    }
+  }
+}
+
+.with-left-branch {
+  flex-direction: row !important;
+  align-items: center;
+  position: relative;
+
+  .left-branch {
+    position: absolute;
+    right: calc(40% + 100px); // 位于主节点左侧，考虑主流程右移10%
+    display: flex;
+    justify-content: flex-end;
+
+    .process-node {
+      margin-right: 20px;
+    }
+  }
+
+  .main-node {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+  }
+
+  &::before {
+    content: '→';
+    position: absolute;
+    right: calc(55% + 45px); // 考虑主流程右移10%
+    font-size: 24px;
+    color: #3473d1;
+    font-weight: bold;
+    transform: translateY(-50%);
+    top: 50%;
+  }
+}
+
+.with-right-branch {
+  flex-direction: row !important;
+  align-items: center;
+  position: relative;
+
+  .left-branch {
+    position: absolute;
+    right: calc(40% + 100px); // 位于主节点左侧，考虑主流程右移10%
+    display: flex;
+    justify-content: flex-end;
+
+    .process-node {
+      margin-right: 20px;
+    }
+  }
+
+  .main-node {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+  }
+
+  &::before {
+    content: '←';
+    position: absolute;
+    right: calc(55% + 45px); // 考虑主流程右移10%
+    font-size: 24px;
+    color: #3473d1;
+    font-weight: bold;
+    transform: translateY(-50%);
+    top: 50%;
+  }
+}
+
+/* 响应式设计 - 在小屏幕上恢复垂直排列 */
+@media (max-width: 768px) {
+  .with-left-branch,
+  .with-right-branch {
+    flex-direction: column !important;
+
+    .left-branch {
+      position: static;
+      order: -1; // 分支节点放在主节点前面
+      margin-bottom: 10px;
+
+      .process-node {
+        margin-right: 0;
+      }
+    }
+
+    &::before {
+      content: '↓';
+      position: static;
+      transform: none;
+      top: auto;
+      margin: 5px 0;
+      text-align: center;
+    }
+  }
+
+  .main-process-line {
+    left: 0; /* 在小屏幕上重置位置 */
+  }
+}
