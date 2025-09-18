@@ -459,6 +459,7 @@ const getPeitemLists = async (itemAssemCode = '', page = 1, peDeptCode = '') => 
     inputCode: ''
   })
   itemList.value = res.records || []
+  filterArray.value = res.records || []
   if (res.records && res.records.length > 0) {
     handleItemClick(res.records[0])
     total.value = res.total
@@ -639,10 +640,19 @@ const handleAddNewItem = async () => {
     pinyinResult.join('').toUpperCase().substring(0, 8) + peItemCode
 }
 const filterInfo = ref('')
+const filterArray = ref([])
 // 点击过滤
 const filter = () => {
   itemAssemCode.value = ''
-  getPeitemLists(filterInfo.value)
+  let arr = [...filterArray.value]
+  if (!filterInfo.value) {
+    itemList.value = [...filterArray.value]
+  } else {
+    itemList.value = arr.filter((item) =>
+      item.peItemName.toLowerCase().includes(filterInfo.value.toLowerCase())
+    )
+  }
+  // getPeitemLists(filterInfo.value)
 }
 
 // 在响应式数据部分添加以下内容
