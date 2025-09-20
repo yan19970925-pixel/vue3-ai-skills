@@ -54,3 +54,7 @@ export const removePeDoctorDept = (data) => {
 export const addPeDoctorDept = (data) => {
   return request.post({ url: '/health-api/health/doctor/addPeDoctorDept', data })
 }
+// 查询数据库用户
+export const getDbUserList = (data) => {
+  return request.post({ url: '/health-api/health/doctor/getDbUserList', data })
+}

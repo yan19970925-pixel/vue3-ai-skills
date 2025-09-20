@@ -374,20 +374,41 @@
             <div class="tishi_in">
               <div class="tishi_t" style="width: 55px">温馨<br />提示</div>
               <div class="tishi_con" style="width: calc(100% - 55px)">
-                <el-row>
-                  <el-col :span="24">* 呼气试验、抽血超声等项目请空腹，抽血后请按压5分钟</el-col>
-                </el-row>
-                <el-row>
-                  <el-col :span="24"
-                    >*
-                    孕期，哺乳期，备孕(半年内，包括男士)请勿做X线检查。泌尿系，经腹妇科彩超请先憋尿，未婚女性请勿做妇科检查</el-col
-                  >
-                </el-row>
-                <el-row>
-                  <el-col :span="24"
-                    >* 体检完成，请把本指引单交回前台，以免影响您的体检报告的发放</el-col
-                  >
-                </el-row>
+                <div v-if="perItem.peVisitListRespVo.kindReminder">
+                  <div v-if="perItem.peVisitListRespVo.kindReminderList.length > 0">
+                    <el-row
+                      v-for="(kindMsg, kindIndex) in perItem.peVisitListRespVo.kindReminderList"
+                      :key="kindIndex"
+                    >
+                      <el-col :span="24">
+                        {{ kindMsg }}
+                      </el-col>
+                    </el-row>
+                  </div>
+                  <div v-else>
+                    <el-row>
+                      <el-col :span="24">
+                        {{ perItem.peVisitListRespVo.kindReminder }}
+                      </el-col>
+                    </el-row>
+                  </div>
+                </div>
+                <div v-else>
+                  <el-row>
+                    <el-col :span="24">* 呼气试验、抽血超声等项目请空腹，抽血后请按压5分钟</el-col>
+                  </el-row>
+                  <el-row>
+                    <el-col :span="24"
+                      >*
+                      孕期，哺乳期，备孕(半年内，包括男士)请勿做X线检查。泌尿系，经腹妇科彩超请先憋尿，未婚女性请勿做妇科检查</el-col
+                    >
+                  </el-row>
+                  <el-row>
+                    <el-col :span="24"
+                      >* 体检完成，请把本指引单交回前台，以免影响您的体检报告的发放</el-col
+                    >
+                  </el-row>
+                </div>
               </div>
             </div>
             <div class="tishi_in" style="border-bottom: none">
@@ -414,10 +435,6 @@
                   <el-col :span="6"
                     >血压：&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;mmHg</el-col
                   >
-                  <el-col :span="8" v-if="perItem.peVisitListRespVo.screeningCode"
-                    >两癌编码：
-                    {{ perItem.peVisitListRespVo.screeningCode }}
-                  </el-col>
                 </el-row>
               </div>
             </div>
@@ -909,19 +926,19 @@ const personList = ref([
     prop: 'unitname',
     align: 'center',
     width: 160
-  },
-  {
-    label: '两癌编码',
-    prop: 'screeningCode',
-    align: 'center',
-    width: 120
-  },
-  {
-    label: '婚检编码',
-    prop: 'premaritalCode',
-    align: 'center',
-    width: 120
   }
+  // {
+  //   label: '两癌编码',
+  //   prop: 'screeningCode',
+  //   align: 'center',
+  //   width: 120
+  // },
+  // {
+  //   label: '婚检编码',
+  //   prop: 'premaritalCode',
+  //   align: 'center',
+  //   width: 120
+  // }
 ])
 const guidanceSheet = ref(true)
 const multipleTableRef = ref<TableInstance>()
@@ -1176,7 +1193,15 @@ const print = () => {
                 margin: 4
               })
               item.peVisitListRespVo.HisImgUrl = HisSrc.value?.src || ''
-
+              if (
+                item.peVisitListRespVo.kindReminder &&
+                item.peVisitListRespVo.kindReminder.includes('\r\n')
+              ) {
+                item.peVisitListRespVo.kindReminderList =
+                  item.peVisitListRespVo.kindReminder.split('\r\n')
+              } else {
+                item.peVisitListRespVo.kindReminderList = []
+              }
               if (
                 item.personalItemToPrintRespVoList &&
                 item.personalItemToPrintRespVoList.length > 0
@@ -1618,10 +1643,8 @@ onMounted(async () => {
     dictType: '体检类型字典',
     cons: 'dict_name:体检类型'
   })
-  // if (petypeNameList.value.length > 0) {
-  //   searchParams.value.peTypeName = petypeNameList.value[0].keyValue
-  // }
   search()
+  initPlugin()
 })
 
 defineExpose({ PrintZhiYinDan })
@@ -1779,10 +1802,6 @@ function destroyPlugin() {
   }
   plugin = null
 }
-
-onMounted(() => {
-  initPlugin()
-})
 
 onBeforeRouteLeave((to, from, next) => {
   destroyPlugin()

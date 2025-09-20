@@ -6,12 +6,28 @@
           <!-- <div class="base-title">医生列表</div> -->
           <div class="base-cont">
             <span class="cont-span">数据库用户：</span>
-            <el-input
+            <el-select
+              v-model="formInfo.dbUser"
+              placeholder="请选择用户"
+              style="width: 20%"
+              class="select-item"
+              clearable
+              filterable
+              @change="dbUserChange"
+            >
+              <el-option
+                v-for="item in dbDoctorList"
+                :key="item.dbUser"
+                :label="item.userName + '--' + item.dbUser"
+                :value="item.dbUser"
+              />
+            </el-select>
+            <!-- <el-input
               style="width: 18%"
               v-model="formInfo.dbUser"
               placeholder="请输入"
               class="select-item"
-            />
+            /> -->
             <span class="cont-span">姓名：</span>
             <el-input
               style="width: 18%"
@@ -104,7 +120,20 @@
               </template>
 
               <template #default="{ row }" v-else>
-                {{ peDocPermList.find((perm) => perm.value === row.peRole)?.label || '未知' }}
+                <span>{{
+                  row.peRole == 1
+                    ? '分科医生'
+                    : row.peRole == 2
+                    ? '全科结果录入'
+                    : row.peRole == '5'
+                    ? '分科结果审核'
+                    : row.peRole == 7
+                    ? '主检初步审核'
+                    : row.peRole == 9
+                    ? '主检最终审核'
+                    : ''
+                }}</span>
+                <!-- {{ peDocPermList.find((perm) => perm.value === row.peRole)?.label || '未知' }} -->
               </template>
             </el-table-column>
             <!-- peRole 列 ，1、2、4、7、9分别对应 peDocPermList中的数据-->
@@ -237,6 +266,7 @@ import { el } from 'element-plus/es/locale'
 
 // ===================== 响应式数据 =====================
 const userFlag = ref(0)
+const dbDoctorList = ref([])
 const doctorList = ref([])
 const addColumns = [
   { prop: 'dbUser', label: '数据用户名', align: 'center' },
@@ -257,7 +287,14 @@ const formInfo = ref({
 })
 const dbUser = ref('')
 const peDocPermList = ref([])
-
+const dbUserChange = (val) => {
+  let userNameList = dbDoctorList.value.filter((item) => item.dbUser == val)
+  if (userNameList && userNameList.length > 0) {
+    formInfo.value.userName = userNameList[0].userName
+  } else {
+    formInfo.value.userName = ''
+  }
+}
 // ===================== 方法 =========================
 // 获取医生列表
 const getPeDoctorList = async (delFlag = 0) => {
@@ -395,12 +432,14 @@ const savePeUserMenu = async () => {
       if (res) {
         addFlag.value = false
         ElMessage.success('新增成功')
+        getPeDoctorList()
       }
     })
   } else {
     await Api.savePeUserMenu(formInfo.value).then((res) => {
       if (res) {
         ElMessage.success('保存成功')
+        getPeDoctorList()
       }
     })
   }
@@ -445,7 +484,8 @@ onMounted(async () => {
     dictType: '系统字典',
     cons: 'dict_type:pe_doctor_permissions;sort:asc;'
   })
-  getPeDoctorList()
+  await getPeDoctorList()
+  dbDoctorList.value = await Api.getDbUserList()
 })
 </script>
 

@@ -80,7 +80,7 @@
         <!-- 右侧详情及项目选择 -->
         <el-col :span="18" style="height: 100%">
           <!-- 套餐详情 -->
-          <div class="base-box" style="background-color: #fff; height: 112px">
+          <div class="base-box" style="background-color: #fff; height: 196px">
             <div class="base-title mb-2px">套餐详情</div>
 
             <div class="base-cont">
@@ -187,10 +187,21 @@
                 <el-button type="primary" @click="savePeSet">保存</el-button>
               </div>
             </div>
+            <div class="base-cont">
+              <span class="cont-span" style="display: inline-block; width: 70px">温馨提示:</span>
+              <el-input
+                v-model="formInfo.kindReminder"
+                type="textarea"
+                rows="3"
+                maxlength="150"
+                show-word-limit
+                @input="kindChange"
+              ></el-input>
+            </div>
           </div>
 
           <!-- 项目选择 -->
-          <div style="width: 100%; height: calc(100% - 116px); margin-top: 4px">
+          <div style="width: 100%; height: calc(100% - 200px); margin-top: 4px">
             <div class="base-box" style="background-color: #fff; height: 100%">
               <div class="base-title mb-2px">项目选择</div>
 
@@ -435,7 +446,8 @@ const formInfo = ref({
   sort: '',
   displayFlag: '',
   peTypeName: '',
-  freeFlag: ''
+  freeFlag: '',
+  kindReminder: ''
 }) // 表单绑定信息
 
 // 获取套餐列表
@@ -471,7 +483,8 @@ const getItemUnselectList = async (setCode, form = '') => {
     pageNo: 1,
     pageSize: 10000000,
     setCode: setCode || '',
-    form: form || ''
+    form: form || '',
+    clinicFlag: 1
   })
   allDataUnselect.value = res.records || []
 }
@@ -598,7 +611,9 @@ const delPeSet = async () => {
     }
   })
 }
-
+const kindChange = (val) => {
+  formInfo.value.kindReminder = val?.replace(/\r?\n/g, '\r\n') || ''
+}
 // 保存套餐
 const savePeSet = async () => {
   // filteredRightData
@@ -607,8 +622,8 @@ const savePeSet = async () => {
       ElMessage.success('保存成功')
     } else if (res && !formInfo.value.setCode) {
       ElMessage.success('新增成功')
-      getItems()
     }
+    getItems()
   })
 }
 // 根据折扣率重新计算团检价格
