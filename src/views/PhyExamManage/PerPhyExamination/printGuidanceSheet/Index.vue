@@ -155,6 +155,20 @@
       </div>
       <div class="search1" style="padding-bottom: 6px">
         <div class="div1">
+          <span class="span1">单位名称：</span>
+          <el-input
+            style="width: 120px"
+            v-model="searchParams.unitName"
+            placeholder="请输入"
+            class="select-item"
+            clearable
+            @change="search"
+          />
+          <span class="selectBtn">
+            <el-button :icon="Search" @click="onFocusUnitCode()" />
+          </span>
+        </div>
+        <div class="div1">
           <span class="span1">单位代码：</span>
           <el-input
             style="width: 120px"
@@ -804,6 +818,68 @@
     </Dialog>
     <img ref="tijianSrc" style="display: none" />
     <img ref="HisSrc" style="display: none" />
+
+    <Dialog
+      append-to-body
+      v-model="selectUnitCodeVisiable"
+      title="单位选择"
+      width="800"
+      @close="selectUnitCodeVisiable = false"
+      class="package-advice-container"
+    >
+      <div
+        ><el-input
+          ref="queryInput"
+          class="queryInput !w-300px"
+          v-model="keyWord"
+          @input="handleQueryItem"
+          autofocus="true"
+          placeholder="请输入拼音码"
+      /></div>
+      <el-table
+        :data="unitCodeList"
+        border
+        style="width: 100%; margin-top: 10px; height: 500px"
+        highlight-current-row
+        @row-dblclick="selectUnitCodeClick"
+        ><el-table-column
+          :resizable="false"
+          align="center"
+          label="单位代码"
+          show-overflow-tooltip
+          prop="unitCode"
+          width="100" /><el-table-column
+          :resizable="false"
+          align="left"
+          label="单位名称"
+          show-overflow-tooltip
+          prop="unitName" /><el-table-column
+          :resizable="false"
+          align="center"
+          label="联系人"
+          width="100"
+          show-overflow-tooltip
+          prop="connecter" /><el-table-column
+          :resizable="false"
+          align="center"
+          label="联系电话"
+          width="120"
+          show-overflow-tooltip
+          prop="phone" /><el-table-column
+          :resizable="false"
+          align="left"
+          label="地址"
+          width="140"
+          show-overflow-tooltip
+          prop="address" /><el-table-column
+          :resizable="false"
+          align="center"
+          label="拼音码"
+          width="100"
+          show-overflow-tooltip
+          prop="inputCode"
+      /></el-table>
+    </Dialog>
   </div>
 </template>
 <script setup lang="ts">
@@ -832,12 +908,14 @@ import html2Canvas from 'html2canvas'
 import JsPDF from 'jspdf'
 import printJS from 'print-js'
 import { queryDictByConfig } from '@/api/PerPhyExamination/perExamination/index'
+import { Search } from '@element-plus/icons-vue'
 
 const tijianSrc = ref<HTMLImageElement | null>(null)
 const HisSrc = ref<HTMLImageElement | null>(null)
 const searchParams = ref({
   preBeginDate: '',
   preEndDate: '',
+  unitName: '',
   unitCode: '',
   unitVisitId: '',
   peId: '',
@@ -1850,6 +1928,59 @@ const changePeType = (val) => {
   search()
 }
 const petypeNameList = ref<any>([])
+const unitInfo = ref<any>({})
+// 根据单位编码查询报道人信息
+// const searchByUnitCode = async () => {
+//   if (formInfo.unitCode) {
+//     // let res = await getPeUnitDict({
+//     let res = await getUnitInfo({
+//       unitCode: formInfo.unitCode
+//     })
+//     if (res && res.unitName) {
+//       formInfo.unitName = res.unitName
+//       formInfo.unitCode = res.unitCode
+//       formInfo.unitVisitId = res.unitVisitId
+//       unitInfo.value = res
+//     } else {
+//       formInfo.unitName = ''
+//       formInfo.unitCode = ''
+//       formInfo.unitVisitId = ''
+//       unitInfo.value = {}
+//       ElMessage.warning('未查询到预约信息')
+//     }
+//     // await getList()
+//   }
+// }
+const selectUnitCodeVisiable = ref(false)
+// 点击单位row数据进行赋值操作
+const selectUnitCodeClick = async (row) => {
+  searchParams.value.unitCode = row.unitCode
+  searchParams.value.unitName = row.unitName
+  searchParams.value.unitVisitId = row.unitVisitId
+  unitInfo.value = row
+  selectUnitCodeVisiable.value = false
+  // await getList()
+}
+const unitCodeList = ref<any>([])
+const keyWord = ref('')
+// 点击按钮查询单位代码和名称并打开弹框
+const onFocusUnitCode = async () => {
+  keyWord.value = ''
+  handleQueryItem()
+  selectUnitCodeVisiable.value = true
+  nextTick(() => {
+    queryInput.value.focus()
+  })
+}
+//根据单位代码过滤单位列表
+const handleQueryItem = async () => {
+  unitCodeList.value = await getPeUnitList({
+    // unitCodeList.value = await getUnitInfo({
+    input: keyWord.value
+    // unitCode: keyWord.value
+  })
+}
+
 const handleRowClick = (row, column, event) => {
   // 切换选中状态
   multipleTableRef.value?.toggleRowSelection(row)
@@ -2423,5 +2554,17 @@ const handleRowClick = (row, column, event) => {
   /* .no-print {
     display: none !important;
   } */
+}
+
+.selectBtn {
+  margin-left: 0;
+  .el-button {
+    position: relative;
+    top: 0px;
+    margin-left: -1px;
+    background: #f5f7fa !important;
+    color: #999 !important;
+    border-radius: 0px 4px 4px 0px !important;
+  }
 }
 </style>
