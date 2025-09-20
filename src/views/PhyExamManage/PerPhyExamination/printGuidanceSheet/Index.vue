@@ -270,6 +270,8 @@
             border
             @selection-change="handleSelectionChange"
             ref="multipleTableRef"
+            @row-click="handleRowClick"
+            highlight-current-row
           >
             <el-table-column type="selection" align="center" width="60" />
             <el-table-column
@@ -1848,6 +1850,10 @@ const changePeType = (val) => {
   search()
 }
 const petypeNameList = ref<any>([])
+const handleRowClick = (row, column, event) => {
+  // 切换选中状态
+  multipleTableRef.value?.toggleRowSelection(row)
+}
 </script>
 <style lang="scss" scoped>
 .per_report {
