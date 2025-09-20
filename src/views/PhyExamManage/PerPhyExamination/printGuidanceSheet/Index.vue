@@ -907,7 +907,7 @@ import { ElLoading, ElMessage } from 'element-plus'
 import html2Canvas from 'html2canvas'
 import JsPDF from 'jspdf'
 import printJS from 'print-js'
-import { queryDictByConfig } from '@/api/PerPhyExamination/perExamination/index'
+import { queryDictByConfig, getPeUnitList } from '@/api/PerPhyExamination/perExamination/index'
 import { Search } from '@element-plus/icons-vue'
 
 const tijianSrc = ref<HTMLImageElement | null>(null)
