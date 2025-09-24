@@ -458,8 +458,7 @@ const handleCheckName = async () => {
     }
   })
 }
-const docPath =
-  process.env.NODE_ENV === 'development' ? '../../../public/static/muban.xls' : '/muban.xls'
+const docPath = process.env.NODE_ENV === 'development' ? '../../../public/muban.xls' : '/muban.xls'
 const downloadExcel = async () => {
   //下载模板
   let a = document.createElement('a')
