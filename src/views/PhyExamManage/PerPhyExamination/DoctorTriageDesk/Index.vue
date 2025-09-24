@@ -11,34 +11,43 @@
             class="select-item"
             clearable
             maxlength="50"
-            @change="getPerInfoMsg"
+            @change="reportChange"
           />
         </div>
         <div class="div1">
-          <span class="span1">姓名：</span>
-          <el-select
-            v-model="personCode"
-            placeholder="请选择"
-            style="width: 150px"
+          <span class="span1" style="width: 42px">姓名：</span>
+          <el-input
+            style="width: 130px"
+            v-model="searchParams.name"
+            placeholder="请输入"
             class="select-item"
-            filterable
             clearable
-          >
-            <el-option
-              v-for="item in personList"
-              @click.stop="personChange(item)"
-              :label="item.name + '--' + item.peVisitId"
-              :value="item.peId"
-              :key="item.peId"
-            />
-          </el-select>
+            maxlength="50"
+            @change="reportChange"
+          />
+        </div>
+        <div class="div1">
+          <span class="span1" style="width: 70px">时间区间：</span>
+          <el-date-picker
+            type="date"
+            style="display: flex; width: 140px"
+            v-model="searchParams.startDate"
+            value-format="YYYY-MM-DD"
+          />
+          <span class="ml-6px mr-6px">至</span>
+          <el-date-picker
+            type="date"
+            style="display: flex; width: 140px"
+            v-model="searchParams.endDate"
+            value-format="YYYY-MM-DD"
+          />
         </div>
         <div class="div1">
           <span class="span1">体检医生：</span>
           <el-select
             v-model="doctorCode"
             placeholder="请选择医生"
-            style="width: calc(100% - 100px)"
+            style="width: calc(100% - 70px)"
             class="select-item"
             filterable
             clearable
@@ -53,14 +62,14 @@
           </el-select>
         </div>
         <div class="div1">
-          <el-button @click="getPerInfoMsg">查询</el-button>
+          <el-button @click="reportChange">查询</el-button>
           <el-button
             class="delReport"
             :disabled="everySearchData.resultStatus == '9'"
             @click="refuseCheck"
             >拒检</el-button
           >
-          <el-button class="clearBtn" @click="clearSearch">清屏</el-button>
+          <!-- <el-button class="clearBtn" @click="clearSearch">清屏</el-button> -->
           <!-- <el-button class="read"> <img :src="dayin" />查询外部监查</el-button> -->
         </div>
         <div class="div1">
@@ -70,6 +79,7 @@
             filterable
             placeholder="请选择"
             @change="checkCodesChange"
+            style="width: calc(100% - 70px)"
           >
             <el-option
               v-for="item in checkDeptList"
@@ -84,11 +94,30 @@
     <div class="triage_con">
       <div class="left_table">
         <div class="list_table">
-          <div>
-            <el-radio-group v-model="reportType" @change="reportChange">
+          <div
+            style="
+              height: 34px;
+              line-height: 34px;
+              margin-bottom: 6px;
+              border-bottom: 1px solid #c5dcff;
+            "
+          >
+            <span
+              style="
+                display: inline-block;
+                width: auto;
+                padding: 0 20px;
+                height: 36px;
+                text-align: center;
+                color: #3473d1;
+                font-weight: 700;
+              "
+              >人员列表</span
+            >
+            <!-- <el-radio-group v-model="reportType" @change="reportChange">
               <el-radio label="1" size="large">当天的报到</el-radio>
               <el-radio label="2" size="large">前后六日的报到</el-radio>
-            </el-radio-group>
+            </el-radio-group> -->
           </div>
           <el-table
             :data="personDeptList"
@@ -108,9 +137,14 @@
               show-overflow-tooltip
               fixed="left"
             >
-              <!-- <template #default="scope">
-                <el-radio :label="scope.row.finishedSign">是</el-radio>
-              </template> -->
+              <template #default="scope">
+                <span v-if="scope.row.finishedSign == '完成'" style="color: #3263fe">{{
+                  scope.row.finishedSign
+                }}</span>
+                <span v-if="scope.row.finishedSign == '未完成'" style="color: #f33d21">{{
+                  scope.row.finishedSign
+                }}</span>
+              </template>
             </el-table-column>
             <el-table-column
               label="体检号"
@@ -907,7 +941,9 @@ const checkCodes = ref('')
 
 const searchParams = reactive({
   peId: '',
-  name: ''
+  name: '',
+  startDate: '',
+  endDate: ''
 })
 const leftTable = ref(null)
 const active = ref(0)
@@ -1070,44 +1106,23 @@ const getDept = () => {
 const comfier = async (row) => {
   if (checkCodes.value) {
     deptVisible.value = false
-    await getPersonList()
     await getDoctorList()
+    await reportChange()
     reportType.value = '1'
-    // 如果有传入体检号和次数，则自动查询
-    if (queryInfo.peId && queryInfo.peVisitId) {
-      searchParams.peId = queryInfo.peId
-      personCode.value = queryInfo.peId
-      everySearchData.value.peVisitId = queryInfo.peVisitId
-      await getPerInfoMsg()
-    } else {
-      await reportChange(1)
-    }
   } else {
     ElMessage.error('请选择科室')
     return
   }
 }
 const checkCodesChange = async (val) => {
-  await reportChange(1)
+  await reportChange()
   reportType.value = '1'
   searchParams.peId = ''
   personCode.value = ''
   itemLists.value = []
   itemResultList.value = []
 }
-const personList = ref([])
 const personCode = ref('')
-const getPersonList = () => {
-  let params = {
-    peId: searchParams.peId,
-    name: searchParams.name,
-    peDeptCode: checkCodes.value
-  }
-  getPePersonalList(params).then((res) => {
-    // console.log(res, '患者列表')
-    personList.value = res
-  })
-}
 const doctorList = ref([])
 const doctorCode = ref('')
 const getDoctorList = () => {
@@ -1119,88 +1134,88 @@ const getDoctorList = () => {
     doctorList.value = res
   })
 }
-const personChange = async (row) => {
-  everySearchData.value = row
-  await getPerInfoMsg()
-}
 const everySearchData = ref({})
 const personDeptList = ref([])
 const checkPerDeptList = ref([])
 const getPerInfoMsg = () => {
   itemLists.value = []
   itemAssemLists.value = []
-  if (searchParams.peId || personCode.value) {
-    searchParams.peId = personCode.value ? personCode.value : searchParams.peId
-    let params = {
-      peId: searchParams.peId ? searchParams.peId : personCode.value,
-      name: '',
-      peDeptCode: checkCodes.value,
-      peVisitId: everySearchData.value.peVisitId || ''
-    }
-    getPePersonalInfo(params).then((res) => {
-      // console.log(res, '当前人的信息')
-      if (res && res.length > 0) {
-        everySearchData.value = res[0]
-        if (personDeptList.value && personDeptList.value.length > 0) {
-          // 检查 res 中的 peid 是否与 personDeptList.value 中的任何一项重复
-          const isUnique = personDeptList.value.every((item) => item.peId != res[0].peId)
+  // if (searchParams.peId || personCode.value) {
+  //   searchParams.peId = personCode.value ? personCode.value : searchParams.peId
+  // let params = {
+  //   peId: searchParams.peId ? searchParams.peId : personCode.value,
+  //   name: '',
+  //   peDeptCode: checkCodes.value,
+  //   peVisitId: everySearchData.value.peVisitId || ''
+  // }
+  // getPePersonalInfo(params).then((res) => {
+  //   // console.log(res, '当前人的信息')
+  //   if (res && res.length > 0) {
+  //     everySearchData.value = res[0]
+  //     if (personDeptList.value && personDeptList.value.length > 0) {
+  //       // 检查 res 中的 peid 是否与 personDeptList.value 中的任何一项重复
+  //       const isUnique = personDeptList.value.every((item) => item.peId != res[0].peId)
 
-          // 如果唯一，则添加到 personDeptList.value 中
-          if (isUnique) {
-            personDeptList.value.push(res[0])
-          }
-          // console.log(personDeptList.value, 'personDeptList')
+  //       // 如果唯一，则添加到 personDeptList.value 中
+  //       if (isUnique) {
+  //         personDeptList.value.push(res[0])
+  //       }
+  //       // console.log(personDeptList.value, 'personDeptList')
+  //     } else {
+  //       personDeptList.value = res
+  //     }
+  if (everySearchData.value && everySearchData.value.peId) {
+    let params2 = {
+      peId: everySearchData.value.peId,
+      peVisitId: everySearchData.value.peVisitId,
+      dbUser: doctorCode.value,
+      peDeptCode: checkCodes.value,
+      sex: ''
+    }
+    getPePersonalDept(params2).then((res) => {
+      // console.log(res, '当前人的科室信息')
+      checkPerDeptList.value = res
+      if (res && res.length > 0) {
+        let checkCodesIndex = checkPerDeptList.value.findIndex(
+          (item) => item.peDeptCode == checkCodes.value
+        )
+        if (checkCodesIndex != -1) {
+          changeActive(checkCodesIndex, checkPerDeptList.value[checkCodesIndex].peDeptCode)
         } else {
-          personDeptList.value = res
+          changeActive(0, checkPerDeptList.value[0].peDeptCode)
         }
-        let params2 = {
-          peId: everySearchData.value.peId,
-          peVisitId: everySearchData.value.peVisitId,
-          dbUser: doctorCode.value,
-          peDeptCode: checkCodes.value,
-          sex: ''
-        }
-        getPePersonalDept(params2).then((res) => {
-          // console.log(res, '当前人的科室信息')
-          checkPerDeptList.value = res
-          if (res && res.length > 0) {
-            let checkCodesIndex = checkPerDeptList.value.findIndex(
-              (item) => item.peDeptCode == checkCodes.value
-            )
-            if (checkCodesIndex != -1) {
-              changeActive(checkCodesIndex, checkPerDeptList.value[checkCodesIndex].peDeptCode)
-            } else {
-              changeActive(0, checkPerDeptList.value[0].peDeptCode)
-            }
-          }
-        })
       }
     })
   }
+  // }
+  // })
+  // }
 }
 const reportType = ref('')
-const reportChange = (val) => {
+const reportChange = () => {
   let params = {
-    startDate: '',
-    endDate: '',
-    peDeptCode: checkCodes.value
+    startDate: searchParams.startDate,
+    endDate: searchParams.endDate,
+    peDeptCode: checkCodes.value,
+    name: searchParams.name,
+    peId: searchParams.peId
   }
-  if (val == '1') {
-    params.startDate = formatDate(new Date(), 'YYYY-MM-DD')
-    params.endDate = formatDate(new Date(), 'YYYY-MM-DD')
-  } else if (val == '2') {
-    // 获取当前日期
-    const currentDate = new Date()
-    // 计算开始日期（当前日期减去6天）
-    const startDate = new Date(currentDate)
-    startDate.setDate(startDate.getDate() - 6)
+  // if (val == '1') {
+  //   params.startDate = formatDate(new Date(), 'YYYY-MM-DD')
+  //   params.endDate = formatDate(new Date(), 'YYYY-MM-DD')
+  // } else if (val == '2') {
+  //   // 获取当前日期
+  //   const currentDate = new Date()
+  //   // 计算开始日期（当前日期减去6天）
+  //   const startDate = new Date(currentDate)
+  //   startDate.setDate(startDate.getDate() - 6)
 
-    // 计算结束日期（当前日期加上6天）
-    const endDate = new Date(currentDate)
-    endDate.setDate(endDate.getDate() + 6)
-    params.startDate = formatDate(startDate, 'YYYY-MM-DD')
-    params.endDate = formatDate(endDate, 'YYYY-MM-DD')
-  }
+  //   // 计算结束日期（当前日期加上6天）
+  //   const endDate = new Date(currentDate)
+  //   endDate.setDate(endDate.getDate() + 6)
+  //   params.startDate = formatDate(startDate, 'YYYY-MM-DD')
+  //   params.endDate = formatDate(endDate, 'YYYY-MM-DD')
+  // }
   toDayCheckIn(params).then((res) => {
     // console.log(res, '当天挂号信息')
     personDeptList.value = res
@@ -1237,14 +1252,14 @@ const checkCodesName = ref('')
 // const mleSuggestArr = ref([])
 const save = () => {
   if (
-    everySearchData.value.resultStatus == '7' &&
+    everySearchData.value.resultStatus == '9' &&
     !isCanDisableInput.value &&
     !isHaveRefusal.value &&
     !route.query &&
     !route.query.peId
   ) {
     ElMessageBox.alert(
-      `体检结果已由主检医生初步审核。您已不能修改分科结果，请通知主检医生需要修改的内容!`,
+      `体检结果已由主检医生最终审核。您已不能修改分科结果，请通知主检医生需要修改的内容!`,
       '提示',
       {
         confirmButtonText: '确定'
@@ -1390,7 +1405,7 @@ const refuseCheck = () => {
 }
 //清屏
 const clearSearch = async () => {
-  await reportChange(1)
+  await reportChange()
   reportType.value = '1'
   searchParams.peId = ''
   personCode.value = ''
