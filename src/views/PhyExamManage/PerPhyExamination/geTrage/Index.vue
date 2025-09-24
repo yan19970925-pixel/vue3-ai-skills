@@ -1122,7 +1122,7 @@ const tableData = ref<Array>([])
 const ExaminePatListInfo = ref({
   startDate: '',
   endDate: '',
-  resultStatus: '0',
+  resultStatus: '2',
   // resultStatus: '7',
   queueStartDate: '',
   queueEndDate: '',
