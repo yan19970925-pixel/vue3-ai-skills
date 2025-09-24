@@ -942,8 +942,8 @@ const checkCodes = ref('')
 const searchParams = reactive({
   peId: '',
   name: '',
-  startDate: '',
-  endDate: ''
+  startDate: formatDate(new Date(), 'YYYY-MM-DD'),
+  endDate: formatDate(new Date(), 'YYYY-MM-DD')
 })
 const leftTable = ref(null)
 const active = ref(0)
