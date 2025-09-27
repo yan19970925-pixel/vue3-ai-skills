@@ -123,7 +123,7 @@
           style="display: flex; justify-content: space-between; align-items: center"
         >
           <span>人员列表</span>
-          <div style="color: #333333" v-show="itemDetail.peId"
+          <div style="color: #333333; padding-right: 10px" v-show="itemDetail.peId"
             >当前体检人员: {{ itemDetail.peId || '' }} | {{ itemDetail.name || '' }}
           </div>
         </div>
@@ -213,7 +213,6 @@
                   :prop="column.prop"
                   :label="column.label"
                   :width="column.width"
-                  show-overflow-tooltip
                 />
                 <!-- <el-table-column label="操作" width="120px">
                     <template #default="scope">
@@ -304,16 +303,9 @@
                       prop="suggest"
                       label="对应指导建议"
                       align="center"
-                      show-overflow-tooltip
                       width="200"
                     ></el-table-column>
-                    <el-table-column
-                      prop="isdisease"
-                      label="疾病诊断"
-                      align="center"
-                      width="120"
-                      show-overflow-tooltip
-                    >
+                    <el-table-column prop="isdisease" label="疾病诊断" align="center" width="120">
                       <template #default="scope">
                         {{ scope.row.isdisease === 0 ? '否' : '是' }}
                       </template>
@@ -426,6 +418,79 @@
         </div>
       </div>
     </div>
+    <el-button
+      style="position: absolute; right: 10px; top: 45%; width: 40px; height: 40px; z-index: 99999"
+      circle
+      @click="openAIDialog"
+    >
+      <img :src="ai" style="width: 24px; height: 24px" />
+    </el-button>
+    <el-drawer
+      v-model="AIDrawerVisble"
+      resizable
+      title="体检AI大模型"
+      direction="rtl"
+      class="ai_drawer"
+    >
+      <div style="height: 100%">
+        <div class="ai_top" v-loading="loading" element-loading-text="思考中...">
+          <div class="ai_con" ref="outputRef">
+            <div
+              style="
+                width: 100%;
+                text-align: right;
+                font-size: 16px;
+                color: #fff;
+                line-height: 32px;
+                background-color: #3473d1;
+                padding: 0 10px;
+              "
+              >{{ askMsg }}</div
+            >
+            {{ displayedText }}
+          </div>
+          <div class="ai_sear">
+            <el-input
+              type="textarea"
+              :rows="3"
+              @keyup.enter="sendMsg('1')"
+              v-model="aiSearch"
+              placeholder="请输入您要询问的内容"
+            ></el-input>
+            <el-button
+              circle
+              icon="Promotion"
+              style="
+                position: absolute;
+                right: 2px;
+                top: 40px;
+                border: none;
+                background-color: #fff;
+              "
+              @click.stop="sendMsg('1')"
+            ></el-button>
+            <img
+              v-show="showStop"
+              style="
+                width: 24px;
+                height: 24px;
+                position: absolute;
+                right: 8px;
+                top: 2px;
+                border: none;
+                background-color: #fff;
+                cursor: pointer;
+              "
+              @click.stop="stopRequest()"
+              :src="stop"
+            />
+          </div>
+        </div>
+        <div class="ai_bottom">
+          <span @click.stop="sendMsg('2')">本次体检建议指导</span>
+        </div>
+      </div>
+    </el-drawer>
     <div ref="printMe" id="pdfDom" class="pdfDom" v-if="showJson">
       <perExaminationReport :jsonData="jsonData" />
     </div>
@@ -634,7 +699,18 @@
           {{ isEditing ? '编辑建议和生活指导' : '新增建议和生活指导（自填）' }}
         </div>
       </template>
-      <div class="suggest-form">
+      <div class="suggest-form" style="padding: 0 12px">
+        <span
+          style="
+            display: inline-block;
+            width: 100%;
+            color: #ed2226;
+            font-size: 14px;
+            height: 30px;
+            line-height: 30px;
+          "
+          >温馨提示：初步审核之后才可修改建议指导内容</span
+        >
         <el-form :model="selfSuggestForm" label-width="120px">
           <!-- <el-form-item label="序号">
             <el-input v-model="selfSuggestForm.suggestCode" placeholder="请输入" />
@@ -678,17 +754,8 @@
               width="120"
               align="center"
             ></el-table-column>
-            <el-table-column
-              prop="suggestName"
-              label="建议名称"
-              width="200"
-              show-overflow-tooltip
-            ></el-table-column>
-            <el-table-column
-              prop="suggestText"
-              label="建议内容"
-              show-overflow-tooltip
-            ></el-table-column>
+            <el-table-column prop="suggestName" label="建议名称" width="200"></el-table-column>
+            <el-table-column prop="suggestText" label="建议内容"></el-table-column>
           </el-table>
         </div>
       </Dialog>
@@ -834,6 +901,8 @@ import duibi from '@/assets/images/duibi.svg'
 import yulan from '@/assets/images/yulan.svg'
 import jiahao from '@/assets/images/jiahao.svg'
 import huizong from '@/assets/images/huizong.svg'
+import ai from '@/assets/images/ai.svg'
+import stop from '@/assets/images/stop.svg'
 import * as Api from '@/api/PerPhyExamination/geTrage/index'
 import type { Ref } from 'vue'
 import { ElTable, ElLoading, ElMessage } from 'element-plus'
@@ -843,6 +912,10 @@ import JsPDF from 'jspdf'
 import printJS from 'print-js'
 import { useRouter } from 'vue-router'
 import { debounce } from 'lodash'
+// import axios from '@/config/axios'
+import axios from 'axios'
+import { parse } from 'path'
+import { result } from 'lodash-es'
 
 const router = useRouter()
 interface User {
@@ -1495,7 +1568,7 @@ const FenKeColum = [
   {
     label: '科室',
     prop: 'deptName',
-    width: '90'
+    width: '120'
   },
   {
     label: '体检医生',
@@ -2016,6 +2089,206 @@ const cancelDeptAudit = async (row) => {
     }
   })
 }
+const AIDrawerVisble = ref(false)
+const loading = ref(false)
+const askMsg = ref('')
+const aiSearch = ref('')
+const showStop = ref(false)
+const openAIDialog = () => {
+  AIDrawerVisble.value = true
+}
+const chatId = ref()
+// 定义 API 地址
+// 定义认证令牌
+const apiUrl = 'http://10.10.10.20:8080/chat/api/open'
+const authToken = 'application-43bb0c12cc24fc7cabdd9deda8655bb9'
+const sendMsg = async (flag) => {
+  const data = ref()
+  let conclusionStr = ''
+  if (flag == '1') {
+    data.value = aiSearch.value
+    askMsg.value = aiSearch.value
+  } else if (flag == '2') {
+    if (peDeptCheckList.value && peDeptCheckList.value.length > 0) {
+      peDeptCheckList.value.forEach((item) => {
+        if (item.conclusion) {
+          conclusionStr += item.conclusion
+        }
+      })
+    }
+    if (conclusionStr && conclusionStr.length > 0) {
+      data.value = `你现在的身份是一个体检系统的总检医生，需要你根据患者此次各个科室体检的小结给出本次体检的建议指导。以下是该患者各科室体检的小结信息（${conclusionStr}）`
+      askMsg.value = '患者本次体检的建议指导'
+    } else {
+      data.value = ''
+      askMsg.value = ''
+    }
+  }
+  if (data.value && data.value.length > 0) {
+    loading.value = true
+    try {
+      let result = await axios.get(apiUrl, {
+        headers: {
+          Accept: '*/*',
+          Authorization: `Bearer application-43bb0c12cc24fc7cabdd9deda8655bb9`
+        }
+      })
+      if (result && result.data.code == 200) {
+        chatId.value = result.data.data
+      }
+      await fetchAiStream(data.value)
+    } catch (err) {
+      loading.value = false
+    }
+  }
+}
+
+// 定义请求数据
+const requestData = {
+  message: '',
+  stream: true,
+  re_chat: true,
+  chat_record_id: chatId.value
+}
+let controller
+let reader
+
+// 封装请求配置
+const requestOptions = {
+  method: 'POST',
+  headers: {
+    Accept: 'application/json, text/plain, */*',
+    'Content-Type': 'application/json',
+    Authorization: `Bearer ${authToken}`
+  },
+  body: JSON.stringify(requestData)
+}
+
+// 停止当前请求的函数
+const stopRequest = () => {
+  if (controller) {
+    controller.abort()
+    loading.value = false
+    showStop.value = false
+  }
+}
+
+const outputRef = ref<HTMLDivElement | null>(null)
+const displayedText = ref('')
+const pendingChars = ref<string[]>([])
+const isStreaming = ref(false)
+let animationFrameId: number | null = null
+
+// 真实 API 集成（Fetch 流式）
+async function fetchAiStream(value) {
+  controller = new AbortController()
+  const signal = controller.signal
+  requestData.message = value
+  requestData.chat_record_id = chatId.value
+  // 更新请求体
+  requestOptions.body = JSON.stringify(requestData)
+  const response = await fetch(`http://10.10.10.20:8080/chat/api/chat_message/${chatId.value}`, {
+    ...requestOptions,
+    signal
+  })
+  if (!response.ok) throw new Error('API 请求失败')
+  const reader = response.body?.getReader()
+  if (!reader) throw new Error('无法读取响应流')
+  displayedText.value = ''
+  readStream(reader)
+}
+async function readStream(reader) {
+  const decoder = new TextDecoder('utf-8')
+  let buffer = ''
+  const { done, value } = await reader.read()
+
+  if (done) {
+    flushPendingChars()
+    return
+  }
+
+  const textChunk = decoder.decode(value)
+  // 按行分割接收到的数据
+  const lines = textChunk.split('\n')
+  for (const line of lines) {
+    if (line.startsWith('data: ')) {
+      try {
+        const dataStr = line.replace('data: ', '')
+        const dataObject = JSON.parse(dataStr)
+        const answer = dataObject.content
+        if (answer) {
+          loading.value = false
+          showStop.value = true
+          aiSearch.value = ''
+          processContent(answer)
+        }
+      } catch (parseError) {
+        console.error('解析数据时出错:', parseError)
+        loading.value = false
+        showStop.value = false
+      }
+    } else if (line.startsWith('event: ping')) {
+      // 跳过 ping 事件
+      continue
+    }
+  }
+  readStream(reader)
+}
+const parseUnicode = (str: string) =>
+  str.replace(/\\u([d\w]{4})/gi, (_, hex) => String.fromCodePoint(parseInt(hex, 16)))
+
+// 处理content内容
+function processContent(content: string) {
+  const parsedText = parseUnicode(content)
+  // 模拟分块（实际API可能已分块）
+  for (const char of parsedText) {
+    pendingChars.value.push(char)
+  }
+  startTypingEffect()
+}
+
+// 启动打字机效果
+function startTypingEffect() {
+  if (isStreaming.value || pendingChars.value.length === 0) return
+
+  isStreaming.value = true
+  typeNextChar()
+}
+
+// 逐字渲染
+function typeNextChar() {
+  if (pendingChars.value.length === 0) {
+    isStreaming.value = false
+    return
+  }
+
+  const char = pendingChars.value.shift()!
+  displayedText.value += char
+
+  // 滚动到底部
+  if (outputRef.value) {
+    outputRef.value.scrollTop = outputRef.value.scrollHeight
+  }
+  animationFrameId = window.requestAnimationFrame(typeNextChar)
+}
+
+// 清空待渲染字符
+function flushPendingChars() {
+  if (pendingChars.value.length > 0) {
+    displayedText.value += pendingChars.value.join('')
+    pendingChars.value = []
+  }
+}
+
+// 在组件销毁时清理
+onUnmounted(() => {
+  if (controller) {
+    controller.abort()
+  }
+  if (reader) {
+    reader.releaseLock()
+  }
+})
 </script>
 <style lang="scss" scoped>
 .per_trage {
@@ -2028,6 +2301,7 @@ const cancelDeptAudit = async (row) => {
   overflow: hidden;
   padding: 40px 8px 0;
   box-sizing: border-box;
+  position: relative;
   .trage_search {
     .search1 {
       padding: 16px 24px;
@@ -2404,6 +2678,52 @@ const cancelDeptAudit = async (row) => {
 
   .el-form-item__label {
     font-weight: bold;
+  }
+}
+.dict-dialog {
+  :deep(.el-dialog__body) {
+    padding: 10px 20px;
+  }
+}
+:deep(.ai_drawer) {
+  .el-drawer__header {
+    margin-bottom: 0;
+    padding: 15px 15px;
+    background-color: #3473d1;
+    color: #fff;
+    font-weight: bold;
+    font-size: 16px;
+  }
+  .ai_top {
+    width: 100%;
+    height: 85%;
+    background: #f5f6f7;
+    .ai_con {
+      height: calc(100% - 83px);
+      width: 100%;
+      padding: 10px;
+      overflow-y: auto;
+      font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+      line-height: 1.6;
+      color: #3473d1;
+      margin-bottom: 16px;
+      white-space: pre-wrap;
+    }
+    .ai_sear {
+      width: 100%;
+      height: 73px;
+      margin-top: 10px;
+      position: relative;
+    }
+  }
+  .ai_bottom {
+    height: 15%;
+    span {
+      display: inline-block;
+      padding: 8px;
+      cursor: pointer;
+      color: #3473d1;
+    }
   }
 }
 </style>
