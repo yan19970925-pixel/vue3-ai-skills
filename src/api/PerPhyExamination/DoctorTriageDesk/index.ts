@@ -66,3 +66,7 @@ export const getPeDeptSuggestList = (data) => {
 export const getPeDeptConclusion = (data) => {
   return request.post({ url: '/health-api/health/advice/getPeDeptConclusion', data })
 }
+//根据项目获取项目异常结果列表
+export const getPeItemReportWriteList = (data) => {
+  return request.post({ url: '/health-api/health/itemDict/getPeItemReportWriteList', data })
+}

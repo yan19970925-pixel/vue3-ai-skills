@@ -1,7 +1,7 @@
 <template>
   <div class="base-setting">
     <div style="width: 100%; height: 100%; overflow: auto">
-      <div style="width: 100%; height: calc(100% - 308px)">
+      <div style="width: 100%; height: calc(100% - 238px)">
         <div class="content">
           <div class="base-title">项目组合</div>
           <div class="base-cont">
@@ -18,7 +18,7 @@
             :data="tableList"
             border
             class="mt-6px"
-            style="width: 100%; height: calc(100% - 120px); min-height: 300px; overflow: auto"
+            style="width: 100%; height: calc(100% - 120px); overflow: auto"
             highlight-current-row
             stripe
             @row-click="handleRowClick"
@@ -32,10 +32,10 @@
             <el-table-column
               label="建议名称"
               prop="suggestName"
-              width="420"
+              width="220"
               show-overflow-tooltip
             />
-            <el-table-column label="建议" prop="suggestText" show-overflow-tooltip />
+            <el-table-column label="建议" prop="suggestText" />
             <el-table-column
               label="匹配模式"
               :formatter="(row) => (row.deptCode === '1' ? '模糊匹配' : '全部匹配')"
@@ -52,11 +52,12 @@
             :current-page="currentPage"
             @current-change="handleCurrentChange"
             class="mt-4"
+            style="margin-top: 8px"
           ></el-pagination>
         </div>
       </div>
 
-      <div class="base-box mt-4px" style="background-color: #fff; height: 304px">
+      <div class="base-box mt-4px" style="background-color: #fff; height: 230px">
         <div class="base-title mb-2px">建议和生活指导详情</div>
 
         <div class="base-cont mt-4px">

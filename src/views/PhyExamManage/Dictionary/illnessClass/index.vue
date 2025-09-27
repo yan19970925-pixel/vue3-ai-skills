@@ -140,7 +140,7 @@
                   v-model="DiagDetail.shortAdv"
                   placeholder="请输入"
                   class="select-item"
-                  rows="5"
+                  rows="4"
                 />
               </div>
 
@@ -152,7 +152,7 @@
                   v-model="DiagDetail.behavior"
                   placeholder="请输入"
                   class="select-item"
-                  rows="5"
+                  rows="4"
                 />
               </div>
 

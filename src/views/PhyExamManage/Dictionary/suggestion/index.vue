@@ -20,7 +20,7 @@
           </div>
         </el-col>
         <el-col :span="20" style="height: 100%">
-          <div style="width: 100%; height: calc(100% - 404px)">
+          <div style="width: 100%; height: calc(100% - 344px)">
             <div class="content">
               <div class="base-title">指导内容</div>
               <div class="base-cont">
@@ -33,18 +33,18 @@
                 :data="rightTableList"
                 border
                 class="mt-6px"
-                style="width: 100%; height: calc(100% - 100px); min-height: 300px; overflow: auto"
+                style="width: 100%; height: calc(100% - 80px); overflow: auto"
                 highlight-current-row
                 stripe
                 @current-change="handleRightChange"
                 @row-click="handleRightRowClick"
               >
-                <el-table-column label="指导内容" prop="guideContent" show-overflow-tooltip />
+                <el-table-column label="指导内容" prop="guideContent" />
               </el-table>
             </div>
           </div>
 
-          <div class="base-box mt-4px" style="background-color: #fff; height: 400px">
+          <div class="base-box mt-4px" style="background-color: #fff; height: 340px">
             <div class="base-title mb-2px">内容详情</div>
 
             <div class="base-cont">

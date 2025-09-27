@@ -592,6 +592,18 @@
                         />
                       </template>
                     </el-table-column>
+                    <el-table-column
+                      label="结果引入"
+                      align="center"
+                      show-overflow-tooltip
+                      width="100px"
+                    >
+                      <template #default="scope">
+                        <el-button type="text" @click="introduce(scope.row, scope.$index)"
+                          >引入</el-button
+                        >
+                      </template>
+                    </el-table-column>
                   </el-table>
                 </div>
               </div>
@@ -665,6 +677,19 @@
                   placeholder="请输入"
                   maxlength="200"
                 />
+                <el-button
+                  type="primary"
+                  style="
+                    position: absolute;
+                    right: -70px;
+                    top: 30px;
+                    background-color: #fff;
+                    border-color: #3263fe;
+                    color: #3263fe;
+                  "
+                  @click="summary"
+                  >总结</el-button
+                >
               </div>
             </el-col>
           </el-row>
@@ -900,6 +925,19 @@
         </div>
       </div>
     </el-dialog>
+    <Dialog v-model="abnormalVisible" title="异常结果引入" top="25vh" width="450px">
+      <div class="quoteCon" style="padding-bottom: 15px">
+        <el-table
+          :data="resultTableData"
+          style="width: 100%"
+          height="400px"
+          border
+          @row-dblclick="introduceExceptions"
+        >
+          <el-table-column label="异常内容" prop="itemDesc" show-overflow-tooltip></el-table-column>
+        </el-table>
+      </div>
+    </Dialog>
   </div>
 </template>
 <script setup lang="ts">
@@ -923,7 +961,8 @@ import {
   getPeDeptNormalDiagList,
   getPeDiagList,
   getPeDeptSuggestList,
-  getPeDeptConclusion
+  getPeDeptConclusion,
+  getPeItemReportWriteList
 } from '@/api/PerPhyExamination/DoctorTriageDesk/index'
 import { useUserStore } from '@/store/modules/user'
 import { formatDate } from '@/utils/formatTime'
@@ -1705,6 +1744,55 @@ const clearQueryParams = () => {
         console.error('路由跳转错误:', err)
       }
     })
+}
+const abnormalVisible = ref(false)
+const resultTableData = ref([])
+const resultRowIndex = ref(null)
+const introduce = (row, index) => {
+  console.log(row)
+  resultRowIndex.value = index
+  let params = { peItemCode: row.itemCode }
+  getPeItemReportWriteList(params).then((res) => {
+    resultTableData.value = res || []
+    abnormalVisible.value = true
+  })
+}
+const introduceExceptions = (row) => {
+  console.log(itemLists.value)
+  if (resultRowIndex.value != null || resultRowIndex.value != undefined) {
+    itemLists.value[resultRowIndex.value].value = row.itemDesc
+  }
+  abnormalVisible.value = false
+}
+const summary = () => {
+  let xiaojieList = []
+  if (
+    perItemData.value &&
+    perItemData.value.itemResultList &&
+    perItemData.value.itemResultList.length > 0
+  ) {
+    perItemData.value.itemResultList.forEach((item) => {
+      if (item.itemName && item.value) {
+        xiaojieList.push(item.itemName + '：' + item.value)
+      }
+    })
+  }
+  if (perItemData.value.mleConclusion && perItemData.value.mleConclusion.length > 0) {
+    ElMessageBox.confirm('是否覆盖当前的小结内容？', '小结提示', {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'warning'
+    })
+      .then(async () => {
+        perItemData.value.mleConclusion = xiaojieList.join('\r\n')
+      })
+      .catch(() => {
+        perItemData.value.mleConclusion =
+          perItemData.value.mleConclusion + '\r\n' + xiaojieList.join('\r\n')
+      })
+  } else {
+    perItemData.value.mleConclusion = xiaojieList.join('\r\n')
+  }
 }
 </script>
 <style lang="scss" scoped>

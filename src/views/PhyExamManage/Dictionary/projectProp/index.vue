@@ -267,7 +267,7 @@ const addPeTestTubeDict = () => {
     diseaseSign: '',
     explanation: '',
     guide: '',
-    orderNo: 0,
+    orderNo: PeItemReportWriteList.value.length + 1,
     inputCode: ''
   })
   setTimeout(() => {

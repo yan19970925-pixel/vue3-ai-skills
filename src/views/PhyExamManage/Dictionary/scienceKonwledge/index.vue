@@ -19,7 +19,7 @@
             :data="tableList"
             border
             class="mt-6px"
-            style="width: 100%; height: calc(100% - 130px); min-height: 300px; overflow: auto"
+            style="width: 100%; height: calc(100% - 130px); overflow: auto"
             highlight-current-row
             stripe
             @row-click="handleRowClick"
@@ -28,7 +28,7 @@
             <el-table-column
               label="科普代码"
               prop="knowledgeCode"
-              width="220"
+              width="120"
               show-overflow-tooltip
               sortable
               :sort-method="(a, b) => a.knowledgeCode.localeCompare(b.knowledgeCode)"
@@ -36,7 +36,7 @@
             <el-table-column
               label="疾病名称"
               prop="knowledgeName"
-              width="420"
+              width="220"
               show-overflow-tooltip
             />
             <el-table-column label="科普知识" prop="knowledgeText" :show-overflow-tooltip="true">
@@ -46,12 +46,12 @@
                 </span>
               </template>
             </el-table-column>
-            <el-table-column label="默认状态" width="170">
+            <el-table-column label="默认状态" width="120">
               <template #default="{ row }">
                 {{ row.knowledgeDefault === 1 ? '默认' : '不默认' }}
               </template>
             </el-table-column>
-            <el-table-column label="输入码" prop="inputCode" width="170" show-overflow-tooltip />
+            <el-table-column label="输入码" prop="inputCode" width="120" show-overflow-tooltip />
           </el-table>
 
           <!-- 分页组件 -->
@@ -62,7 +62,7 @@
             :total="total"
             :current-page="currentPage"
             @current-change="handleCurrentChange"
-            class="mt-4"
+            class="mt-3"
           ></el-pagination>
         </div>
       </div>
@@ -110,7 +110,7 @@
             v-model="rowDetails.knowledgeText"
             placeholder="请输入"
             class="select-item"
-            rows="3"
+            rows="6"
           />
         </div>
 
