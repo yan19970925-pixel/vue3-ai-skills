@@ -1387,11 +1387,15 @@ const appointChange = (val) => {
   if (val) {
     formInfo.pePreDate = formatDate(new Date(), 'YYYY-MM-DD')
     formInfo.visitDate = formatDate(new Date(), 'YYYY-MM-DD')
+    getItemUnselectList('', selectedCategory.value == '全部' ? '' : selectedCategory.value)
   } else {
     formInfo.pePreDate = ''
     formInfo.visitDate = ''
     allDataSelected.value = []
     xuanzhongData.value = {}
+    shaixuanAllDataList.value = []
+    xuanzhongChecked.value = []
+    shaixuanChecked.value = []
   }
 }
 //根据体检类型筛选套餐分类
@@ -1822,6 +1826,8 @@ const clearMsg = async () => {
   allDataSelected.value = []
   shaixuanAllDataList.value = []
   xuanzhongData.value = {}
+  xuanzhongChecked.value = []
+  shaixuanChecked.value = []
   formInfo.idType = IDtypeList.value[0].typeCode
   formInfo.peTypeName = petypeNameList.value[0].keyValue
   checkedPeSetListData.value = ''
