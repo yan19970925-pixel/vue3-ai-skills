@@ -1578,7 +1578,7 @@ const FenKeColum = [
   {
     label: '体检时间',
     prop: 'checkTime',
-    width: ''
+    width: '165'
   },
   {
     label: '阳性体征',
@@ -2301,7 +2301,6 @@ onUnmounted(() => {
   overflow: hidden;
   padding: 40px 8px 0;
   box-sizing: border-box;
-  position: relative;
   .trage_search {
     .search1 {
       padding: 16px 24px;

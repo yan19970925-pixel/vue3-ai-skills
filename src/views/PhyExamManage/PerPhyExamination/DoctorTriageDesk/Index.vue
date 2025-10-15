@@ -1270,6 +1270,7 @@ const reportChange = () => {
   })
 }
 const personalClick = (row) => {
+  isCanDisableInput.value = false
   everySearchData.value = row
   personCode.value = row.peId
   getPerInfoMsg()
@@ -1395,17 +1396,19 @@ const comfierSave = () => {
           type: 'warning'
         }
       ).then(() => {
-        savePatientExam(params).then((res) => {
+        savePatientExam(params).then(async (res) => {
           ElMessage.success('保存成功')
           finalConfirmVisible.value = false
-          personalClick(everySearchData.value)
+          await reportChange()
+          await personalClick(everySearchData.value)
         })
       })
     } else {
-      savePatientExam(params).then((res) => {
+      savePatientExam(params).then(async (res) => {
         ElMessage.success('保存成功')
+        await reportChange()
         finalConfirmVisible.value = false
-        personalClick(everySearchData.value)
+        await personalClick(everySearchData.value)
       })
     }
   }
