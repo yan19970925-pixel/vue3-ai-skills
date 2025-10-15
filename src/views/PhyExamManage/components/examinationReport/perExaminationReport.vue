@@ -1,11 +1,7 @@
 <template>
   <div class="report">
     <div class="report_con page">
-      <div class="title">
-        <div class="position">
-          <img :src="imgSrc" />
-        </div>
-      </div>
+      <div class="title"> </div>
       <div class="center">
         <div> {{ jsonData.peVisitListRespVo.hospitalname }}体检报告 </div>
         <div> 健 康 体 检 报 告 </div>
@@ -43,12 +39,20 @@
           <div>单位部门：</div>
           <div class="d_border">{{ jsonData.peVisitListRespVo.print_date }}</div>
         </div>
-        <div class="bottom">{{ jsonData.peVisitListRespVo.hospitalname }}</div>
+        <!-- <div class="bottom">{{ jsonData.peVisitListRespVo.hospitalname }}</div> -->
+        <div class="dreess">
+          <div>客服热线：0335-5363064（5363053）</div>
+          <div>中心网址：www.pla281.com</div>
+          <div>秦皇岛市北戴河区驼峰路4号</div>
+          <div class="position">
+            <img :src="imgSrc" />
+          </div>
+        </div>
       </div>
       <div
         style="
           width: 100%;
-          margin-top: 200px;
+          margin-top: 0px;
           font-size: 14px;
           text-align: center;
           border-top: 1px solid #000;
@@ -70,6 +74,12 @@
         <!-- <img :src="avatar" alt="" /> -->
         <div>{{ jsonData.peVisitListRespVo.hospitalname }}</div>
       </div>
+      <div class="logo_miaoshu">
+        <div>尊敬的客人：</div>
+        <div
+          >&nbsp;&nbsp;&nbsp;您好！感谢您光临北戴河康复疗养中心体检中心！健康体检的目的在于及时了解您自身的健康状况，现将您的体检结果报告如下，请您详阅。如果您对体检结果有异议，请于一周内到本中心查询或致电客服部（0335-5363064），我们将有专家为您答疑解惑。为了您的健康，我们建议您每年进行一次系统体检。欢迎您再次光临北戴河康复疗养中心体检中心！</div
+        >
+      </div>
       <div class="back_c">主检报告</div>
       <div class="back_t">体检汇总</div>
       <div class="back_for">
@@ -82,30 +92,32 @@
         >
         <!-- <div class="back_t1_c">建议控制饮食，加强运动，减轻体重。</div> -->
       </div>
+      <div class="doc_con">
+        <div class="con1"> 初审医生：{{ jsonData.peVisitListRespVo.chiefDoctor }}</div>
+        <div class="con1">初审日期：{{ jsonData.peVisitListRespVo.chiefAuditDate }}</div>
+      </div>
       <div class="jianyi">健康建议</div>
       <div class="jianyi_c" v-for="(item2, index2) in jsonData.guideResultDO" :key="index2">
         <div>{{ index2 + 1 }}、{{ item2.guideTitle }}</div>
-        <div :style="jsonData.guideResultDO.length > 10 ? 'font-size:12px;line-height:16px' : ''">
-          {{ item2.guideContent }}</div
+        <div
+          :style="jsonData.guideResultDO.length > 10 ? 'font-size:12px;line-height:16px' : ''"
+          v-html="
+            item2.guideContent &&
+            (item2.guideContent.includes('\r\n') || item2.guideContent.includes('\n'))
+              ? item2.guideContent.replace(/\r?\n/g, '<br />')
+              : item2.guideContent
+          "
         >
+        </div>
       </div>
       <!-- <div class="ganxie"></div> -->
       <!-- <div class="ganxie_c">
           我们需要提示您注意的是：本次体检反映的是您当前的健康状况。因人体存在个体生物差异及您选择的检查项目并未涵盖全身所有脏器。因此医生所做的医学诊断和健康状况建议，是依据您的陈述和本次检查的结果综合分析评估而产生的。我们建议您对异常的结果进行相关的进一步检查或跟踪复查。
         </div> -->
+
       <div class="doc_con">
-        <div class="con1">
-          <!-- 主检医生： -->
-          {{}}</div
-        >
-        <div class="con1">主审医生：{{ jsonData.peVisitListRespVo.chiefDoctor }}</div>
-      </div>
-      <div class="doc_con">
-        <div class="con1">
-          <!-- 主检日期： -->
-          {{}}</div
-        >
-        <div class="con1">主审日期：{{ jsonData.peVisitListRespVo.chiefAuditDate }}</div>
+        <div class="con1"> 终审医生：{{ jsonData.peVisitListRespVo.auditDoctor }}</div>
+        <div class="con1">终审日期：{{ jsonData.peVisitListRespVo.lastAuditDate }}</div>
       </div>
       <div class="pagination">第{{ 1 }}页/共{{ newDeptResultA.length + 1 }}页</div>
     </div>
@@ -151,8 +163,8 @@
                   :class="!item.isJy ? 'td11' : 'td1'"
                   v-if="item.peItemName"
                   :style="
-                    item.peItemName && item.peItemName.length > 9
-                      ? 'font-size:12px;line-height:15px; font-weight: bold;overflow: hidden;'
+                    item.peItemName && item.peItemName.length > 18
+                      ? 'font-size:12px;line-height:15px; overflow: hidden;'
                       : ''
                   "
                   >{{ item.peItemName }}</td
@@ -163,7 +175,7 @@
                   :style="
                     (item.peResult && item.peResult.length > 36 && !item.isJy) ||
                     (item.peResult && item.peResult.length > 10 && item.isJy)
-                      ? 'font-size:12px;line-height:15px; font-weight: bold;display: -webkit-box;-webkit-line-clamp: 2;-webkit-box-orient: vertical;overflow: hidden;'
+                      ? 'font-size:12px;line-height:15px; display: -webkit-box;-webkit-line-clamp: 2;-webkit-box-orient: vertical;overflow: hidden;'
                       : ''
                   "
                 >
@@ -197,10 +209,10 @@
                 }}</td>
               </tr>
             </table>
-            <div class="xiaojie" v-if="item.xiaojie">小结</div>
+            <!-- <div class="xiaojie" v-if="item.xiaojie">小结</div>
             <div class="xiaojie_con" v-if="item.resultXiaoJie"
               ><div> {{ item.resultXiaoJie }}</div>
-            </div>
+            </div> -->
             <!-- <div class="xiaojie_con">{{ item }}</div> -->
           </div>
           <!-- </div> -->
@@ -254,8 +266,8 @@ const generateBarcode = () => {
   if (peId) {
     JsBarcode(imgRef.value, peId, {
       fontSize: 14,
-      width: 2,
-      height: 60
+      width: 1,
+      height: 30
     })
     imgSrc.value = imgRef.value?.src || ''
   }
@@ -308,7 +320,6 @@ const processData = () => {
       }
     })
   })
-
   if (result.length > 0) {
     result.forEach((item) => {
       item.forEach((items) => {
@@ -322,7 +333,7 @@ const processData = () => {
           },
           {
             isTableHeard: true,
-            isJy: items[0].jsJy,
+            isJy: items[0].isJy,
             height: 30
           }
         )
@@ -331,17 +342,17 @@ const processData = () => {
             its.height = 30
           }
         })
-        items.push({ xiaojie: '小结', height: 30 })
-        if (items[items.length - 2].content && items[items.length - 2].content.length > 0) {
-          items[items.length - 2].content.forEach((element) => {
-            items.push({ resultXiaoJie: element, height: 30 })
-          })
-        }
+        // items.push({ xiaojie: '小结', height: 30 })
+        // if (items[items.length - 2].content && items[items.length - 2].content.length > 0) {
+        //   items[items.length - 2].content.forEach((element) => {
+        //     items.push({ resultXiaoJie: element, height: 30 })
+        //   })
+        // }
       })
     })
   }
-  console.log(splitArrayByHeight(result.flat(Infinity), 990), 'ssss')
-  newDeptResultA.value = splitArrayByHeight(result.flat(Infinity), 990)
+  console.log(splitArrayByHeight(result.flat(Infinity), 1020), 'ssss')
+  newDeptResultA.value = splitArrayByHeight(result.flat(Infinity), 1020)
   // buildPaginationGroups(result)
 }
 const splitArrayByHeight = (arr, maxHeight) => {
@@ -536,25 +547,18 @@ watch(
     // margin-bottom: 10px; */
     .title {
       margin-bottom: 200px;
-      position: relative;
       .title_div {
         margin-bottom: 10px;
-      }
-      .position {
-        text-align: center;
-        position: absolute;
-        top: 15px;
-        right: 70px;
       }
     }
     .center {
       width: 100%;
       text-align: center;
-      margin-bottom: 150px;
+      margin-bottom: 90px;
       div {
         margin-bottom: 10px;
         font-weight: bold;
-        font-size: 26px;
+        font-size: 50px;
       }
     }
     .info {
@@ -565,6 +569,18 @@ watch(
         display: flex;
         margin-bottom: 15px;
         justify-content: center;
+      }
+      .dreess {
+        font-size: 14px;
+        font-family: 'SimSun', '宋体';
+        margin-top: 200px;
+        position: relative;
+        .position {
+          text-align: center;
+          position: absolute;
+          top: -4px;
+          right: 20px;
+        }
       }
       .d_border {
         width: 280px;
@@ -587,6 +603,7 @@ watch(
     width: 100%;
     margin: 0 auto;
     margin-top: 10px;
+    font-family: 'SimSun', '宋体';
     // box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
     /* // border: 1px solid red; */
     position: relative;
@@ -603,7 +620,7 @@ watch(
       display: flex;
       border-bottom: #000 2px solid;
       box-sizing: border-box;
-      margin-bottom: 10px;
+      // margin-bottom: 10px;
       div {
         width: 20%;
         overflow: hidden;
@@ -658,6 +675,10 @@ watch(
         left: 0;
       }
     }
+    .logo_miaoshu {
+      font-size: 14px;
+      line-height: 22px;
+    }
     .back_c {
       width: 100%;
       font-size: 22px;
@@ -676,14 +697,16 @@ watch(
       margin-bottom: 20px;
       .back_t1 {
         width: 100%;
-        font-size: 18px;
-        line-height: 28px;
+        font-size: 16px;
+        line-height: 24px;
+        font-family: 'SimSun', '宋体';
       }
       .back_t1_c {
         width: 100%;
-        font-size: 18px;
-        line-height: 28px;
+        font-size: 16px;
+        line-height: 24px;
         word-wrap: break-word; /* 允许在单词内换行 */
+        font-family: 'SimSun', '宋体';
       }
     }
     .jianyi {
@@ -694,9 +717,10 @@ watch(
     .jianyi_c {
       width: 100%;
       height: auto;
-      font-size: 18px;
-      line-height: 28px;
+      font-size: 16px;
+      line-height: 24px;
       word-wrap: break-word; /* 允许在单词内换行 */
+      font-family: 'SimSun', '宋体';
     }
     .ganxie {
       width: 100%;
@@ -729,10 +753,10 @@ watch(
     .jieguo {
       .jieguo_keshi {
         width: 100%;
-        font-size: 24px;
+        font-size: 22px;
         text-align: center;
         height: 33px;
-        line-height: 33px;
+        line-height: 31px;
         border-top: #000 1px solid;
         border-bottom: #000 1px solid;
         box-sizing: border-box;
@@ -741,7 +765,7 @@ watch(
       }
       .jieguo_name {
         display: flex;
-        font-size: 20px;
+        font-size: 18px;
         height: 30px;
         border-bottom: #000 1px solid;
         box-sizing: border-box;
@@ -767,6 +791,7 @@ watch(
           //     font-weight: bold;
           //   }
           // } */
+          font-size: 16px;
           .table-header {
             td {
               font-weight: bold;
@@ -780,10 +805,10 @@ watch(
               padding: 0;
             }
             .td1 {
-              width: 30%;
+              width: 40%;
             }
             .td2 {
-              width: 25%;
+              width: 15%;
             }
             .td3 {
               width: 15%;
