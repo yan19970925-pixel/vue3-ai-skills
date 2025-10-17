@@ -995,6 +995,7 @@ const isCanDisableInput = ref<Boolean>(false)
 const isHaveRefusal = ref<Boolean>(false)
 // 当前患者所有体检项目的分科结果查询点击
 const changeActive = (index, peDeptCode) => {
+  isCanDisableInput.value = false
   active.value = index
   let params = {
     peId: everySearchData.value.peId,
@@ -1011,31 +1012,6 @@ const changeActive = (index, peDeptCode) => {
         confirmButtonText: '确定'
       })
     }
-    if (
-      perItemData.value.itemResultList &&
-      perItemData.value.itemResultList.length > 0 &&
-      perItemData.value.itemResultList[0].finishedSign == '拒检'
-    ) {
-      isHaveRefusal.value = true
-      ElMessageBox.confirm(
-        `体检号${everySearchData.value.peId} 已经拒绝过${
-          checkPerDeptList.value[active.value].peDeptName
-        }的体检项目，是否重新录入新的结果?`,
-        '提示',
-        {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning'
-        }
-      )
-        .then(() => {
-          isCanDisableInput.value = false
-        })
-        .catch(() => {
-          isCanDisableInput.value = true
-        })
-    }
-    isHaveRefusal.value = false
     // 使用 reduce 方法根据 resultClass 字段分组
     const groupedByResultClass = res.itemResultList.reduce((acc, item) => {
       const key = item.resultClass
@@ -1078,6 +1054,8 @@ const itemAssemLists = ref()
 
 // 当前选中的组合项目
 const selectedAssemCode = ref('')
+//当前选中的组合项目数据
+const selectedAssemData = ref({})
 
 // 根据选中的组合项目过滤出对应的项目列表
 const filteredItemResultList = computed(() => {
@@ -1104,8 +1082,34 @@ const itemLists = ref()
 
 // 在 script setup 中添加以下函数
 const handleAssemRowClick = (row) => {
+  isCanDisableInput.value = false
+  selectedAssemData.value = row
   selectedAssemCode.value = row.assemCode
   itemLists.value = itemResultList.value.flat().filter((item) => item.assemCode === row.assemCode)
+  if (itemLists.value && itemLists.value.length > 0 && itemLists.value[0].finishedSign == '拒检') {
+    isHaveRefusal.value = true
+    ElMessageBox.confirm(
+      `体检号${everySearchData.value.peId} 已经拒绝过<span style="color:#ed2226">${
+        checkPerDeptList.value[active.value].peDeptName
+      }</span>中的<span style="color:#ed2226">${
+        selectedAssemData.value.itemAssemName
+      }</span>体检项目，是否重新录入新的结果?`,
+      '提示',
+      {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning',
+        dangerouslyUseHTMLString: true
+      }
+    )
+      .then(() => {
+        isCanDisableInput.value = false
+      })
+      .catch(() => {
+        isCanDisableInput.value = true
+      })
+  }
+  isHaveRefusal.value = false
 }
 
 const setAssemRowClassName = ({ row }) => {
@@ -1424,15 +1428,21 @@ const refuseCheck = () => {
     let parmas = {
       peId: everySearchData.value.peId,
       peVisitId: everySearchData.value.peVisitId,
-      deptCode: checkPerDeptList.value[active.value].peDeptCode
+      deptCode: checkPerDeptList.value[active.value].peDeptCode,
+      itemAssemCode: selectedAssemCode.value
     }
     ElMessageBox.confirm(
-      `确认拒绝${checkPerDeptList.value[active.value].peDeptName}的检查吗？`,
+      `确认拒绝<span style="color:#ed2226">${
+        checkPerDeptList.value[active.value].peDeptName
+      }</span>中的<span style="color:#ed2226">${
+        selectedAssemData.value.itemAssemName
+      }</span>项目的检查吗？`,
       '提示',
       {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
-        type: 'warning'
+        type: 'warning',
+        dangerouslyUseHTMLString: true
       }
     ).then(() => {
       refusePatientExam(parmas).then((res) => {
@@ -1678,7 +1688,7 @@ const handleItemValueChange = (row) => {
     }
   }
 }
-const queryInfo = reactive({ peId: '', peVisitId: '', deptCode: '' })
+const queryInfo = reactive({ peId: '', peVisitId: '', deptCode: '', startDate: '', endDate: '' })
 onMounted(async () => {
   // getDept()
   await getSelectedDept({ dbUser: dbUser })
@@ -1697,6 +1707,8 @@ onMounted(async () => {
     queryInfo.peId = parsedQueryInfo.peId || ''
     queryInfo.peVisitId = parsedQueryInfo.peVisitId || ''
     queryInfo.deptCode = parsedQueryInfo.deptCode || ''
+    queryInfo.startDate = parsedQueryInfo.startDate || ''
+    queryInfo.endDate = parsedQueryInfo.endDate || ''
 
     // 清除存储的数据
     sessionStorage.removeItem('doctorTriageQueryInfo')
@@ -1705,6 +1717,8 @@ onMounted(async () => {
     queryInfo.peId = route.query.peId || ''
     queryInfo.peVisitId = route.query.peVisitId || ''
     queryInfo.deptCode = route.query.deptCode || ''
+    queryInfo.startDate = route.query.startDate || ''
+    queryInfo.endDate = route.query.endDate || ''
     // queryInfo.deptName = route.query.deptName || ''
 
     // 如果有参数，存储到 sessionStorage
@@ -1726,6 +1740,8 @@ onMounted(async () => {
     searchParams.peId = queryInfo.peId
     personCode.value = queryInfo.peId
     everySearchData.value.peVisitId = queryInfo.peVisitId
+    searchParams.startDate = queryInfo.startDate
+    searchParams.endDate = queryInfo.endDate
     comfier()
   }
 })
@@ -1736,6 +1752,8 @@ const clearQueryParams = () => {
   delete newQuery.peId
   delete newQuery.peVisitId
   delete newQuery.deptCode
+  delete newQuery.startDate
+  delete newQuery.endDate
 
   router
     .replace({

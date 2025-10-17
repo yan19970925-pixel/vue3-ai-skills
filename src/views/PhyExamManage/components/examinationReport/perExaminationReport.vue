@@ -608,12 +608,14 @@ watch(
     /* // border: 1px solid red; */
     position: relative;
     .pagination {
+      margin: 0 30px;
       position: absolute;
-      bottom: 10px;
+      bottom: 15px;
       left: 0;
       right: 0;
       text-align: center;
       font-size: 14px;
+      border-top: #000 1px solid;
     }
     .biaoti {
       width: 100%;

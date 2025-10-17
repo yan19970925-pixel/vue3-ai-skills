@@ -1272,8 +1272,8 @@ const getExaminePatList = async (row) => {
         isChubu.value = false
         isZuizhong.value = false
       }
-      if (peDeptCheckList.value && peDeptCheckList.value[0]?.mle_suggest) {
-        mle_suggest.value = peDeptCheckList.value[0].mle_suggest
+      if (res && res[0]?.mle_suggest) {
+        mle_suggest.value = res[0].mle_suggest
       }
     }
   })
@@ -1669,6 +1669,19 @@ const debouncedItemClick = debounce((row) => {
 }, 500)
 
 const itemClick = (row) => {
+  Api.getNoFinishItem({ peId: row.peId, peVisitId: row.peVisitId }).then((res) => {
+    if (res) {
+      let newStr = res.split(';').join('<br />')
+      ElMessageBox.alert(
+        `<span style="font-size:18px;font-weight:blod">该患者还有下列体检项目尚未完成!</span><br /><span style="color:#ed2226">${newStr}</span>`,
+        '提示',
+        {
+          confirmButtonText: '确定',
+          dangerouslyUseHTMLString: true
+        }
+      )
+    }
+  })
   debouncedItemClick(row)
 }
 const historyExamList = ref([])
@@ -2045,7 +2058,9 @@ const fenkeJieguo = () => {
       query: {
         deptCode: currentFenkeRow.value.deptCode,
         peId: itemDetail.value.peId,
-        peVisitId: itemDetail.value.peVisitId
+        peVisitId: itemDetail.value.peVisitId,
+        startDate: ExaminePatListInfo.value.queueStartDate,
+        endDate: ExaminePatListInfo.value.queueEndDate
       }
     })
   } else {
@@ -2392,7 +2407,7 @@ onUnmounted(() => {
         height: calc(100vh - 223px);
         .card_con1 {
           width: 100%;
-          height: 100%;
+          height: calc(100vh - 280px);
           .con_title {
             display: flex;
             align-items: center;

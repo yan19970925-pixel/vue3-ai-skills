@@ -60,3 +60,7 @@ export const updateFinishedSignList = (data) => {
 export const cancleCbAuditDept = (data) => {
   return request.post({ url: '/health-api/health/audit/cancleCbAuditDept', data })
 }
+//查询患者是否有未做完的体检项目
+export const getNoFinishItem = (data) => {
+  return request.post({ url: '/health-api/health/audit/getNoFinishItem', data })
+}

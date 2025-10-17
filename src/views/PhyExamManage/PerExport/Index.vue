@@ -58,8 +58,8 @@
             class="select-item !w-180px"
           />
           <el-checkbox v-model="isShowDetail" label="详情" />
-          <el-checkbox label="打印封面" />
-          <el-checkbox label="打印内容" />
+          <!-- <el-checkbox label="打印封面" />
+          <el-checkbox label="打印内容" /> -->
           <el-button class="resetBtn ml-16px" @click="getFinalReport(false, true, false)">
             <img
               src="@\assets\imgs\print2x.png"
@@ -68,7 +68,7 @@
             />
             打印
           </el-button>
-          <el-button class="resetBtn" @click="getFinalReport(true, true, false)">
+          <!-- <el-button class="resetBtn" @click="getFinalReport(true, true, false)">
             <img
               src="@\assets\imgs\preview.png"
               alt="预览"
@@ -83,7 +83,7 @@
               style="width: 16px; height: 16px; margin-right: 4px"
             />
             导出pdf
-          </el-button>
+          </el-button> -->
           <!-- <el-button class="resetBtn" @click="getFinalReport(false, false, true)">
             <el-icon><Upload /></el-icon>
             上传体检报告pdf
@@ -204,6 +204,7 @@ import html2Canvas from 'html2canvas'
 import JsPDF from 'jspdf'
 import printJS from 'print-js'
 import { formatDate } from '@/utils/formatTime'
+import { VuePrintNext } from 'vue-print-next'
 const searchParams = reactive({
   unitCode: '',
   unitVisitId: '',
@@ -311,7 +312,7 @@ const getFinalReport = async (bool, printBool, upload) => {
       peId: itemDetail.peId || '',
       peVisitId: itemDetail.peVisitId || ''
     })
-      .then((res) => {
+      .then(async (res) => {
         if (!bool && printBool) {
           peReportPrint({ peId: itemDetail.peId, peVisitId: itemDetail.peVisitId })
         }
@@ -322,11 +323,18 @@ const getFinalReport = async (bool, printBool, upload) => {
           showJson.value = true
           console.log('jsonData', jsonData)
           jsonData.value.peVisitListRespVo.peVisitId = itemDetail.peVisitId
-          if (bool) {
-            yulanDialogVisible.value = bool
-          } else {
-            getPdf2(printBool, itemDetail, upload)
-          }
+          setTimeout(() => {
+            nextTick(async () => {
+              await printTjbg()
+              jsonData.value = {}
+              showJson.value = false
+            })
+          }, 500)
+          // if (bool) {
+          //   yulanDialogVisible.value = bool
+          // } else {
+          //   getPdf2(printBool, itemDetail, upload)
+          // }
           // jsonData.value.user = itemDetail.value
           // getPePatList()
         }
@@ -336,7 +344,37 @@ const getFinalReport = async (bool, printBool, upload) => {
       })
   }
 }
+const printTjbg = () => {
+  const style = document.createElement('style')
+  style.innerHTML = `
+        @page {
+          size: A4 portrait;
+          margin:0mm;
+          marks: none;
+        }
+        html, body {
+          overflow: visible !important;
+          height: 100% !important;
+          margin: 0 !important;
+          padding: 0 !important;
+        }
+        #pdfDom {
+          display: block !important;
+          visibility: visible !important;
+        }
+      `
+  document.head.appendChild(style)
 
+  new VuePrintNext({
+    el: '#pdfDom',
+    preview: false, // 调试时启用预览
+    paperSize: 'A4',
+    orientation: 'portrait',
+    previewOpenCallback: () => {
+      document.head.removeChild(style)
+    }
+  })
+}
 // 定义响应式变量
 const htmlTitle = ref('体检报告')
 const loadingInstance = ref(null)

@@ -1229,7 +1229,7 @@ import { Search } from '@element-plus/icons-vue'
 import PrintZhiYinDan from '@/views/PhyExamManage/PerPhyExamination/printGuidanceSheet/Index.vue'
 import { ref } from 'vue'
 import axios from 'axios'
-
+import { debounce } from 'lodash'
 const printZhiYinDanRef = ref()
 const handlePrint = async (params) => {
   if (printZhiYinDanRef.value?.PrintZhiYinDan) {
@@ -1637,6 +1637,9 @@ const validatePhoneNumber = (phoneNumberHome) => {
 }
 // 保存信息
 const saveDengJi = async () => {
+  saveDengJiTime()
+}
+const saveDengJiTime = debounce(() => {
   if (formInfo.joinUnit == 1) {
     if (!formInfo.unitCode) {
       ElMessage.error('单位代码不能为空')
@@ -1804,7 +1807,7 @@ const saveDengJi = async () => {
     await handlePrint(formInfo)
     clearMsg()
   })
-}
+}, 500)
 const clearMsg = async () => {
   allDisabled.value = false
   // 获取 formInfo 的所有属性名
