@@ -25,10 +25,11 @@
             remote
             clearable
             class="select-item !w-120px"
+            @change="selectGroupChange"
           >
             <el-option
-              v-for="(item, index) in groupList"
-              :key="index"
+              v-for="item in groupList"
+              :key="item.groupingCode"
               :label="item.unitName + '-' + item.groupingName"
               :value="item.groupingCode"
           /></el-select>
@@ -42,7 +43,7 @@
             class="select-item !w-190px"
           >
             <el-option
-              v-for="(item, index) in allDataSelected"
+              v-for="(item, index) in copyAllDataSelected"
               :key="index"
               :label="item.itemAssemName"
               :value="item.itemAssemCode"
@@ -64,6 +65,13 @@
           <el-button class="resetBtn" @click="moreDeleteItemList"> 批量删除项目 </el-button>
         </div>
         <div class="base-cont">
+          <span class="ml-16px">姓名:</span>
+          <el-input
+            v-model="searchParams.name"
+            placeholder="姓名"
+            @change="searchInfo()"
+            class="select-item !w-120px"
+          />
           <span class="ml-18px">年龄:</span>
           <el-select
             v-model="searchParams.ageCompare"
@@ -166,14 +174,8 @@
             <el-option label="任意" value="任意" />
             <el-option label="未预约" value="未预约" />
             <el-option label="未完成" value="未完成" />
-            <el-option label="完成" value="完成" /></el-select
-          ><span class="ml-16px">部门:</span
-          ><el-input
-            v-model="searchParams.department"
-            placeholder="部门"
-            @change="searchInfo()"
-            class="select-item !w-120px"
-          />
+            <el-option label="完成" value="完成" />
+          </el-select>
           <el-button type="primary" @click="searchInfo"> 查询 </el-button>
           <el-button class="resetBtn" @click="printInfo">
             <img
@@ -371,13 +373,16 @@ import {
   batchAddItems,
   batchDelItems,
   exportPeUnitPersonal,
-  peUnitVisitFilter
+  peUnitVisitFilter,
+  getPeSetItemSelectedList,
+  getUnitInfo
 } from '@/api/allProcess/index'
 import { formatDate } from '@/utils/formatTime'
 import download from '@/utils/download'
 import { print } from '@/print/index'
 import renyuanliebiaoHTML from '@/print/tj_renyuanliebiao'
 const allDataSelected = ref<any>([]) //项目
+const copyAllDataSelected = ref<any>([])
 const selectItemCode = ref('')
 const certName = ref('')
 const unitCode = ref('')
@@ -474,6 +479,7 @@ onMounted(async () => {
     clinicFlag: 1
   })
   allDataSelected.value = arr.records
+  copyAllDataSelected.value = arr.records
   let res = await getSystemDateTime()
   nowDate.value = formatDate(res, 'YYYY-MM-DD HH:mm:ss')
 })
@@ -584,6 +590,7 @@ const moreDeleteItemList = async () => {
   })
 }
 const searchParams = ref({
+  name: '',
   ageCompare: '任意',
   ageMin: null,
   ageMax: null,
@@ -598,6 +605,7 @@ const rightInfo = ref<any>({})
 const searchInfo = async () => {
   if (peVisitAllList.value.length == 0) return
   let res = await peUnitVisitFilter({
+    name: searchParams.value.name,
     ageCompare: searchParams.value.ageCompare,
     ageMin:
       searchParams.value.ageCompare == '任意' || searchParams.value.ageCompare == '小于'
@@ -675,6 +683,38 @@ const handleDeleteItem = async (row, index) => {
   peVisitListRespList.value.splice(index, 1)
   let zIndex = peVisitFilterList.value.findIndex((res) => res.peId == row.peId)
   peVisitFilterList.value.splice(zIndex, 1)
+}
+const selectGroupChange = async (val) => {
+  let resList = []
+  let setListSelected = {}
+  if (unitCode.value) {
+    await getUnitInfo({ unitCode: unitCode.value }).then((res) => {
+      if (res.groupingDictDOList && res.groupingDictDOList.length > 0) {
+        res.groupingDictDOList.forEach((item) => {
+          if (item.groupingCode == val && item.setListSelected && item.setListSelected.length > 0) {
+            setListSelected = item.setListSelected[0]
+          }
+        })
+      }
+    })
+  }
+  if (val && setListSelected && setListSelected.setCode) {
+    resList = await getPeSetItemSelectedList({
+      form: '',
+      pageNo: 1,
+      pageSize: 10000000,
+      setCode: setListSelected.setCode
+    })
+    if (resList.length > 0) {
+      let allDataUnselect = JSON.parse(JSON.stringify(allDataSelected.value))
+      const allDataSelectedItemCodes = new Set(resList.map((item) => item.itemAssemCode))
+      copyAllDataSelected.value = allDataUnselect.filter((item) => {
+        return !allDataSelectedItemCodes.has(item.itemAssemCode)
+      })
+    }
+  } else {
+    copyAllDataSelected.value = allDataSelected.value
+  }
 }
 </script>
 

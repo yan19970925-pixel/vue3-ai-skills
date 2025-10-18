@@ -107,6 +107,13 @@ export const peUnitVisitFilter = (data: any) => {
     data
   })
 }
+//单位体检-查询套餐内包含的项目
+export const getPeSetItemSelectedList = (data: any) => {
+  return request.post({
+    url: '/health-api/health/itemAssemSet/getPeSetItemSelectedList',
+    data
+  })
+}
 // 单位体检-单位登记-导出
 export const exportPeUnitPersonal = (data: any) => {
   return request.downloadByPOST({
