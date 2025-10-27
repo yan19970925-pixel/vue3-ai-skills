@@ -577,9 +577,23 @@
                       label="项目名称"
                       prop="itemName"
                       align="center"
-                      width="160px"
+                      width="140px"
                       show-overflow-tooltip
                     />
+                    <el-table-column label="描述" align="center" show-overflow-tooltip>
+                      <template #default="scope">
+                        <el-input
+                          v-model="scope.row.keyName"
+                          style="width: 100%"
+                          :autosize="{ minRows: 3, maxRows: 3 }"
+                          type="textarea"
+                          placeholder="请输入"
+                          maxlength="200"
+                          :disabled="isCanDisableInput"
+                          readonly
+                        />
+                      </template>
+                    </el-table-column>
                     <el-table-column label="结果" align="center" show-overflow-tooltip>
                       <template #default="scope">
                         <el-input
@@ -597,7 +611,7 @@
                       label="结果引入"
                       align="center"
                       show-overflow-tooltip
-                      width="100px"
+                      width="86px"
                     >
                       <template #default="scope">
                         <el-button type="text" @click="introduce(scope.row, scope.$index)"
@@ -1021,7 +1035,7 @@
     </Dialog>
   </div>
 </template>
-<script setup lang="ts">
+<script setup lang="ts" name="doctorTriageDesk">
 import { VuePrintNext } from 'vue-print-next'
 import readCard from '@/assets/images/readCard.svg'
 import report from '@/assets/images/report.svg'

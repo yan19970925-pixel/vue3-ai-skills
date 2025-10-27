@@ -101,6 +101,23 @@
         <div class="con1"> 初审医生：{{ jsonData.peVisitListRespVo.chiefDoctor }}</div>
         <div class="con1">初审日期：{{ jsonData.peVisitListRespVo.chiefAuditDate }}</div>
       </div>
+      <div class="back_t">终检结论</div>
+      <div class="back_for">
+        <div
+          class="back_t1"
+          v-html="
+            jsonData.suggest &&
+            (jsonData.suggest.includes('\r\n') || jsonData.suggest.includes('\n'))
+              ? jsonData.suggest.replace(/\r?\n/g, '<br />')
+              : jsonData.suggest
+          "
+        ></div>
+        <!-- <div class="back_t1_c">建议控制饮食，加强运动，减轻体重。</div> -->
+      </div>
+      <div class="doc_con">
+        <div class="con1"> 终审医生：{{ jsonData.peVisitListRespVo.auditDoctor }}</div>
+        <div class="con1">终审日期：{{ jsonData.peVisitListRespVo.lastAuditDate }}</div>
+      </div>
       <div class="pagination">第{{ 1 }}页/共{{ newDeptResultA.length + 2 }}页</div>
     </div>
     <div class="report_jiben page">
@@ -134,11 +151,6 @@
       <!-- <div class="ganxie_c">
           我们需要提示您注意的是：本次体检反映的是您当前的健康状况。因人体存在个体生物差异及您选择的检查项目并未涵盖全身所有脏器。因此医生所做的医学诊断和健康状况建议，是依据您的陈述和本次检查的结果综合分析评估而产生的。我们建议您对异常的结果进行相关的进一步检查或跟踪复查。
         </div> -->
-
-      <div class="doc_con">
-        <div class="con1"> 终审医生：{{ jsonData.peVisitListRespVo.auditDoctor }}</div>
-        <div class="con1">终审日期：{{ jsonData.peVisitListRespVo.lastAuditDate }}</div>
-      </div>
       <div class="pagination">第{{ 2 }}页/共{{ newDeptResultA.length + 2 }}页</div>
     </div>
     <div class="report_jiben page" v-for="(itemValue, p) in newDeptResultA" :key="p">
@@ -183,7 +195,8 @@
                   :class="!item.isJy ? 'td11' : 'td1'"
                   v-if="item.peItemName"
                   :style="
-                    item.peItemName && item.peItemName.length > 18
+                    (item.peItemName && item.peItemName.length > 9 && !item.isJy) ||
+                    (item.peItemName && item.peItemName.length > 18 && item.isJy)
                       ? 'font-size:12px;line-height:15px; overflow: hidden;'
                       : ''
                   "

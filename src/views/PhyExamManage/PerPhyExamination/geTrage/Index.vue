@@ -389,9 +389,9 @@
               <div class="heard_title">
                 <span>体检综合建议和健康指导</span>
                 <div class="btn">
-                  <el-button @click="addDivisionSugges">汇总分科建议</el-button>
-                  <el-button @click="addChiefSugges">汇总主检分项建议</el-button>
-                  <el-button class="del" @click="clearSugges">清除建议</el-button>
+                  <!-- <el-button @click="addDivisionSugges">汇总分科建议</el-button> -->
+                  <el-button @click="addChiefSugges">汇总终检结论</el-button>
+                  <el-button class="del" @click="clearSugges">清除结论</el-button>
                 </div>
               </div>
               <div class="con3_de">
@@ -1434,7 +1434,7 @@ const addChiefSugges = () => {
         if (diaseseList.value.length > 0) {
           diaseseList.value.forEach((item, index) => {
             if (item.name) {
-              chiefSuggesList.push(index + 1 + '、' + item.name, item.suggest)
+              chiefSuggesList.push(index + 1 + '、' + item.name)
             }
           })
         }
@@ -1444,7 +1444,7 @@ const addChiefSugges = () => {
         if (diaseseList.value.length > 0) {
           diaseseList.value.forEach((item, index) => {
             if (item.name) {
-              chiefSuggesList.push(index + 1 + '、' + item.name, item.suggest)
+              chiefSuggesList.push(index + 1 + '、' + item.name)
             }
           })
         }
@@ -1454,7 +1454,7 @@ const addChiefSugges = () => {
     if (diaseseList.value.length > 0) {
       diaseseList.value.forEach((item, index) => {
         if (item.name) {
-          chiefSuggesList.push(index + 1 + '、' + item.name, item.suggest)
+          chiefSuggesList.push(index + 1 + '、' + item.name)
         }
       })
     }
