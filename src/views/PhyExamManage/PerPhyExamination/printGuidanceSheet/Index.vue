@@ -892,29 +892,43 @@
     <Dialog
       v-model="recycleVisible"
       top="10vh"
+      width="80%"
       :fullscreen="true"
       :close-on-click-modal="false"
       @close="recycleVisible = false"
       title="回收指引单"
     >
       <div>
-        <el-table :data="allRecycleData" border style="width: 100%; height: 400px">
+        <el-table :data="allRecycleData" style="width: 100%" border height="400px">
+          <el-table-column prop="name" label="姓名" width="100" align="center" />
+          <el-table-column prop="peId" label="体检号" width="120" align="center" />
+          <el-table-column prop="peVisitId" label="体检次数" width="100" align="center" />
           <el-table-column
-            align="center"
-            label="完成状态"
+            prop="itemAssemName"
+            label="项目组合"
+            min-width="150"
             show-overflow-tooltip
-            prop="unitCode"
-            width="100"
           />
-          <el-table-column
-            align="center"
-            label="项目名称"
-            show-overflow-tooltip
-            prop="unitCode"
-            width="100"
-          />
+          <el-table-column prop="finishStatus" label="完成情况" width="100" align="center">
+            <template #default="scope">
+              <span :style="{ color: scope.row.finishedSign === '完成' ? 'green' : 'orange' }">
+                {{ scope.row.finishedSign }}
+              </span>
+            </template>
+          </el-table-column>
+          <el-table-column prop="doctor" label="检查医生" width="100" align="center" />
+          <el-table-column prop="peDeptName" label="检查科室" width="120" align="center" />
+          <el-table-column prop="applyNo" label="申请单号" width="" align="center" />
         </el-table>
-        <div style="width: 100%; display: flex; align-items: center; justify-content: center">
+        <div
+          style="
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 10px;
+          "
+        >
           <el-button
             style="color: #3263fe; background: #fff; border-color: #3263fe"
             @click="recycleCancel"
@@ -945,7 +959,8 @@ import {
   healthCertificateInfo,
   healthCertificateInfoUpload,
   upPdfEmployees,
-  peSign
+  peSign,
+  updateFinishedSignList
 } from '@/api/PerPhyExamination/printGuidanceSheet/index'
 import { formatDate } from '@/utils/formatTime'
 import PrintPdf from './printPdf.vue'
@@ -2049,6 +2064,13 @@ const recheckData = ref({})
 const recycleZYD = (row) => {
   recheckData.value = row
   recycleVisible.value = true
+  updateFinishedSignList({
+    peId: row.peId,
+    peVisitId: row.peVisitId,
+    pePreDate: row.pePreDate
+  }).then((res) => {
+    allRecycleData.value = res
+  })
 }
 const recycleConfirm = () => {
   recycleVisible.value = false

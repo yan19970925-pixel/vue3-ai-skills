@@ -13,11 +13,11 @@
         </div>
         <div class="info_flex">
           <div>性&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;别：</div>
-          <div class="d_border" style="width: 90px; padding-left: 30px">{{
+          <div class="d_border" style="width: 94px; padding-left: 30px">{{
             jsonData.peVisitListRespVo.sex
           }}</div>
           <div style="margin-left: 10px">年&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;龄：</div>
-          <div class="d_border" style="width: 90px; padding-left: 30px">{{
+          <div class="d_border" style="width: 94px; padding-left: 30px">{{
             jsonData.peVisitListRespVo.age
           }}</div>
         </div>
@@ -578,7 +578,7 @@ watch(
       div {
         margin-bottom: 10px;
         font-weight: bold;
-        font-size: 30px;
+        font-size: 40px;
       }
     }
     .info {
@@ -589,6 +589,7 @@ watch(
         display: flex;
         margin-bottom: 15px;
         justify-content: center;
+        font-size: 16px;
       }
       .dreess {
         font-size: 14px;

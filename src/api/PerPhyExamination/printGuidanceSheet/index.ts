@@ -55,3 +55,7 @@ export const upPdfEmployees = (data) => {
     data
   })
 }
+// 个人体检-主检医生审核-查询完成状态列表
+export const updateFinishedSignList = (data) => {
+  return request.post({ url: '/health-api/health/audit/updateFinishedSignList', data })
+}
