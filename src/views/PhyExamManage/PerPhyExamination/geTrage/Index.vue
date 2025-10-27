@@ -615,7 +615,7 @@
           >
             <el-table-column
               label="体检项目"
-              prop="itemAssemName"
+              prop="peItemName"
               align="left"
               width="160px"
               show-overflow-tooltip
@@ -2430,7 +2430,7 @@ const chatId = ref()
 // 定义 API 地址
 // 定义认证令牌
 const apiUrl = 'http://10.10.10.20:8080/chat/api/open'
-const authToken = 'application-43bb0c12cc24fc7cabdd9deda8655bb9'
+const authToken = 'application-18eaeeaace5fa66b41cb8b7d44b0ca76'
 const sendMsg = async (flag) => {
   const data = ref()
   let conclusionStr = ''
@@ -2475,7 +2475,7 @@ const sendMsg = async (flag) => {
       let result = await axios.get(apiUrl, {
         headers: {
           Accept: '*/*',
-          Authorization: `Bearer application-43bb0c12cc24fc7cabdd9deda8655bb9`
+          Authorization: `Bearer application-18eaeeaace5fa66b41cb8b7d44b0ca76`
         }
       })
       if (result && result.data.code == 200) {

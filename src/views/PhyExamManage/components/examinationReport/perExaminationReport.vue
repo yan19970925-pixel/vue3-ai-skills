@@ -195,8 +195,7 @@
                   :class="!item.isJy ? 'td11' : 'td1'"
                   v-if="item.peItemName"
                   :style="
-                    (item.peItemName && item.peItemName.length > 9 && !item.isJy) ||
-                    (item.peItemName && item.peItemName.length > 18 && item.isJy)
+                    item.peItemName && item.peItemName.length > 9
                       ? 'font-size:12px;line-height:15px; overflow: hidden;'
                       : ''
                   "
