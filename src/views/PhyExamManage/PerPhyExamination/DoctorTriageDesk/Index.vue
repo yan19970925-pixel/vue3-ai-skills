@@ -161,8 +161,8 @@
               show-overflow-tooltip
             />
             <el-table-column
-              label="预约日期"
-              prop="pePreDate"
+              label="体检日期"
+              prop="peQueueDate"
               align="center"
               width="140px"
               show-overflow-tooltip
@@ -391,7 +391,7 @@
             <!-- 将 #selectedCode 部分替换为以下代码 -->
             <div class="item-result-container" style="width: 100%">
               <!-- 左侧组合项目列表 -->
-              <div class="assem-list-container" style="width: 15%">
+              <div class="assem-list-container" style="width: 19%">
                 <!-- <div class="assem-list-title">组合项目列表</div> -->
                 <el-table
                   :data="itemAssemLists"
@@ -399,6 +399,7 @@
                   @row-click="handleAssemRowClick"
                   :row-class-name="setAssemRowClassName"
                   highlight-current-row
+                  class="assem_table"
                   stripe
                   border
                 >
@@ -411,7 +412,7 @@
               </div>
 
               <!-- 右侧项目详情 -->
-              <div class="item-detail-container" style="width: 84%">
+              <div class="item-detail-container" style="width: 80%">
                 <div
                   v-if="itemLists && itemLists.length > 0 && itemLists[0]?.resultClass == '检验'"
                   style="width: 100%"
@@ -938,6 +939,86 @@
         </el-table>
       </div>
     </Dialog>
+    <Dialog v-model="yxjwjzTiXingVisible" title="阳性及危急值提醒" top="15vh" width="750px">
+      <div class="quoteCon" style="padding-bottom: 15px">
+        <el-table
+          :data="yxjwjzTiXingData"
+          style="width: 100%"
+          height="400px"
+          highlight-current-row
+          stripe
+          border
+        >
+          <el-table-column
+            label="检验项目名称"
+            prop="itemAssemName"
+            align="center"
+            width="120px"
+            show-overflow-tooltip
+          />
+          <el-table-column
+            label="项目名称"
+            prop="itemName"
+            align="center"
+            width="160px"
+            show-overflow-tooltip
+          />
+          <el-table-column
+            label="结果"
+            align="center"
+            show-overflow-tooltip
+            prop="peResult"
+          ></el-table-column>
+          <el-table-column
+            label="参考值"
+            width="140px"
+            align="center"
+            show-overflow-tooltip
+            prop="printContext"
+          >
+          </el-table-column>
+          <el-table-column
+            label="单位"
+            prop="units"
+            align="center"
+            width="120px"
+            show-overflow-tooltip
+          />
+          <el-table-column label="I" align="center" width="80px" show-overflow-tooltip>
+            <template #default="scope">
+              <span
+                v-if="scope.row.abnormalIndicator == 'H'"
+                style="
+                  color: #f33d21;
+                  display: flex;
+                  width: 100%;
+                  align-items: center;
+                  justify-content: center;
+                "
+              >
+                <img :src="shang" style="width: 16px; height: 16px" />{{
+                  scope.row.abnormalIndicator
+                }}</span
+              >
+              <span
+                v-if="scope.row.abnormalIndicator == 'L'"
+                style="
+                  color: #3263fe;
+                  display: flex;
+                  width: 100%;
+                  align-items: center;
+                  justify-content: center;
+                "
+              >
+                <img :src="xia" style="width: 16px; height: 16px" />{{
+                  scope.row.abnormalIndicator
+                }}</span
+              >
+            </template>
+          </el-table-column>
+        </el-table>
+      </div>
+    </Dialog>
   </div>
 </template>
 <script setup lang="ts">
@@ -962,7 +1043,8 @@ import {
   getPeDiagList,
   getPeDeptSuggestList,
   getPeDeptConclusion,
-  getPeItemReportWriteList
+  getPeItemReportWriteList,
+  getPeAbnormalItemList
 } from '@/api/PerPhyExamination/DoctorTriageDesk/index'
 import { useUserStore } from '@/store/modules/user'
 import { formatDate } from '@/utils/formatTime'
@@ -1273,11 +1355,19 @@ const reportChange = () => {
     }
   })
 }
+const yxjwjzTiXingData = ref([])
+const yxjwjzTiXingVisible = ref(false)
 const personalClick = (row) => {
   isCanDisableInput.value = false
   everySearchData.value = row
   personCode.value = row.peId
   getPerInfoMsg()
+  getPeAbnormalItemList({ peId: row.peId, peVisitId: row.peVisitId }).then((res) => {
+    if (res && res.length > 0) {
+      yxjwjzTiXingData.value = res
+      yxjwjzTiXingVisible.value = true
+    }
+  })
 }
 const setRowClassName = ({ row }) => {
   if (
@@ -2150,6 +2240,23 @@ const summary = () => {
     font-weight: bold;
     margin-bottom: 8px;
     padding-left: 8px;
+  }
+  /* // 添加tooltip右侧显示样式 */
+  :deep(.el-tooltip__popper) {
+    &.is-light {
+      &[x-placement^='right'] {
+        margin-left: 10px !important;
+      }
+    }
+  }
+
+  /* // 确保tooltip在表格单元格溢出时显示在右侧 */
+  :deep(.el-table) {
+    .cell {
+      .el-tooltip {
+        white-space: nowrap;
+      }
+    }
   }
 }
 

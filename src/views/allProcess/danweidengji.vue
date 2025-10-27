@@ -506,36 +506,57 @@
         style="width: 100%; margin-top: 10px; height: 500px"
         highlight-current-row
         @row-dblclick="selectUnitCodeClick"
-        ><el-table-column
+      >
+        <el-table-column
           :resizable="false"
           align="center"
           label="单位代码"
           show-overflow-tooltip
           prop="unitCode"
-          width="100" /><el-table-column
+          width="80" />
+        <el-table-column
           :resizable="false"
           align="left"
           label="单位名称"
           show-overflow-tooltip
-          prop="unitName" /><el-table-column
+          prop="unitName"
+          width="160" />
+        <el-table-column
           :resizable="false"
           align="center"
           label="联系人"
-          width="100"
+          width="80"
           show-overflow-tooltip
-          prop="connecter" /><el-table-column
+          prop="connecter" />
+        <el-table-column
           :resizable="false"
           align="center"
           label="联系电话"
           width="120"
           show-overflow-tooltip
-          prop="phone" /><el-table-column
+          prop="phone" />
+        <el-table-column
+          :resizable="false"
+          align="center"
+          label="预约开始时间"
+          width="120"
+          show-overflow-tooltip
+          prop="appointsDate" />
+        <el-table-column
+          :resizable="false"
+          align="center"
+          label="预约结束时间"
+          width="120"
+          show-overflow-tooltip
+          prop="appointsEndDate" />
+        <el-table-column
           :resizable="false"
           align="left"
           label="地址"
           width="140"
           show-overflow-tooltip
-          prop="address" /><el-table-column
+          prop="address" />
+        <el-table-column
           :resizable="false"
           align="center"
           label="拼音码"

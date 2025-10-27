@@ -65,3 +65,7 @@ export const createPePatInfo = (data) => {
 export const getPePatInfo = (data) => {
   return request.post({ url: '/health-api/health/patInfo/getPePatInfo', data })
 }
+//个人体检登记-首页统计信息信息
+export const homePageCountInfo = (data) => {
+  return request.post({ url: '/health-api/health/homePage/homePageCountInfo', data })
+}

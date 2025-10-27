@@ -12,7 +12,7 @@
               <div class="img_div_p">
                 <p class="div_p">个检总数(人)</p>
                 <div class="div_div">
-                  <p>{{ medicalData.isComplete || '1255' }}</p>
+                  <p>{{ medicalData.personalExamCount || '1255' }}</p>
                 </div>
               </div>
             </div>
@@ -23,7 +23,7 @@
               <div class="img_div_p">
                 <p class="div_p">团检总数(人)</p>
                 <div class="div_div">
-                  <p>{{ medicalData.notWritten || '1255' }}</p>
+                  <p>{{ medicalData.unitExamCount || '1255' }}</p>
                 </div>
               </div>
             </div>
@@ -34,7 +34,7 @@
               <div class="img_div_p">
                 <p class="div_p">评估报告总数(人)</p>
                 <div class="div_div">
-                  <p>{{ medicalData.notCommit || '1255' }}</p>
+                  <p>{{ medicalData.auditReportCount || '1255' }}</p>
                 </div>
               </div>
             </div>
@@ -45,7 +45,7 @@
               <div class="img_div_p">
                 <p class="div_p">复检总数(人)</p>
                 <div class="div_div">
-                  <p>{{ medicalData.monthGrade || '1255' }}</p>
+                  <p>{{ medicalData.recheckCount || '1255' }}</p>
                 </div>
               </div>
             </div>
@@ -106,7 +106,7 @@
       </div>
       <div class="r-left-content">
         <div class="r-left-inp-left">
-          <div class="buttons"
+          <!-- <div class="buttons"
             ><span
               :class="{ toggleActivate: zhuyuanType == '2' }"
               @click="toggleQueryInpPatCountTrendApi('2')"
@@ -116,7 +116,7 @@
               @click="toggleQueryInpPatCountTrendApi('3')"
               >总检状态</span
             >
-          </div>
+          </div> -->
           <p class="message-title">近一个月体检总状态</p>
           <div
             ref="overallStatusRef"
@@ -143,33 +143,9 @@
         <p class="message-title">未来7天体检统计</p>
         <div class="examli">
           <div class="li-top">
-            <div class="li-row">
-              <div>06/11</div>
-              <div>156人</div>
-            </div>
-            <div class="li-row">
-              <div>06/12</div>
-              <div>156人</div>
-            </div>
-            <div class="li-row">
-              <div>06/13</div>
-              <div>156人</div>
-            </div>
-            <div class="li-row">
-              <div>06/14</div>
-              <div>156人</div>
-            </div>
-            <div class="li-row">
-              <div>06/15</div>
-              <div>156人</div>
-            </div>
-            <div class="li-row">
-              <div>06/16</div>
-              <div>156人</div>
-            </div>
-            <div class="li-row">
-              <div>06/17</div>
-              <div>156人</div>
+            <div class="li-row" v-for="item in medicalData.futureWeekCount" :key="item.FUTURE_DATE">
+              <div>{{ item.FUTURE_DATE || '' }}</div>
+              <div>{{ item.COUNT }}人</div>
             </div>
           </div>
         </div>
@@ -179,11 +155,19 @@
             <div class="tijian" ref="examTypeRef"></div>
             <div class="ul">
               <span class="left-li left-li1"></span>
-              <span class="right-li">个人体检 丨265（64.2%）</span>
+              <span class="right-li"
+                >个人体检 丨 {{ medicalData.futureWeekPersonalExamCount }}（{{
+                  medicalData.futureWeekPersonalExamCountPercent
+                }}%）</span
+              >
             </div>
             <div class="ul">
               <span class="left-li left-li2"></span>
-              <span class="right-li">团队体检 丨154（35.8%）</span>
+              <span class="right-li"
+                >团队体检 丨{{ medicalData.futureWeekUnitExamCount }}（{{
+                  medicalData.futureWeekUnitExamCountPercent
+                }}%）</span
+              >
             </div>
           </div>
           <div class="li-right">
@@ -191,11 +175,19 @@
             <div class="sexType" ref="sexRatioRef"></div>
             <div class="ul">
               <span class="left-li left-li3"></span>
-              <span class="right-li">男性 丨265（64.2%）</span>
+              <span class="right-li"
+                >男性 丨{{ medicalData.futureWeekMaleExamCount }}（{{
+                  medicalData.futureWeekMaleExamCountPercent
+                }}%）</span
+              >
             </div>
             <div class="ul">
               <span class="left-li left-li4"></span>
-              <span class="right-li">女性 丨154（35.8%）</span>
+              <span class="right-li"
+                >女性 丨{{ medicalData.futureWeekFemaleExamCount }}（{{
+                  medicalData.futureWeekFemaleExamCountPercent
+                }}%）</span
+              >
             </div>
           </div>
         </div>
@@ -208,7 +200,7 @@
             <div class="crisis-item-top-l">单位</div>
             <div class="crisis-item-top-l">危急值</div>
           </div>
-          <div style="flex: 1; overflow: auto">
+          <div style="flex: 1; overflow: auto" v-if="crisisData.length > 0">
             <div
               :class="{ 'crisis-item-row': index % 2 != 0, 'crisis-item': true }"
               v-for="(item, index) in crisisData"
@@ -224,6 +216,12 @@
                 {{ item.content }}
               </div>
             </div>
+          </div>
+          <div
+            v-else
+            style="height: 260px; display: flex; align-items: center; justify-content: center"
+          >
+            暂无数据
           </div>
         </div>
         <!-- <div class="p-12px message-empty" v-else>
@@ -245,76 +243,18 @@ import reInspection from '@/assets/imgs/re-inspection.png'
 import * as echarts from 'echarts'
 import { useUserStore } from '@/store/modules/user'
 import { formatDate } from '@/utils/formatTime'
+import { homePageCountInfo } from '@/api/PerPhyExamination/perExamination/index'
+import { it } from 'node:test'
 const userStore = useUserStore()
 const userInfo = computed(() => userStore.getUser)
 const currenHospitalId = computed(() => userStore.getHospitalId)
 const zhuyuanType = ref('2')
-const crisisData = ref<any>([
-  {
-    name: '张三',
-    content: '采血时间超时',
-    unit: '个人体检'
-  },
-  {
-    name: '阿凡达',
-    content: '心电图检查缺血性ST-T波改变',
-    unit: '公司名称公司名称公司名称'
-  },
-  {
-    name: '张三',
-    content: '采血时间超时',
-    unit: '个人体检'
-  },
-  {
-    name: '阿凡达',
-    content: '心电图检查缺血性ST-T波改变',
-    unit: '公司名称公司名称公司名称'
-  },
-  {
-    name: '张三',
-    content: '采血时间超时',
-    unit: '个人体检'
-  },
-  {
-    name: '阿凡达',
-    content: '心电图检查缺血性ST-T波改变',
-    unit: '公司名称公司名称公司名称'
-  },
-  {
-    name: '张三',
-    content: '采血时间超时',
-    unit: '个人体检'
-  },
-  {
-    name: '阿凡达',
-    content: '心电图检查缺血性ST-T波改变',
-    unit: '公司名称公司名称公司名称'
-  },
-  {
-    name: '张三',
-    content: '采血时间超时',
-    unit: '个人体检'
-  },
-  {
-    name: '阿凡达',
-    content: '心电图检查缺血性ST-T波改变',
-    unit: '公司名称公司名称公司名称'
-  },
-  {
-    name: '张三',
-    content: '采血时间超时',
-    unit: '个人体检'
-  },
-  {
-    name: '阿凡达',
-    content: '心电图检查缺血性ST-T波改变',
-    unit: '公司名称公司名称公司名称'
-  }
-])
+const crisisData = ref<any>([])
 const medicalData = ref<any>({})
 onMounted(async () => {
   // await queryInpPatCountTrendApi()
   // await queryToDoListApi()
+  medicalData.value = await homePageCountInfo()
   nextTick(() => {
     showCheckupChart() //近一个月体检人数
     showAllCheckupChart() //近一个月体检总人数分布
@@ -326,6 +266,15 @@ onMounted(async () => {
 })
 const checkupRef = ref<HTMLDivElement | null>(null)
 const showCheckupChart = () => {
+  let xdata = []
+  let ydata = []
+  let pastMonthCountMap = medicalData.value.pastMonthCountMap
+  if (pastMonthCountMap && pastMonthCountMap.length > 0) {
+    pastMonthCountMap.forEach((item) => {
+      xdata.unshift(item.VISIT_DAY)
+      ydata.unshift(item.DATA_COUNT)
+    })
+  }
   if (checkupRef.value) {
     const chartInstance = echarts.init(checkupRef.value)
     window.addEventListener('resize', () => {
@@ -342,14 +291,17 @@ const showCheckupChart = () => {
       xAxis: {
         type: 'category',
         boundaryGap: false,
-        data: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12']
+        data: xdata
       },
       yAxis: {
         type: 'value'
       },
+      tooltip: {
+        trigger: 'axis'
+      },
       series: [
         {
-          data: [100, 245, 456, 467, 564, 435, 356, 234, 109, 345, 546, 645],
+          data: ydata,
           type: 'line',
           smooth: true, // 设置为 true 以启用平滑曲线
           lineStyle: {
@@ -378,15 +330,29 @@ const showCheckupChart = () => {
 }
 const checkupAllRef = ref<HTMLDivElement | null>(null)
 const showAllCheckupChart = () => {
+  let xdata = [],
+    ydata1 = [],
+    ydata2 = [],
+    pastMonthPersonalCountMap = medicalData.value.pastMonthPersonalCountMap,
+    pastMonthUnitCountMap = medicalData.value.pastMonthUnitCountMap
+  if (pastMonthPersonalCountMap && pastMonthPersonalCountMap.length > 0) {
+    pastMonthPersonalCountMap.forEach((item) => {
+      xdata.unshift(item.VISIT_DAY)
+      ydata1.unshift(item.DATA_COUNT)
+    })
+  }
+
+  if (pastMonthUnitCountMap && pastMonthUnitCountMap.length > 0) {
+    pastMonthUnitCountMap.forEach((item) => {
+      ydata2.unshift(item.DATA_COUNT)
+    })
+  }
   if (checkupAllRef.value) {
     const chartInstance2 = echarts.init(checkupAllRef.value)
     window.addEventListener('resize', () => {
       chartInstance2.resize()
     })
-    const rawData = [
-      [100, 302, 301, 334, 390, 330, 320, 320, 320],
-      [320, 132, 101, 134, 90, 230, 210, 320, 320]
-    ]
+    const rawData = [ydata1, ydata2]
     const totalData: number[] = []
     for (let i = 0; i < rawData[0].length; ++i) {
       let sum = 0
@@ -429,9 +395,9 @@ const showAllCheckupChart = () => {
 
       yAxis: {
         type: 'value',
-        min: 0, // 设置 Y 轴的最小值
-        max: 1000, // 设置 Y 轴的最大值
-        interval: 200, // 设置 Y 轴的刻度间隔
+        // min: 0, // 设置 Y 轴的最小值
+        // max: 500, // 设置 Y 轴的最大值
+        // interval: 200, // 设置 Y 轴的刻度间隔
         axisLabel: {
           formatter: '{value}' // 可选：格式化刻度标签
         }
@@ -439,7 +405,7 @@ const showAllCheckupChart = () => {
 
       xAxis: {
         type: 'category',
-        data: ['1', '2', '3', '4', '5', '6', '7', '8', '9']
+        data: xdata
       },
       series
     }
@@ -459,8 +425,8 @@ const showOverallStatusChart = () => {
       },
       legend: {
         top: '5%',
-        left: 'center',
-        show: false // 隐藏图例
+        left: 'center'
+        // show: false // 隐藏图例
       },
       series: [
         {
@@ -484,14 +450,14 @@ const showOverallStatusChart = () => {
           },
           data: [
             {
-              value: 1048,
+              value: medicalData.value.pastMonthPersonalAuditCount,
               name: '团检',
               itemStyle: {
                 color: '#165DFF' // 为“团检”设置颜色，例如番茄红
               }
             },
             {
-              value: 735,
+              value: medicalData.value.pastMonthUnitAuditCount,
               name: '个检',
               itemStyle: {
                 color: '#F7BA1E' // 为“个检”设置颜色，例如钢蓝色
@@ -543,14 +509,14 @@ const showExamTypeChart = () => {
           },
           data: [
             {
-              value: 1048,
+              value: medicalData.value.futureWeekUnitExamCount,
               name: '团检',
               itemStyle: {
                 color: '#4D94FF'
               }
             },
             {
-              value: 735,
+              value: medicalData.value.futureWeekPersonalExamCount,
               name: '个检',
               itemStyle: {
                 color: '#00C27C'
@@ -601,14 +567,14 @@ const showSexRatioChart = () => {
           },
           data: [
             {
-              value: 1048,
+              value: medicalData.value.futureWeekMaleExamCount,
               name: '男性',
               itemStyle: {
                 color: '#3473D1'
               }
             },
             {
-              value: 735,
+              value: medicalData.value.futureWeekFemaleExamCount,
               name: '女性',
               itemStyle: {
                 color: '#EC6B44'
@@ -682,8 +648,8 @@ const showBusiness = () => {
       },
       legend: {
         top: '5%',
-        left: 'center',
-        show: false // 隐藏图例
+        left: 'center'
+        // show: false // 隐藏图例
       },
       series: [
         {
@@ -707,14 +673,14 @@ const showBusiness = () => {
           },
           data: [
             {
-              value: 1048,
+              value: medicalData.value.toDayUnitExam,
               name: '团检',
               itemStyle: {
                 color: '#165DFF' // 为“团检”设置颜色，例如番茄红
               }
             },
             {
-              value: 735,
+              value: medicalData.value.toDayPersonalExam,
               name: '个检',
               itemStyle: {
                 color: '#F7BA1E' // 为“个检”设置颜色，例如钢蓝色

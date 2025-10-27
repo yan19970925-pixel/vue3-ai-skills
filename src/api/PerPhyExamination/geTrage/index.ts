@@ -64,3 +64,15 @@ export const cancleCbAuditDept = (data) => {
 export const getNoFinishItem = (data) => {
   return request.post({ url: '/health-api/health/audit/getNoFinishItem', data })
 }
+//查询患者历史体检数据对比
+export const pastExamResultList = (data) => {
+  return request.post({ url: '/health-api/health/audit/pastExamResultList', data })
+}
+//撤销终审
+export const updateResultStatus = (data) => {
+  return request.post({ url: '/health-api/health/audit/updateResultStatus', data })
+}
+//添加复检计划
+export const updateReCheckPlan = (data) => {
+  return request.post({ url: '/health-api/health/reCheck/updateReCheckPlan', data })
+}

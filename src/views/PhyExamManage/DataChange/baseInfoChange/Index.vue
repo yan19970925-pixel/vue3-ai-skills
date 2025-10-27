@@ -2,6 +2,41 @@
   <div class="per_exma">
     <div class="exma_search">
       <div class="search_div">
+        <span>体检时间区间：</span>
+        <el-date-picker
+          v-model="peTime"
+          format="YYYY-MM-DD"
+          value-format="YYYY-MM-DD"
+          type="daterange"
+          start-placeholder="开始日期"
+          end-placeholder="结束日期"
+          class="!w-280px"
+          @change="search"
+        />
+      </div>
+      <div class="search_div">
+        <span> 体检号 ：</span>
+        <el-input
+          style="width: 160px"
+          v-model="searchPeId"
+          placeholder="请输入"
+          class="select-item"
+          clearable
+          @blur="search"
+        />
+      </div>
+      <div class="search_div">
+        <span> 姓名 ：</span>
+        <el-input
+          style="width: 160px"
+          v-model="searchPeName"
+          placeholder="请输入"
+          class="select-item"
+          clearable
+          @blur="search"
+        />
+      </div>
+      <!-- <div class="search_div">
         <el-checkbox
           v-model="formInfo.joinUnit"
           label="属于单位体检"
@@ -14,13 +49,6 @@
       </div>
       <div class="search_div">
         <span> <b style="color: #ed2226" v-show="formInfo.joinUnit == 1">*</b>单位代码：</span>
-        <!-- <el-input
-          style="width: 160px"
-          v-model="formInfo.unitCode"
-          placeholder="请输入"
-          class="select-item"
-          clearable
-        /> -->
         <el-input
           v-model="formInfo.unitCode"
           @keyup.enter="searchByUnitCode"
@@ -60,48 +88,13 @@
           clearable
           :disabled="allDisabled"
         />
-      </div>
-      <!-- <div class="search_div">
-        <span>单位编制数：</span>
-        <el-input
-          style="width: 100px"
-          v-model="formInfo.unitNumber"
-          placeholder="请输入"
-          class="select-item"
-          clearable
-        />
       </div> -->
       <div class="search_div">
-        <!-- <el-button class="save" @click="searchByPeId">查询</el-button> -->
-        <el-button class="clear" @click="clearMsg">清屏</el-button>
+        <el-button class="save" @click="search">查询</el-button>
+        <!-- <el-button class="clear" @click="clearMsg">清屏</el-button> -->
       </div>
-      <div class="search_div">
-        <el-checkbox
-          :disabled="allDisabled"
-          v-model="formInfo.appointPeExam"
-          @change="appointChange"
-          size="large"
-        >
-          <b style="color: #ed2226">*</b>预约体检
-        </el-checkbox>
-      </div>
-      <div class="search_div">
-        <span><b style="color: #ed2226">*</b>预约时间：</span>
-        <el-date-picker
-          :disabled="!formInfo.appointPeExam"
-          v-model="formInfo.pePreDate"
-          type="date"
-          placeholder="选择日期"
-          style="width: 160px"
-          value-format="YYYY-MM-DD"
-          class="select-item"
-          @change="handleTimeChange"
-          :disabled-date="disabledDate || allDisabled"
-        />
-      </div>
-      <div class="search_div">
+      <!-- <div class="search_div">
         <el-button class="save" :disabled="allDisabled" @click="saveDengJi">保存</el-button>
-        <!-- <el-button class="save" @click="readIdCard">身份证读卡</el-button> -->
         <el-button class="save" :disabled="allDisabled" @click="OcrRecognition(false)"
           >身份证读卡</el-button
         >
@@ -112,21 +105,83 @@
           @click="OcrRecognition(true)"
           >对象身份证读卡</el-button
         >
-        <!-- <el-button @click="handlePrint({ peId: 'TJ10000015' })">调用打印</el-button> -->
-        <!-- <el-button class="read" @click="readIdCard"> <img :src="readCard" />读卡 </el-button> -->
-        <!-- <el-button class="read" @click="personReport"> <img :src="report" />报到 </el-button> -->
-      </div>
+      </div> -->
     </div>
     <div class="exma_con">
+      <div class="con_one mr-4px">
+        <div class="left_heard">
+          <span>体检人员列表</span>
+        </div>
+        <div class="left_con pl-8px pr-8px">
+          <el-table
+            :data="personList"
+            style="width: 100%"
+            border
+            highlight-current-row
+            height="calc(100vh - 220px)"
+            @row-click="perListRowClick"
+          >
+            <!-- @row-dblclick="perListRowClick" -->
+            <el-table-column
+              prop="peId"
+              label="体检号"
+              align="center"
+              width="120px"
+            ></el-table-column>
+            <el-table-column
+              prop="peVisitId"
+              label="体检次数"
+              align="center"
+              width="86px"
+            ></el-table-column>
+            <el-table-column
+              prop="name"
+              align="center"
+              width="120px"
+              label="姓名"
+            ></el-table-column>
+            <el-table-column prop="sex" align="center" width="60px" label="性别"></el-table-column>
+            <el-table-column
+              prop="dateOfBirth"
+              align="center"
+              width="120px"
+              label="出生日期"
+            ></el-table-column>
+            <el-table-column
+              prop="unitname"
+              align="center"
+              width="120px"
+              show-overflow-tooltip="true"
+              label="单位名称"
+            ></el-table-column>
+            <el-table-column
+              prop="idNo"
+              align="center"
+              width="180px"
+              label="身份证号"
+            ></el-table-column>
+          </el-table>
+        </div>
+      </div>
       <div class="con_left">
         <div class="left_heard">
           <span>人员基本信息</span>
-          <el-checkbox
+          <!-- <el-checkbox
             style="margin-left: 30px; height: 40px; line-height: 40px"
             v-model="isVerifyID"
             >是否校验身份证</el-checkbox
+          > -->
+          <span style="color: #333; font-weight: normal; padding-right: 0"
+            ><b style="color: #ed2226">*</b>预约日期：</span
           >
-          <el-button @click="openAi"><img :src="ai" />套餐智能推荐</el-button>
+          <el-date-picker
+            v-model="formInfo.pePreDate"
+            type="date"
+            placeholder="选择日期"
+            style="width: 160px; display: inline-block"
+            value-format="YYYY-MM-DD"
+            :disabled="allDisabled"
+          />
         </div>
         <div class="left_con">
           <el-row>
@@ -391,7 +446,7 @@
                 </el-select>
               </div>
               <div class="left_form">
-                <span><b style="color: #ed2226">*</b>身份证号：</span>
+                <span><b style="color: #ed2226">*</b>证件编号：</span>
                 <el-input
                   style="width: calc(100% - 100px)"
                   v-model="formInfo.idNo"
@@ -440,7 +495,7 @@
                   clearable
                 />
               </div>
-              <div class="left_form">
+              <!-- <div class="left_form">
                 <span><b style="color: #ed2226">*</b>优先级：</span>
                 <el-select
                   v-model="formInfo.peLevel"
@@ -456,26 +511,7 @@
                   <el-option label="VIP" value="VIP" />
                   <el-option label="特别" value="特别" />
                 </el-select>
-              </div>
-              <div class="left_form">
-                <span>职业：</span>
-                <el-select
-                  v-model="formInfo.occupation"
-                  placeholder="职业类型"
-                  style="width: calc(100% - 100px)"
-                  class="select-item"
-                  filterable
-                  default-first-option
-                  :disabled="allDisabled"
-                >
-                  <el-option
-                    v-for="item in occupationList"
-                    :key="item.occupationCode"
-                    :label="item.occupationName"
-                    :value="item.occupationCode"
-                  />
-                </el-select>
-              </div>
+              </div> -->
               <div
                 class="left_form"
                 v-show="
@@ -585,7 +621,26 @@
                     </template> -->
                   </el-upload>
                 </div>
-
+                <div class="left_form">
+                  <span>职业：</span>
+                  <el-select
+                    v-model="formInfo.occupation"
+                    placeholder="职业类型"
+                    style="width: calc(100% - 100px)"
+                    class="select-item"
+                    filterable
+                    default-first-option
+                    :disabled="allDisabled"
+                    clearable
+                  >
+                    <el-option
+                      v-for="item in occupationList"
+                      :key="item.occupationCode"
+                      :label="item.occupationName"
+                      :value="item.occupationCode"
+                    />
+                  </el-select>
+                </div>
                 <div
                   class="left_form"
                   v-show="formInfo.peTypeName == '婚检' || formInfo.peTypeName == '孕前优生检查'"
@@ -707,57 +762,14 @@
               </div>
             </el-col>
           </el-row>
-          <!-- <el-row>
-            <el-col :span="9">
-              
-            </el-col>
-          </el-row> -->
-          <el-row>
-            <!-- <el-col :span="18">
-              <div class="left_form">
-                <span><b style="color: #ed2226">*</b>出生地：</span>
-                <el-input
-                  v-model="birthPlaceName"
-                  placeholder="请输入"
-                  class="select-item"
-                  clearable
-                  :loading="areaLoading"
-                  @click="onShowDiagDialog"
-                  :remote-method="remoteAreaMethod"
-                  :disabled="allDisabled"
-                >
-                  <template #default>
-                    {{
-                      birthPlaceOptions.find((item) => item.areaCode === formInfo.birthPlace)
-                        ?.areaName || ''
-                    }}
-                  </template>
-                </el-input>
-              </div>
-            </el-col> -->
-          </el-row>
-          <!-- <el-row>
-            <el-col :span="9">
-              <div class="left_form">
-                <span>自定编号：</span>
-                <el-input
-                  style="width: calc(100% - 100px)"
-                  v-model="formInfo.workno"
-                  placeholder="请输入"
-                  class="select-item"
-                  clearable
-                />
-              </div>
-            </el-col>
-            
-          </el-row> -->
+          <el-row> </el-row>
           <el-row>
             <el-col :span="16">
               <div class="left_form">
                 <span>通讯地址：</span>
                 <el-input
                   style="width: calc(100% - 100px)"
-                  v-model="formInfo.mailingAddress"
+                  v-model="formInfo.address"
                   placeholder="请输入"
                   class="select-item"
                   clearable
@@ -766,79 +778,23 @@
               </div>
             </el-col>
           </el-row>
-          <!-- <el-row>
-            <el-col :span="9">
-              <div class="left_form">
-                <span>邮政编码：</span>
-                <el-input
-                  style="width: calc(100% - 100px)"
-                  v-model="formInfo.postcode"
-                  placeholder="请输入"
-                  class="select-item"
-                  clearable
-                />
-              </div>
-            </el-col>
-            <el-col :span="9">
-              <div class="left_form">
-                <span>邮箱：</span>
-                <el-input
-                  style="width: calc(100% - 100px)"
-                  v-model="formInfo.email"
-                  placeholder="请输入"
-                  class="select-item"
-                  clearable
-                />
-              </div>
-              <div class="left_form">
-                <span>网络密码：</span>
-                <el-input
-                  style="width: calc(100% - 100px)"
-                  v-model="formInfo.setCode"
-                  placeholder="请输入"
-                  class="select-item"
-                  clearable
-                />
-              </div>
-            </el-col>
-          </el-row> -->
-          <!-- <el-row>
-            <el-col :span="9">
-              <div class="left_form">
-                <span>体检类别：</span>
-                <el-input
-                  style="width: calc(100% - 100px)"
-                  v-model="formInfo.setCode"
-                  placeholder="请输入"
-                  class="select-item"
-                  clearable
-                />
-              </div>
-            </el-col>
-          </el-row> -->
-          <!-- <el-row>
-            <el-col :span="9">
-              <div class="left_form">
-                <span>卡号：</span>
-                <el-input
-                  style="width: calc(100% - 100px)"
-                  v-model="formInfo.setCode"
-                  placeholder="请输入"
-                  class="select-item"
-                  clearable
-                />
-              </div>
-            </el-col>
-            <el-col :span="9">
-              <div class="left_form">
-                <el-checkbox v-model="checked1" label="是否使用卡支付" size="large" />
-              </div>
-            </el-col>
-          </el-row> -->
-          <div class="per_list" @click="showPersonList">患<br />者<br />列<br />表</div>
+          <div class="search_div">
+            <el-button
+              v-show="formInfo.peTypeName == '婚检' || formInfo.peTypeName == '孕前优生检查'"
+              class="save"
+              :disabled="allDisabled"
+              @click="OcrRecognition(true)"
+              >对象身份证读卡</el-button
+            >
+            <!-- <el-button class="save" :disabled="allDisabled" @click="OcrRecognition(false)"
+              >身份证读卡</el-button
+            > -->
+            <el-button class="save" :disabled="allDisabled" @click="saveDengJi">保存</el-button>
+          </div>
+          <!-- <div class="per_list" @click="showPersonList">患<br />者<br />列<br />表</div> -->
         </div>
       </div>
-      <div class="con_right">
+      <!-- <div class="con_right">
         <div>
           <div class="right_heard">
             <span>套餐选择</span>
@@ -858,16 +814,7 @@
                 />
               </el-col>
               <el-col :span="1"></el-col>
-              <el-col :span="11">
-                <!-- <span class="span1">已选</span>
-                <el-input
-                  style="width: calc(100% - 38px)"
-                  v-model="formInfo.setCode"
-                  placeholder="请输入"
-                  class="select-item"
-                  clearable
-                /> -->
-              </el-col>
+              <el-col :span="11"> </el-col>
             </el-row>
           </div>
           <div
@@ -966,7 +913,7 @@
               <el-col :span="12" class="col">
                 <div
                   class="unChecked"
-                  style="height: calc(100vh - 630px)"
+                  style="height: calc(100vh - 700px)"
                   :class="allDisabled ? 'is-disabled' : ''"
                 >
                   <div
@@ -994,13 +941,13 @@
               >
                 <div
                   class="isChecked"
-                  style="height: calc(100vh - 630px)"
+                  style="height: calc(100vh - 700px)"
                   :class="allDisabled ? 'is-disabled' : ''"
                 >
                   <div class="div" v-for="item in allDataSelected" :key="item.itemAssemCode">
                     <el-tooltip
                       effect="dark"
-                      :content="`${item.itemAssemName}(${item.discountPrice}元)`"
+                      :content="`${item.itemAssemName}(${item.personPrice}元)`"
                       placement="right"
                     >
                       <el-checkbox-group
@@ -1021,16 +968,6 @@
           </div>
           <div class="price">
             <el-row>
-              <!-- <el-col :span="6">
-                <span class="span1">单价：</span>
-                <el-input
-                  style="width: calc(100% - 72px)"
-                  v-model="price"
-                  placeholder="请输入"
-                  class="select-item"
-                  clearable
-                />
-              </el-col> -->
               <el-col :span="8">
                 <span class="span1">总金额：</span>
                 <el-input
@@ -1042,54 +979,12 @@
                   disabled
                 />
               </el-col>
-              <!-- <el-col :span="8">
-                <span class="span1">个检金额：</span>
-                <el-input
-                  style="width: calc(100% - 72px)"
-                  v-model="formInfo.totalCharges"
-                  placeholder="请输入"
-                  class="select-item"
-                  clearable
-                  :disabled="allDisabled"
-                />
-              </el-col> -->
-              <!-- <el-col :span="8">
-                <span class="span1">团检金额：</span>
-                <el-input
-                  style="width: calc(100% - 72px)"
-                  v-model="formInfo.totalCharges"
-                  placeholder="请输入"
-                  class="select-item"
-                  clearable
-                  :disabled="allDisabled"
-                />
-              </el-col> -->
             </el-row>
           </div>
         </div>
-      </div>
+      </div> -->
     </div>
-    <el-drawer
-      class="per_drawer"
-      v-model="personListdrawer"
-      title="今日已登记患者列表"
-      size="20%"
-      direction="ltr"
-    >
-      <div>
-        <el-table
-          :data="personList"
-          style="width: 100%"
-          border
-          highlight-current-row
-          @row-dblclick="perListRowClick"
-          height="calc(100vh - 120px)"
-        >
-          <el-table-column prop="peId" label="体检号" width="120px"></el-table-column>
-          <el-table-column prop="name" label="姓名"></el-table-column>
-        </el-table>
-      </div>
-    </el-drawer>
+
     <Dialog
       v-model="diagDialogVisible"
       width="600px"
@@ -1197,41 +1092,16 @@
           prop="inputCode"
       /></el-table>
     </Dialog>
-    <Dialog
-      v-model="AiVisible"
-      width="600px"
-      max-height="600px"
-      :fullscreen="false"
-      :close-on-click-modal="false"
-      title="智能套餐推荐"
-    >
-      <div style="width: 100%; height: 100%" v-loading="loading" element-loading-text="思考中...">
-        <span
-          style="
-            height: calc(100% - 83px);
-            width: 100%;
-            padding: 10px;
-            overflow-y: auto;
-            font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
-            line-height: 1.6;
-            color: #3473d1;
-            margin-bottom: 16px;
-            white-space: pre-wrap;
-          "
-          >{{ displayedText }}</span
-        >
-      </div>
-    </Dialog>
     <PrintZhiYinDan ref="printZhiYinDanRef" v-show="false" />
   </div>
 </template>
 <script setup lang="ts" name="perExamination">
+import * as updateApi from '@/api/PerPhyExamination/DataChange/baseInfoChange/index.ts'
 import readCard from '@/assets/images/readCard.svg'
 import report from '@/assets/images/report.svg'
 import person from '@/assets/images/person.svg'
 import shezhi from '@/assets/images/shezhi.svg'
 import paizhao from '@/assets/images/paizhao.svg'
-import ai from '@/assets/images/ai.svg'
 import * as Api from '@/api/systemSetting/PEPackage/index'
 import { getAccessToken } from '@/utils/auth'
 import {
@@ -1250,15 +1120,15 @@ import {
   getUnitInfo,
   getPePatInfo
 } from '@/api/PerPhyExamination/perExamination/index'
+import { updatePePatIentInfo } from '@/api/PerPhyExamination/DataChange/baseInfoChange/index'
 import dayjs from 'dayjs'
 import { formatDate } from '@/utils/formatTime'
 import { Search } from '@element-plus/icons-vue'
 import PrintZhiYinDan from '@/views/PhyExamManage/PerPhyExamination/printGuidanceSheet/Index.vue'
 import { ref } from 'vue'
 import axios from 'axios'
-import { debounce } from 'lodash'
-import { open } from 'fs'
-import Dialog from '@/components/Dialog/src/Dialog.vue'
+const time = ref([formatDate(new Date(), 'YYYY-MM-DD'), formatDate(new Date(), 'YYYY-MM-DD')])
+
 const printZhiYinDanRef = ref()
 const handlePrint = async (params) => {
   if (printZhiYinDanRef.value?.PrintZhiYinDan) {
@@ -1310,7 +1180,7 @@ const formInfo = reactive({
   visitDate: '',
   setCode: '',
   totalCharges: 0,
-  mailingAddress: '',
+  address: '',
   unitVisitId: '',
   screeningCode: '',
   peVisitId: 1,
@@ -1324,8 +1194,10 @@ const formInfo = reactive({
   addressProvince: '',
   addressCity: '',
   addressDistrict: '',
-  addressStreet: ''
+  addressStreet: '',
   // freeFlag: ''
+  time: time.value,
+  itemList: []
 })
 const price = ref(0) // 单价
 const selectedCategory = ref('全部') // 当前选中分类
@@ -1333,13 +1205,13 @@ const categories = ref<any>([]) // 分类列表
 const allDataUnselect = ref([]) // 可选项目列表
 watch(selectedCategory, (newValue) => {
   console.log(newValue)
-  if (formInfo.appointPeExam) {
-    if (newValue === '全部') {
-      getItemUnselectList(setCode.value)
-    } else {
-      getItemUnselectList(setCode.value, newValue)
-    }
-  }
+  // if (formInfo.appointPeExam) {
+  //   if (newValue === '全部') {
+  //     getItemUnselectList(setCode.value)
+  //   } else {
+  //     getItemUnselectList(setCode.value, newValue)
+  //   }
+  // }
   zuheSearch.value = ''
 })
 const unitInfo = ref<any>({})
@@ -1350,6 +1222,9 @@ const searchByUnitCode = async () => {
     let res = await getUnitInfo({
       unitCode: formInfo.unitCode
     })
+    if (res.taxId) {
+      formInfo.taxId = res.taxId
+    }
     if (res && res.unitName) {
       formInfo.unitName = res.unitName
       formInfo.unitCode = res.unitCode
@@ -1396,8 +1271,25 @@ const handleQueryItem = async () => {
 }
 //查询的体检号
 const searchPeId = ref<String>('')
+const searchPeName = ref<String>('')
 // 根据体检号查询人员登记信息并赋值
-const searchByPeId = () => {}
+const peTime = ref([formatDate(new Date(), 'YYYY-MM-DD'), formatDate(new Date(), 'YYYY-MM-DD')])
+const search = () => {
+  selectPeVisitList({
+    preBeginDate: peTime.value[0],
+    preEndDate: peTime.value[1],
+    unitCode: '',
+    unitVisitId: '',
+    peId: searchPeId.value || '',
+    peVisitId: '',
+    idNo: '',
+    number: '',
+    name: searchPeName.value || ''
+  }).then((res) => {
+    console.log('%c Line:1344 🥃 res', 'color:#ffdd4d', res)
+    personList.value = res
+  })
+}
 const joinUnitChange = () => {
   if (formInfo.joinUnit == 1) {
     formInfo.chargeType = '团检'
@@ -1416,15 +1308,11 @@ const appointChange = (val) => {
   if (val) {
     formInfo.pePreDate = formatDate(new Date(), 'YYYY-MM-DD')
     formInfo.visitDate = formatDate(new Date(), 'YYYY-MM-DD')
-    getItemUnselectList('', selectedCategory.value == '全部' ? '' : selectedCategory.value)
   } else {
     formInfo.pePreDate = ''
     formInfo.visitDate = ''
     allDataSelected.value = []
     xuanzhongData.value = {}
-    shaixuanAllDataList.value = []
-    xuanzhongChecked.value = []
-    shaixuanChecked.value = []
   }
 }
 //根据体检类型筛选套餐分类
@@ -1452,8 +1340,8 @@ const changePeType = (val) => {
     formInfo.addressStreet = ''
   }
   if (val == '婚检' || val == '孕前优生检查') {
-    formInfo.addressCity = '秦皇岛市'
-    formInfo.addressDistrict = '北戴河区'
+    formInfo.addressCity = '北京市'
+    formInfo.addressDistrict = '延庆区'
   }
 }
 //套餐编码
@@ -1532,8 +1420,7 @@ const getItemUnselectList = async (setCode, form = '') => {
     pageNo: 1,
     pageSize: 10000000,
     // setCode: setCode || '',
-    form: form || '',
-    clinicFlag: 1
+    form: form || ''
   })
   allDataUnselect.value = res.records || []
   shaixuanAllDataList.value = res.records || []
@@ -1580,7 +1467,7 @@ const xuanzhongHandleItem = (item, checked) => {
     allDataSelected.value.forEach((item) => {
       item.setCode = null
     })
-    xuanzhongData.value = {}
+    // xuanzhongData.value = {}
   }
   const allDataSelectedItemCodes = new Set(allDataSelected.value.map((item) => item.itemAssemCode))
   shaixuanAllDataList.value = allDataUnselect.value.filter((item) => {
@@ -1666,9 +1553,6 @@ const validatePhoneNumber = (phoneNumberHome) => {
 }
 // 保存信息
 const saveDengJi = async () => {
-  saveDengJiTime()
-}
-const saveDengJiTime = debounce(() => {
   if (formInfo.joinUnit == 1) {
     if (!formInfo.unitCode) {
       ElMessage.error('单位代码不能为空')
@@ -1707,13 +1591,15 @@ const saveDengJiTime = debounce(() => {
   else if (!formInfo.chargeType) {
     ElMessage.error('费别不能为空')
     return
-  } else if (!formInfo.peLevel) {
-    ElMessage.error('优先级不能为空')
-    return
-    // } else if (!formInfo.birthPlace) {
-    //   ElMessage.error('出生地不能为空')
-    //   return
-  } else if (!formInfo.phoneNumberHome) {
+  }
+  //else if (!formInfo.peLevel) {
+  //   ElMessage.error('优先级不能为空')
+  //   return
+  //   // } else if (!formInfo.birthPlace) {
+  //   //   ElMessage.error('出生地不能为空')
+  //   //   return
+  // }
+  else if (!formInfo.phoneNumberHome) {
     ElMessage.error('联系电话不能为空')
     return
   } else if (!formInfo.appointPeExam) {
@@ -1786,35 +1672,40 @@ const saveDengJiTime = debounce(() => {
     return
   }
 
-  let itemList = []
-  let num = 0
-  allDataSelected.value.forEach((item) => {
-    itemList.push({
-      itemCode: item.itemAssemCode,
-      deptCode: item.peDeptCode,
-      chartCode: item.chartCode,
-      setCode: item.setCode || null
-    })
-    // num += item.personPrice * 100
-    num += item.discountPrice * 100
-  })
-  formInfo.totalCharges = (num / 100).toFixed(2)
-  formInfo.itemList = itemList
-  console.log(allDataSelected.value, itemList, num)
+  // let itemList = []
+  // let num = 0
+  // allDataSelected.value.forEach((item) => {
+  //   itemList.push({
+  //     itemCode: item.itemAssemCode,
+  //     deptCode: item.peDeptCode,
+  //     chartCode: item.chartCode,
+  //     setCode: item.setCode || null
+  //   })
+  //   // num += item.personPrice * 100
+  //   num += item.discountPrice * 100
+  // })
+  // formInfo.totalCharges = (num / 100).toFixed(2)
+  // formInfo.itemList = itemList
+  // console.log(allDataSelected.value, itemList, num)
   if (formInfo.joinUnit != 1) {
     formInfo.unitCode = '****'
   }
-  formInfo.setCode = xuanzhongData.value.setCode || null
+  // formInfo.setCode = xuanzhongData.value.setCode || null
   if (formInfo.sex == '1') {
     formInfo.sex = '男'
   } else if (formInfo.sex == '0') {
     formInfo.sex = '女'
   }
-  console.log('%c Line:1505 🍡 formInfo', 'color:#465975', formInfo)
-  createPePatInfo(formInfo).then(async (res) => {
+  let params = {
+    peId: formInfo.peId,
+    peVisitId: formInfo.peVisitId,
+    peVisit: formInfo,
+    peMasterIndex: formInfo
+  }
+  updatePePatIentInfo(params).then(async (res) => {
     ElMessage.success('保存成功')
-    formInfo.peId = res.peId
-    formInfo.peVisitId = res.peVisitId
+    // formInfo.peId = res.peId
+    // formInfo.peVisitId = res.peVisitId
     // // 获取 formInfo 的所有属性名
     // const keys = Object.keys(formInfo)
 
@@ -1833,10 +1724,11 @@ const saveDengJiTime = debounce(() => {
     // formInfo.peId = await getMaxPeId()
     // allDataSelected.value = []
     // shaixuanAllDataList.value = []
-    await handlePrint(formInfo)
-    clearMsg()
+    // await handlePrint(formInfo)
+    search()
+    // clearMsg()
   })
-}, 500)
+}
 const clearMsg = async () => {
   allDisabled.value = false
   // 获取 formInfo 的所有属性名
@@ -1854,20 +1746,18 @@ const clearMsg = async () => {
     }
   })
   // }
-  formInfo.peId = await getMaxPeId()
+  formInfo.peId = '' //await getMaxPeId()
   allDataSelected.value = []
   shaixuanAllDataList.value = []
   xuanzhongData.value = {}
-  xuanzhongChecked.value = []
-  shaixuanChecked.value = []
-  formInfo.idType = IDtypeList.value[0].typeCode
+  formInfo.idType = '01' //IDtypeList.value[0].typeCode
   formInfo.peTypeName = petypeNameList.value[0].keyValue
   checkedPeSetListData.value = ''
   formInfo.unitCode = ''
   formInfo.photo = ''
   photoUrl.value = ''
   selectedCategory.value = '全部'
-  await getItemUnselectList()
+  // await getItemUnselectList()
   await changePeType(formInfo.peTypeName)
 }
 const formLoading = ref(false) // 表单的加载中：1）修改时的数据加载；2）提交的按钮禁用
@@ -1940,69 +1830,71 @@ const getImageUrl = (photoData: string) => {
 const isVerifyID = ref(true)
 //根据身份证号计算
 const countbrith = async (value) => {
-  if (isVerifyID.value) {
-    let isTrueId = isValidIDCard(value)
-    if (isTrueId) {
-      if (formInfo.idNo && formInfo.idNo.length >= 6) {
-        const year = formInfo.idNo.substring(6, 10)
-        const month = formInfo.idNo.substring(10, 12)
-        const day = formInfo.idNo.substring(12, 14)
-        formInfo.dateOfBirth = `${year}-${month}-${day}`
-        countCompute(formInfo.idNo)
-        formInfo.peLevel = '普通'
-        formInfo.nation = '汉族'
-        formInfo.country = 'CN'
-        formInfo.appointPeExam = true
-        formInfo.pePreDate = formatDate(new Date(), 'YYYY-MM-DD')
-        formInfo.visitDate = formatDate(new Date(), 'YYYY-MM-DD')
-        if (formInfo.joinUnit != 1) {
-          formInfo.chargeType = '个检'
+  if (formInfo.idType == '01') {
+    if (isVerifyID.value) {
+      let isTrueId = isValidIDCard(value)
+      if (isTrueId) {
+        if (formInfo.idNo && formInfo.idNo.length >= 6) {
+          const year = formInfo.idNo.substring(6, 10)
+          const month = formInfo.idNo.substring(10, 12)
+          const day = formInfo.idNo.substring(12, 14)
+          formInfo.dateOfBirth = `${year}-${month}-${day}`
+          countCompute(formInfo.idNo)
+          formInfo.peLevel = '普通'
+          formInfo.nation = '汉族'
+          formInfo.country = 'CN'
+          formInfo.appointPeExam = true
+          formInfo.pePreDate = formatDate(new Date(), 'YYYY-MM-DD')
+          formInfo.visitDate = formatDate(new Date(), 'YYYY-MM-DD')
+          if (formInfo.joinUnit != 1) {
+            formInfo.chargeType = '个检'
+          } else {
+            formInfo.chargeType = '团检'
+          }
         } else {
-          formInfo.chargeType = '团检'
+          // Object.assign(PatienInfo.value, {
+          //   age: '',
+          //   datebrith: '',
+          //   sex: '',
+          //   birthPlace: ''
+          // })
         }
       } else {
-        // Object.assign(PatienInfo.value, {
-        //   age: '',
-        //   datebrith: '',
-        //   sex: '',
-        //   birthPlace: ''
-        // })
+        ElMessage.error('身份证号不正确!')
+        return
       }
-    } else {
+      try {
+        const patInfo = await Api.getPatInfo({ idNo: value })
+        if (patInfo.peVisitId !== '0') {
+          formInfo.peVisitId = patInfo.peVisitId + 1
+        }
+        if (patInfo && patInfo.idNo) {
+          // 使用接口返回值赋值
+          formInfo.peId = patInfo.insuranceNoTj || '' // (await getMaxPeId())
+          formInfo.name = patInfo.name || ''
+          formInfo.sex = patInfo.sex === '男' ? '1' : '0'
+          formInfo.dateOfBirth = patInfo.dateOfBirth || ''
+          // formInfo.birthPlace = patInfo.birthPlace || ''
+          formInfo.address = patInfo.address || ''
+          formInfo.phoneNumberHome = patInfo.phoneNumberHome || ''
+          formInfo.photo = getImageUrl(patInfo.photo) || photoUrl.value || ''
+          formInfo.department = patInfo.department || ''
+          formInfo.screeningCode = patInfo.screeningCode || ''
+          // formInfo.idType = IDtypeList.value[1]?.typeCode || '' // 默认证件类型
+          const foundItem = IDtypeList.value.find((item) => item.typeCode === '01')
+          formInfo.idType = foundItem ? foundItem.typeName : IDtypeList.value[1]?.typeName || ''
+          formInfo.nation = patInfo.nation || '汉族'
+          formInfo.country = patInfo.country || 'CN'
+          // formInfo.pePreDate = patInfo.pePreDate || ''
+          // formInfo.visitDate = patInfo.visitDate || ''
+          formInfo.maritalStatus = patInfo.maritalStatus || ''
+        }
+      } catch (error) {
+        console.log('%c error', 'color:#7f2b82', error)
+      }
+    } else if (formInfo.idNo && formInfo.idNo.length != 18) {
       ElMessage.error('身份证号不正确!')
-      return
     }
-    try {
-      const patInfo = await Api.getPatInfo({ idNo: value })
-      if (patInfo.peVisitId !== '0') {
-        formInfo.peVisitId = patInfo.peVisitId + 1
-      }
-      if (patInfo && patInfo.idNo) {
-        // 使用接口返回值赋值
-        formInfo.peId = patInfo.insuranceNoTj || (await getMaxPeId())
-        formInfo.name = patInfo.name || ''
-        formInfo.sex = patInfo.sex === '男' ? '1' : '0'
-        formInfo.dateOfBirth = patInfo.dateOfBirth || ''
-        // formInfo.birthPlace = patInfo.birthPlace || ''
-        formInfo.mailingAddress = patInfo.mailingAddress || ''
-        formInfo.phoneNumberHome = patInfo.phoneNumberHome || ''
-        formInfo.photo = getImageUrl(patInfo.photo) || photoUrl.value || ''
-        formInfo.department = patInfo.department || ''
-        formInfo.screeningCode = patInfo.screeningCode || ''
-        // formInfo.idType = IDtypeList.value[1]?.typeCode || '' // 默认证件类型
-        const foundItem = IDtypeList.value.find((item) => item.typeCode === '01')
-        formInfo.idType = foundItem ? foundItem.typeName : IDtypeList.value[1]?.typeName || ''
-        formInfo.nation = patInfo.nation || '汉族'
-        formInfo.country = patInfo.country || 'CN'
-        // formInfo.pePreDate = patInfo.pePreDate || ''
-        // formInfo.visitDate = patInfo.visitDate || ''
-        formInfo.maritalStatus = patInfo.maritalStatus || ''
-      }
-    } catch (error) {
-      console.log('%c error', 'color:#7f2b82', error)
-    }
-  } else if (formInfo.idNo && formInfo.idNo.length != 18) {
-    ElMessage.error('身份证号不正确!')
   }
 }
 // 身份证校验码验证函数
@@ -2181,82 +2073,72 @@ const handleTimeChange = (val) => {
 const personReport = () => {}
 //患者列表
 const personList = ref<any>([])
-const personListdrawer = ref(false)
-// 显示患者列表按钮
-const showPersonList = async () => {
-  await selectPeVisitList({
-    preBeginDate: formatDate(new Date(), 'YYYY-MM-DD'),
-    preEndDate: formatDate(new Date(), 'YYYY-MM-DD'),
-    unitCode: '',
-    unitVisitId: '',
-    peId: '',
-    peVisitId: '',
-    idNo: '',
-    number: '',
-    name: ''
-  }).then((res) => {
-    personList.value = res || []
-  })
-  personListdrawer.value = true
-}
+
 //患者列表选中的患者数据
 const personInfo = ref<any>({})
-const setRowClassName = ({ row }) => {
-  if (row.peId == personInfo.value.peId) {
-    return 'table-checked-row-style'
-  }
-  return 'text-black'
-}
 //整个页面禁用
 const allDisabled = ref(false)
 //点击患者列表
-const perListRowClick = (row) => {
+const perListRowClick = async (row) => {
+  await clearMsg()
   personInfo.value = row
-  allDisabled.value = true
-  getPePatInfo({ peId: row.peId }).then((res) => {
-    // 使用Object.assign来合并对象，而不是重新创建
-    Object.assign(formInfo, {
-      joinUnit: row.joinUnit || 0,
-      unitCode: row.unitCode || '',
-      unitName: row.unitName || '',
-      taxId: row.taxId || '',
-      unitNumber: row.unitNumber || '',
-      pePreDate: row.pePreDate || '',
-      peId: row.peId || '',
-      name: row.name || '',
-      dateOfBirth: row.dateOfBirth || '',
-      photo: row.photo || '',
-      sex: row.sex || '',
-      peTypeName: row.peTypeName || '',
-      chargeType: row.chargeType || '',
-      idType: row.idType || '',
-      idNo: row.idNo || '',
-      age: row.age || '',
-      maritalStatus: row.maritalStatus || '',
-      department: row.department || '',
-      peLevel: row.peLevel || '',
-      country: row.country || '',
-      nation: row.nation || '',
-      birthPlace: row.birthPlace || '',
-      address: row.address || '',
-      phoneNumberHome: row.phoneNumberHome || '',
-      appointPeExam: row.appointPeExam || '',
-      visitDate: row.visitDate || '',
-      setCode: row.setCode || '',
-      totalCharges: row.totalCharges || 0,
-      mailingAddress: row.mailingAddress || 0
-    })
-    formInfo.peTypeName = res.selectedSets[0]?.peTypeName //体检类型
-    formInfo.chargeType = res.chargeType //费别
-    formInfo.country = res.country //国籍
-    formInfo.nation = res.nation //民族
-    formInfo.idType = res.idType //证件类型
-    formInfo.birthPlace = res.birthPlace //出生地
-    formInfo.totalCharges = res.totalCharges //价格
-    xuanzhongData.value = res.selectedSets[0] ? res.selectedSets[0] : {} //套餐信息
-    allDataSelected.value = res.selectedItems //选中项目
+  // 使用Object.assign来合并对象，而不是重新创建
+  await Object.assign(formInfo, {
+    joinUnit: row.joinUnit || 0,
+    unitCode: row.unitCode || '',
+    unitName: row.unitName || '',
+    taxId: row.taxId || '',
+    unitNumber: row.unitNumber || '',
+    pePreDate: row.pePreDate || '',
+    peId: row.peId || '',
+    name: row.name || '',
+    dateOfBirth: row.dateOfBirth || '',
+    photo: row.photo || '',
+    sex: row.sex || '',
+    peTypeName: row.peTypeName || '',
+    chargeType: row.chargeType || '',
+    idType: row.idType || '',
+    idNo: row.idNo || '',
+    age: row.age || '',
+    maritalStatus: row.maritalStatus || '',
+    department: row.department || '',
+    peLevel: row.peLevel || '',
+    country: row.country || '',
+    nation: row.nation || '',
+    birthPlace: row.birthPlace || '',
+    address: row.address || '',
+    appointPeExam: true || '',
+    visitDate: row.visitDate || '',
+    setCode: row.setCode || '',
+    totalCharges: row.totalCharges || 0
   })
-  personListdrawer.value = false
+  await queryDictByConfig({ keyWord: '', dictType: '地区字典' }).then((res) => {
+    birthPlaceOptions.value = res
+  })
+  await getPePatInfo({ peId: row.peId }).then((res) => {
+    if (res) {
+      allDisabled.value = false
+      formInfo.phoneNumberHome = res.phoneNumberHome || ''
+      formInfo.peTypeName = res.selectedSets[0]?.peTypeName //体检类型
+      formInfo.chargeType = res.chargeType //费别
+      formInfo.country = res.country //国籍
+      formInfo.nation = res.nation //民族
+      formInfo.idType = res.idType //证件类型
+      formInfo.birthPlace = res.birthPlace //出生地
+      formInfo.totalCharges = res.totalCharges //价格
+      // formInfo.itemList = res.selectedItems //已选套餐
+      formInfo.peVisitId = res.peVisitId //体检次数
+      formInfo.occupation = res.occupation // 职业
+      xuanzhongData.value = res.selectedSets[0] ? res.selectedSets[0] : {} //套餐信息
+      allDataSelected.value = res.selectedItems //选中项目
+
+      birthPlaceName.value =
+        birthPlaceOptions.value.find((item) => item.areaCode === formInfo.birthPlace)?.areaName ||
+        ''
+    } else {
+      allDisabled.value = true
+    }
+  })
 }
 
 //体检类型
@@ -2265,7 +2147,7 @@ const petypeNameList = ref<any>([])
 const occupationList = ref<any>([])
 
 onMounted(async () => {
-  formInfo.peId = await getMaxPeId()
+  formInfo.peId = '' // await getMaxPeId()
   await getClass()
   CitizenShipListDates.value = await queryDictByConfig({ dictType: '国家字典' })
   NationListDates.value = await queryDictByConfig({ dictType: '民族字典' })
@@ -2441,7 +2323,7 @@ const jieQvShuJv = (res) => {
       formInfo.name = name
       formInfo.sex = sex === '男' ? '1' : '0'
       formInfo.nation = nation
-      formInfo.mailingAddress = address
+      formInfo.address = address
       if (birthDate && birthDate.length === 8) {
         const year = birthDate.substring(0, 4)
         const month = birthDate.substring(4, 6)
@@ -2822,192 +2704,6 @@ const getUintCode = async () => {
     ElMessage.warning('未找到匹配的单位')
   }
 }
-const AiVisible = ref(false)
-const openAi = async () => {
-  if (formInfo.age && formInfo.sex && formInfo.occupation) {
-    AiVisible.value = true
-    await sendMsg()
-  }
-}
-const loading = ref(false)
-const aiSearch = ref('')
-const showStop = ref(false)
-
-const chatId = ref()
-// 定义 API 地址
-// 定义认证令牌
-const apiUrl = 'http://10.10.10.20:8080/chat/api/open'
-const authToken = 'application-43bb0c12cc24fc7cabdd9deda8655bb9'
-const sendMsg = async () => {
-  const data = ref()
-  let zhiye = occupationList.value.filter((item) => item.occupationCode == formInfo.occupation)
-  data.value = `患者年龄${formInfo.age}岁，性别${formInfo.sex}，职业为${zhiye[0].occupationName}，推荐套餐`
-
-  if (data.value && data.value.length > 0) {
-    loading.value = true
-    try {
-      let result = await axios.get(apiUrl, {
-        headers: {
-          Accept: '*/*',
-          Authorization: `Bearer application-43bb0c12cc24fc7cabdd9deda8655bb9`
-        }
-      })
-      if (result && result.data.code == 200) {
-        chatId.value = result.data.data
-      }
-      await fetchAiStream(data.value)
-    } catch (err) {
-      loading.value = false
-    }
-  }
-}
-
-// 定义请求数据
-const requestData = {
-  message: '',
-  stream: true,
-  re_chat: true,
-  chat_record_id: chatId.value
-}
-let controller
-let reader
-
-// 封装请求配置
-const requestOptions = {
-  method: 'POST',
-  headers: {
-    Accept: 'application/json, text/plain, */*',
-    'Content-Type': 'application/json',
-    Authorization: `Bearer ${authToken}`
-  },
-  body: JSON.stringify(requestData)
-}
-
-// 停止当前请求的函数
-const stopRequest = () => {
-  if (controller) {
-    controller.abort()
-    loading.value = false
-    showStop.value = false
-  }
-}
-
-const outputRef = ref<HTMLDivElement | null>(null)
-const displayedText = ref('')
-const pendingChars = ref<string[]>([])
-const isStreaming = ref(false)
-let animationFrameId: number | null = null
-
-// 真实 API 集成（Fetch 流式）
-async function fetchAiStream(value) {
-  controller = new AbortController()
-  const signal = controller.signal
-  requestData.message = value
-  requestData.chat_record_id = chatId.value
-  // 更新请求体
-  requestOptions.body = JSON.stringify(requestData)
-  const response = await fetch(`http://10.10.10.20:8080/chat/api/chat_message/${chatId.value}`, {
-    ...requestOptions,
-    signal
-  })
-  if (!response.ok) throw new Error('API 请求失败')
-  const reader = response.body?.getReader()
-  if (!reader) throw new Error('无法读取响应流')
-  displayedText.value = ''
-  readStream(reader)
-}
-async function readStream(reader) {
-  const decoder = new TextDecoder('utf-8')
-  let buffer = ''
-  const { done, value } = await reader.read()
-
-  if (done) {
-    flushPendingChars()
-    return
-  }
-
-  const textChunk = decoder.decode(value)
-  // 按行分割接收到的数据
-  const lines = textChunk.split('\n')
-  for (const line of lines) {
-    if (line.startsWith('data: ')) {
-      try {
-        const dataStr = line.replace('data: ', '')
-        const dataObject = JSON.parse(dataStr)
-        const answer = dataObject.content
-        if (answer) {
-          loading.value = false
-          showStop.value = true
-          aiSearch.value = ''
-          processContent(answer)
-        }
-      } catch (parseError) {
-        console.error('解析数据时出错:', parseError)
-        loading.value = false
-        showStop.value = false
-      }
-    } else if (line.startsWith('event: ping')) {
-      // 跳过 ping 事件
-      continue
-    }
-  }
-  readStream(reader)
-}
-const parseUnicode = (str: string) =>
-  str.replace(/\\u([d\w]{4})/gi, (_, hex) => String.fromCodePoint(parseInt(hex, 16)))
-
-// 处理content内容
-function processContent(content: string) {
-  const parsedText = parseUnicode(content)
-  // 模拟分块（实际API可能已分块）
-  for (const char of parsedText) {
-    pendingChars.value.push(char)
-  }
-  startTypingEffect()
-}
-
-// 启动打字机效果
-function startTypingEffect() {
-  if (isStreaming.value || pendingChars.value.length === 0) return
-
-  isStreaming.value = true
-  typeNextChar()
-}
-
-// 逐字渲染
-function typeNextChar() {
-  if (pendingChars.value.length === 0) {
-    isStreaming.value = false
-    return
-  }
-
-  const char = pendingChars.value.shift()!
-  displayedText.value += char
-
-  // 滚动到底部
-  if (outputRef.value) {
-    outputRef.value.scrollTop = outputRef.value.scrollHeight
-  }
-  animationFrameId = window.requestAnimationFrame(typeNextChar)
-}
-
-// 清空待渲染字符
-function flushPendingChars() {
-  if (pendingChars.value.length > 0) {
-    displayedText.value += pendingChars.value.join('')
-    pendingChars.value = []
-  }
-}
-
-// 在组件销毁时清理
-onUnmounted(() => {
-  if (controller) {
-    controller.abort()
-  }
-  if (reader) {
-    reader.releaseLock()
-  }
-})
 </script>
 <style lang="scss" scoped>
 .per_exma {
@@ -3057,17 +2753,6 @@ onUnmounted(() => {
           border-right: none;
         }
       }
-      .selectBtn {
-        margin-left: 0;
-        .el-button {
-          position: relative;
-          top: 0px;
-          margin-left: -1px;
-          background: #f5f7fa !important;
-          color: #999 !important;
-          border-radius: 0px 4px 4px 0px !important;
-        }
-      }
       .clear {
         background-color: #fff;
         border-color: #3473d1;
@@ -3080,16 +2765,15 @@ onUnmounted(() => {
     justify-content: space-between;
     margin-top: 6px;
     height: calc(100vh - 160px);
-    .con_left {
+    .con_one {
       background-color: #fff;
-      width: 49.8%;
+      width: 49.9%;
       .left_heard {
         height: 40px;
         line-height: 40px;
         /* padding-left: 20px; */
         margin-bottom: 11px;
         border-bottom: 1px solid #c5dcff;
-        position: relative;
         span {
           display: inline-block;
           width: auto;
@@ -3100,17 +2784,33 @@ onUnmounted(() => {
           color: #3473d1;
           font-weight: bold;
         }
-        .el-button {
-          display: flex;
-          align-items: center;
-          color: #3473d1;
-          border-color: #3473d1;
-          position: absolute;
-          right: 10px;
-          top: 3px;
-          img {
-            width: 20px;
-            height: 20px;
+
+        .left_con {
+          position: relative;
+          height: calc(100% - 50px);
+          .left_form {
+            display: flex;
+            align-items: center;
+            height: 50px;
+            span {
+              display: inline-block;
+              width: 100px;
+              text-align: right;
+              font-size: 14px;
+              color: #333333;
+            }
+          }
+          .per_list {
+            position: absolute;
+            left: 0;
+            top: 35%;
+            background-color: #3473d1;
+            color: #fff;
+            padding: 6px 4px;
+            border-radius: 0 8px 8px 0;
+            cursor: pointer;
+            font-size: 12px;
+            line-height: 16px;
           }
         }
       }
@@ -3235,6 +2935,227 @@ onUnmounted(() => {
           }
         }
       }
+      .search_div {
+        margin-left: 10px;
+        display: flex;
+        align-items: center;
+        span {
+          margin-left: 10px;
+        }
+        .save {
+          background: #3473d1;
+          color: #fff;
+          border-color: #3473d1;
+          padding: 0 20px;
+        }
+        .read {
+          padding: 0 20px;
+          color: #3473d1;
+          border-color: #3473d1;
+          display: flex;
+          align-items: center;
+          img {
+            width: 14px;
+            height: 14px;
+            margin-right: 4px;
+          }
+        }
+        .cunitInput {
+          :deep(.el-input__wrapper) {
+            border-radius: 4px 0px 0px 4px;
+            border-right: none;
+          }
+        }
+        .clear {
+          background-color: #fff;
+          border-color: #3473d1;
+          color: #3473d1;
+        }
+      }
+    }
+    .con_left {
+      background-color: #fff;
+      width: 49.8%;
+      .left_heard {
+        height: 40px;
+        line-height: 40px;
+        /* padding-left: 20px; */
+        margin-bottom: 11px;
+        border-bottom: 1px solid #c5dcff;
+        span {
+          display: inline-block;
+          width: auto;
+          padding: 0 20px;
+          height: 40px;
+          text-align: center;
+          /* border-bottom: 2px solid #3473d1; */
+          color: #3473d1;
+          font-weight: bold;
+        }
+      }
+      .left_con {
+        position: relative;
+        height: calc(100% - 50px);
+        .left_form {
+          display: flex;
+          align-items: center;
+          height: 50px;
+          span {
+            display: inline-block;
+            width: 100px;
+            text-align: right;
+            font-size: 14px;
+            color: #333333;
+          }
+        }
+        .per_list {
+          position: absolute;
+          left: 0;
+          top: 35%;
+          background-color: #3473d1;
+          color: #fff;
+          padding: 6px 4px;
+          border-radius: 0 8px 8px 0;
+          cursor: pointer;
+          font-size: 12px;
+          line-height: 16px;
+        }
+      }
+      .right_touxiang {
+        .left_form {
+          display: flex;
+          align-items: center;
+          height: 50px;
+          padding-right: 10px;
+          span {
+            display: inline-block;
+            width: 100px;
+            text-align: right;
+            font-size: 14px;
+            color: #333333;
+          }
+        }
+        :deep(.avatar-uploader .el-upload) {
+          border-radius: 6px;
+          cursor: pointer;
+          position: relative;
+          overflow: hidden;
+          transition: var(--el-transition-duration-fast);
+          width: 160px;
+          height: 202px;
+          padding: 0;
+          margin: 0 auto;
+        }
+
+        :deep(.el-upload-dragger) {
+          padding: 0;
+        }
+        :deep(.upload-handle) {
+          position: absolute;
+          top: 0;
+          right: 0;
+          box-sizing: border-box;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 100%;
+          height: 100%;
+          cursor: pointer;
+          background: rgb(0 0 0 / 60%);
+          opacity: 0;
+          transition: var(--el-transition-duration-fast);
+          .handle-icon {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 0 6%;
+            color: aliceblue;
+            .el-icon {
+              margin-bottom: 15%;
+              font-size: 140%;
+            }
+            span {
+              font-size: 100%;
+            }
+          }
+        }
+        :deep(.el-upload-list__item) {
+          &:hover {
+            .upload-handle {
+              opacity: 1;
+            }
+          }
+        }
+        .touxiang {
+          width: 100%;
+          text-align: center;
+          margin-bottom: 22px;
+          .per {
+            width: 160px;
+            height: 200px;
+            margin: 0 auto;
+          }
+          .save {
+            background-color: #3473d1;
+            color: #fff;
+            border-color: #3473d1;
+          }
+          .shezhi {
+            color: #3473d1;
+            border-color: #3473d1;
+          }
+          .el-button {
+            width: 112px;
+            img {
+              width: 14px;
+              height: 14px;
+              margin-right: 4px;
+            }
+          }
+        }
+      }
+      .search_div {
+        margin-left: 10px;
+        display: flex;
+        align-items: center;
+        position: absolute;
+        right: 10px;
+        bottom: 10px;
+
+        span {
+          margin-left: 10px;
+        }
+        .save {
+          background: #3473d1;
+          color: #fff;
+          border-color: #3473d1;
+          padding: 0 20px;
+        }
+        .read {
+          padding: 0 20px;
+          color: #3473d1;
+          border-color: #3473d1;
+          display: flex;
+          align-items: center;
+          img {
+            width: 14px;
+            height: 14px;
+            margin-right: 4px;
+          }
+        }
+        .cunitInput {
+          :deep(.el-input__wrapper) {
+            border-radius: 4px 0px 0px 4px;
+            border-right: none;
+          }
+        }
+        .clear {
+          background-color: #fff;
+          border-color: #3473d1;
+          color: #3473d1;
+        }
+      }
     }
     .con_right {
       width: 49.8%;
@@ -3274,7 +3195,7 @@ onUnmounted(() => {
           border-radius: 4px;
         }
         .unChecked {
-          height: 130px;
+          height: 200px;
           width: 100%;
           overflow-y: auto;
 

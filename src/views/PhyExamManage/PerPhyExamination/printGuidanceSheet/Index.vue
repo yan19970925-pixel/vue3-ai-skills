@@ -44,12 +44,13 @@
         <div class="div1">
           <span class="span1">体检号：</span>
           <el-input
+            ref="peIdRef"
             style="width: 120px; margin-right: 12px"
             v-model="searchParams.peId"
             placeholder="请输入"
             class="select-item"
             clearable
-            @change="search"
+            @input="recycleSearch"
           />
         </div>
         <div class="div1">
@@ -151,6 +152,9 @@
         </div>
         <div class="div1">
           <el-button @click="search">查询</el-button>
+        </div>
+        <div class="div1" style="margin-left: 20px">
+          <el-checkbox @change="recycleChange" v-model="recycle" label="回收指引单" size="large" />
         </div>
       </div>
       <div class="search1" style="padding-bottom: 6px">
@@ -297,6 +301,11 @@
               :width="item.width"
               show-overflow-tooltip
             >
+            </el-table-column>
+            <el-table-column label="回收指引单" width="120" align="center" fixed="right">
+              <template #default="scope">
+                <el-button type="text" @click="recycleZYD(scope.row)">回收</el-button>
+              </template>
             </el-table-column>
           </el-table>
           <div style="width: 190px; height: 20px; font-size: 20px; color: #666"
@@ -879,6 +888,43 @@
           show-overflow-tooltip
           prop="inputCode"
       /></el-table>
+    </Dialog>
+    <Dialog
+      v-model="recycleVisible"
+      top="10vh"
+      :fullscreen="true"
+      :close-on-click-modal="false"
+      @close="recycleVisible = false"
+      title="回收指引单"
+    >
+      <div>
+        <el-table :data="allRecycleData" border style="width: 100%; height: 400px">
+          <el-table-column
+            align="center"
+            label="完成状态"
+            show-overflow-tooltip
+            prop="unitCode"
+            width="100"
+          />
+          <el-table-column
+            align="center"
+            label="项目名称"
+            show-overflow-tooltip
+            prop="unitCode"
+            width="100"
+          />
+        </el-table>
+        <div style="width: 100%; display: flex; align-items: center; justify-content: center">
+          <el-button
+            style="color: #3263fe; background: #fff; border-color: #3263fe"
+            @click="recycleCancel"
+            >取消</el-button
+          >
+          <el-button style="color: #fff; background-color: #3263fe" @click="recycleConfirm"
+            >确定</el-button
+          >
+        </div>
+      </div>
     </Dialog>
   </div>
 </template>
@@ -1984,6 +2030,31 @@ const handleQueryItem = async () => {
 const handleRowClick = (row, column, event) => {
   // 切换选中状态
   multipleTableRef.value?.toggleRowSelection(row)
+}
+
+//回收指引单
+const recycle = ref(false)
+const peIdRef = ref(null)
+const recycleChange = (val) => {
+  if (val) {
+    peIdRef.value?.focus()
+  }
+}
+const recycleVisible = ref(false)
+const allRecycleData = ref([])
+const recycleSearch = () => {
+  search()
+}
+const recheckData = ref({})
+const recycleZYD = (row) => {
+  recheckData.value = row
+  recycleVisible.value = true
+}
+const recycleConfirm = () => {
+  recycleVisible.value = false
+}
+const recycleCancel = () => {
+  recycleVisible.value = false
 }
 </script>
 <style lang="scss" scoped>

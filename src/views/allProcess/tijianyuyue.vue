@@ -224,64 +224,59 @@
             prop="peId"
             label="体检号"
             align="center"
-            width="220"
+            width="120"
           />
           <el-table-column
             show-overflow-tooltip
             prop="peVisitId"
             label="体检次数"
             align="center"
-            width="150"
+            width="80"
           />
           <el-table-column
             show-overflow-tooltip
             prop="name"
             label="姓名"
             align="center"
-            width="150"
+            width="120"
           />
           <el-table-column
             show-overflow-tooltip
             prop="sex"
             label="性别"
             align="center"
-            width="150"
+            width="60"
           />
           <el-table-column
             show-overflow-tooltip
             prop="age"
             label="年龄"
             align="center"
-            width="150"
+            width="60"
           />
           <el-table-column
             show-overflow-tooltip
             prop="maritalStatus"
             label="婚姻"
             align="center"
-            width="150"
+            width="120"
           />
           <el-table-column
             show-overflow-tooltip
             prop="visitStatus"
             label="体检状态"
             align="center"
-            width="200"
+            width="160"
           />
           <el-table-column
             show-overflow-tooltip
             prop="groupingName"
             label="体检分组"
             align="center"
-            width="200"
           />
-          <el-table-column
-            show-overflow-tooltip
-            prop="department"
-            label="部门"
-            align="center"
-            width="150"
-          />
+          <!-- width="200" -->
+          <el-table-column show-overflow-tooltip prop="department" label="部门" align="center" />
+          <!-- width="150" -->
           <el-table-column fixed="right" label="操作" align="center" width="60">
             <template #default="scope">
               <el-button
@@ -316,46 +311,75 @@
       <el-table
         :data="unitCodeList"
         border
-        style="width: 100%; margin-top: 10px; height: 500px"
+        style="width: 100%; margin-top: 10px; height: 400px"
         highlight-current-row
         @row-dblclick="selectUnitCodeClick"
-        ><el-table-column
+      >
+        <el-table-column
           :resizable="false"
           align="center"
           label="单位代码"
           show-overflow-tooltip
           prop="unitCode"
-          width="100" /><el-table-column
+          width="80"
+        />
+        <el-table-column
           :resizable="false"
           align="left"
           label="单位名称"
           show-overflow-tooltip
-          prop="unitName" /><el-table-column
+          prop="unitName"
+          width="160"
+        />
+        <el-table-column
           :resizable="false"
           align="center"
           label="联系人"
-          width="100"
+          width="80"
           show-overflow-tooltip
-          prop="connecter" /><el-table-column
+          prop="connecter"
+        />
+        <el-table-column
           :resizable="false"
           align="center"
           label="联系电话"
           width="120"
           show-overflow-tooltip
-          prop="phone" /><el-table-column
+          prop="phone"
+        />
+        <el-table-column
+          :resizable="false"
+          align="center"
+          label="预约开始时间"
+          width="120"
+          show-overflow-tooltip
+          prop="appointsDate"
+        />
+        <el-table-column
+          :resizable="false"
+          align="center"
+          label="预约结束时间"
+          width="120"
+          show-overflow-tooltip
+          prop="appointsEndDate"
+        />
+        <el-table-column
           :resizable="false"
           align="left"
           label="地址"
           width="140"
           show-overflow-tooltip
-          prop="address" /><el-table-column
+          prop="address"
+        />
+        <el-table-column
           :resizable="false"
           align="center"
           label="拼音码"
           width="100"
           show-overflow-tooltip
           prop="inputCode"
-      /></el-table>
+        />
+      </el-table>
     </Dialog>
   </div>
 </template>
@@ -461,7 +485,9 @@ const handleQueryItem = async () => {
     input: keyWord.value
   })
 }
+const unitData = ref({})
 const selectUnitCodeClick = async (row) => {
+  unitData.value = row
   unitCode.value = row.unitCode
   certName.value = row.unitName
   selectUnitCodeVisiable.value = false
@@ -503,6 +529,13 @@ const handleAppoint = async () => {
   }
   if (!selectPeVisitList.value || selectPeVisitList.value.length == 0) {
     ElMessage.error('请选择人员')
+    return false
+  }
+  if (
+    new Date(appointDate.value) < new Date(unitData.value.appointsDate) ||
+    new Date(appointDate.value) > new Date(unitData.value.appointsEndDate)
+  ) {
+    ElMessage.error('预约日期不在单位预约日期范围内')
     return false
   }
   ElMessageBox.confirm('确认预约下列项目吗？', '提示', {

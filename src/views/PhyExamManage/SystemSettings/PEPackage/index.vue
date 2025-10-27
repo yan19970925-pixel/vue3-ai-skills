@@ -563,7 +563,17 @@ watch(
   () => selected.value,
   (newValue) => {
     if (newValue.length > 0) {
-      handleUnSelectClick(newValue[0], 'selected')
+      ElMessageBox.confirm('是否删除所选中数据？', '系统提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      })
+        .then(async () => {
+          handleUnSelectClick(newValue[0], 'selected')
+        })
+        .catch(() => {
+          selected.value = []
+        })
     }
   }
 )

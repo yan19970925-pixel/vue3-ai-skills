@@ -70,3 +70,7 @@ export const getPeDeptConclusion = (data) => {
 export const getPeItemReportWriteList = (data) => {
   return request.post({ url: '/health-api/health/itemDict/getPeItemReportWriteList', data })
 }
+//个人体检-分科医生检查-查询异常项目名称
+export const getPeAbnormalItemList = (data) => {
+  return request.post({ url: '/health-api/health/peDoctorCheck/getPeAbnormalItemList', data })
+}

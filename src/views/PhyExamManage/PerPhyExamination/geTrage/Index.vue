@@ -148,44 +148,73 @@
               :width="item.width"
               show-overflow-tooltip
             >
-              <template #default="scope" v-if="item.prop == 'isPrint'">
+              <template #default="{ row }" v-if="item.prop == 'isPrint'">
                 <el-radio
-                  :model-value="scope.row.isPrint === '1'"
-                  @change="onChangeShow(scope.row, $event)"
+                  :model-value="row.isPrint === '1'"
+                  @change="onChangeShow(row, $event)"
                   label="是"
                 />
+              </template>
+              <template #default="{ row }" v-else-if="item.prop == 'resultStatus'">
+                <span v-if="row.resultStatus == '0'">已预约</span>
+                <span v-if="row.resultStatus == '1'">已执行</span>
+                <span v-if="row.resultStatus == '2'">待审核</span>
+                <span v-if="row.resultStatus == '5'">已分科审核</span>
+                <span v-if="row.resultStatus == '7'">已初步审核</span>
+                <span v-if="row.resultStatus == '9'">已最终审核</span>
+                <span v-if="row.resultStatus == 'A'">非正常结束</span>
+                <span v-if="row.resultStatus == 'P'">体检挂起</span>
               </template>
             </el-table-column>
             <!-- 在 el-table-column 循环后添加操作列 -->
             <!-- <el-table-column label="操作" width="74" fixed="right"> -->
-            <!-- <el-table-column label="详情" width="74" fixed="right">
+            <el-table-column label="复检计划" width="90" align="center" fixed="right">
               <template #default="scope">
-                <el-button
+                <!-- <el-button
                   style="font-size: 18px; color: #fff"
                   type="primary"
                   size="small"
                   @click="showDetail(scope.row)"
                 >
                   <el-icon><Avatar /></el-icon>
-                </el-button>
+                </el-button> -->
+                <el-button type="text" @click="addFuJian(scope.row)">增加</el-button>
               </template>
-            </el-table-column> -->
+            </el-table-column>
           </el-table>
         </div>
         <div class="btn">
-          <el-button @click="cbAuditDept" :disabled="isFenke">
+          <el-button
+            @click="cbAuditDept"
+            :disabled="
+              isFenke ||
+              !(
+                itemDetail.resultStatus == '0' ||
+                itemDetail.resultStatus == '1' ||
+                itemDetail.resultStatus == '2'
+              )
+            "
+          >
             <img :src="fenkeshenhe" />分科审核
           </el-button>
-          <!-- <el-button @click="fenkejieguo"> <img :src="fenkejieguo" />分科结果 </el-button> -->
+          <!-- <el-button @click="fenkeJieguo"> <img :src="fenkejieguo" />分科结果 </el-button> -->
 
-          <el-button @click="firstAudit" :disabled="isChubu">
+          <el-button @click="firstAudit" :disabled="isChubu || itemDetail.resultStatus != '5'">
             <img :src="chubushenhe" />初步审核
           </el-button>
 
-          <el-button @click="cbLastAuditDept" :disabled="isZuizhong">
+          <el-button
+            @click="cbLastAuditDept"
+            :disabled="isZuizhong || itemDetail.resultStatus != '7'"
+          >
             <img :src="zuizhongshenhe" />最终审核
           </el-button>
-
+          <el-button
+            @click="revokeAppeal"
+            style="background-color: #fff; color: #ed2226; border-color: #ed2226"
+            :disabled="itemDetail.resultStatus != '9'"
+            >撤销终审</el-button
+          >
           <el-button @click="finalReport"> <img :src="tijianbaogao" />体检报告 </el-button>
 
           <el-button @click="saveAudit">保存</el-button>
@@ -235,10 +264,10 @@
               <div class="con2_left">
                 <div class="heard_title">
                   <span>历史体检记录</span>
-                  <!-- <div class="btn">
+                  <div class="btn">
                     <el-button @click="contrast"> <img :src="duibi" />对比</el-button>
-                    <el-button @click="shenhe"> <img :src="yulan" />预览</el-button>
-                  </div> -->
+                    <!-- <el-button @click="shenhe"> <img :src="yulan" />预览</el-button> -->
+                  </div>
                 </div>
                 <div class="con2_table">
                   <el-table :data="historyExamList" style="width: 100%; height: 100%" border>
@@ -271,8 +300,18 @@
                   <div class="btn">
                     <span class="spanTS">（红色为诊断，<br />蓝色为阳性体征）</span>
                     <el-checkbox v-model="selfInpFlag" label="自填" />
-                    <el-button @click="openSuggestDialog"> <img :src="jiahao" />新增</el-button>
-                    <el-button class="del" @click="deleteSelectedRows">删除</el-button>
+                    <el-button
+                      @click="openSuggestDialog"
+                      :disabled="itemDetail.resultStatus == '9'"
+                    >
+                      <img :src="jiahao" />新增</el-button
+                    >
+                    <el-button
+                      class="del"
+                      @click="deleteSelectedRows"
+                      :disabled="itemDetail.resultStatus == '9'"
+                      >删除</el-button
+                    >
                     <!-- <el-button @click="shenhe"> <img :src="huizong" />汇总</el-button> -->
                   </div>
                 </div>
@@ -317,6 +356,7 @@
                           size="small"
                           type="primary"
                           @click="handleEdit(scope.$index, scope.row)"
+                          :disabled="itemDetail.resultStatus == '9'"
                         >
                           修改
                         </el-button>
@@ -379,11 +419,14 @@
             </div>
           </el-tab-pane> -->
           <!-- 修改科普知识部分的模板代码 -->
-          <!-- <el-tab-pane label="科普知识">
+          <el-tab-pane label="科普知识">
             <div class="card_con5">
               <div class="heard_title">
-                <span>体检综合建议和健康指导</span>
+                <span>体检科普知识</span>
                 <div class="btn">
+                  <el-button @click="openKnowledgeDialog">
+                    <img :src="jiahao" />增加健康处方及小常识
+                  </el-button>
                   <el-button @click="openKnowledgeDialog">
                     <img :src="jiahao" />增加科普知识
                   </el-button>
@@ -404,14 +447,14 @@
                     :prop="column.prop"
                     :label="column.label"
                     :width="column.width"
-                    show-overflow-tooltip
+                    :show-overflow-tooltip="column.showTooltip"
                     header-algin="center"
                     align="center"
                   />
                 </el-table>
               </div>
             </div>
-          </el-tab-pane> -->
+          </el-tab-pane>
         </el-tabs>
         <div class="btn">
           <!-- <el-button @click="save">报告确认</el-button> -->
@@ -433,6 +476,24 @@
       class="ai_drawer"
     >
       <div style="height: 100%">
+        <div class="tishi_msg">
+          <span
+            >1.
+            本服务基于AI人工智能技术生成内容或执行任务，其输出结果可能受到训练数据、算法局限性及实时环境的影响，不保证绝对准确、完整或适用。</span
+          >
+          <span
+            >2.
+            本服务基于AI所提供的信息、建议或决策不可替代专业领域（包括但不限于医疗、法律等领域）的人工判断，请谨慎参考并根据实际情况自行核实、验证及专业判断</span
+          >
+          <span
+            >3.
+            因您使用本服务由AI产生的直接或间接后果（包括但不限于数据泄露、经济损失、法律纠纷等），本公司概不承担责任。</span
+          >
+          <span
+            >4.
+            本服务由AI生成的内容可能包含未被识别的错误、偏见或不当信息，不代表本公司所属软件产品的立场或观点。</span
+          >
+        </div>
         <div class="ai_top" v-loading="loading" element-loading-text="思考中...">
           <div class="ai_con" ref="outputRef">
             <div
@@ -487,7 +548,10 @@
           </div>
         </div>
         <div class="ai_bottom">
-          <span @click.stop="sendMsg('2')">本次体检建议指导</span>
+          <span @click.stop="sendMsg('2')">体检报告智能分析</span>
+          <span @click.stop="sendMsg('3')">健康风险评估</span>
+          <span @click.stop="sendMsg('4')">个性化健康建议</span>
+          <span @click.stop="sendMsg('5')">健康趋势预测</span>
         </div>
       </div>
     </el-drawer>
@@ -498,7 +562,7 @@
       :model-value="duibiDialogVisible"
       :fullscreen="false"
       :close-on-click-modal="false"
-      width="800px"
+      width="940px"
       class="dict-dialog"
       @close="() => (duibiDialogVisible = false)"
     >
@@ -511,55 +575,96 @@
             <span class="span1">体检号：</span>
             <el-input
               style="width: 120px; margin-right: 12px"
-              v-model="code"
+              v-model="itemDetail.peId"
               placeholder="请输入"
               class="select-item"
-              clearable
+              readonly
             />
           </div>
           <div class="div1">
-            <span class="span1">体检号：</span>
+            <span class="span1">姓名：</span>
             <el-input
               style="width: 120px; margin-right: 12px"
-              v-model="code"
+              v-model="itemDetail.name"
               placeholder="请输入"
               class="select-item"
-              clearable
+              readonly
             />
           </div>
           <div class="div1">
             <span class="span1">性别：</span>
             <el-input
               style="width: 120px; margin-right: 12px"
-              v-model="code"
+              v-model="itemDetail.sex"
               placeholder="请输入"
               class="select-item"
-              clearable
+              readonly
             />
           </div>
-          <div class="div1">
+          <!-- <div class="div1">
             <el-button @click="print">查询 </el-button>
-          </div>
+          </div> -->
         </div>
-        <div>
-          <el-table :data="tableData" style="width: 100%" height="calc(100vh - 500px)" border>
+        <div style="height: 450px; overflow-y: auto">
+          <el-table
+            v-for="(item, index) in duibiData"
+            :data="item[0]"
+            :key="index"
+            style="width: 100%; margin-bottom: 10px"
+            border
+          >
             <el-table-column
-              v-for="item in personList"
-              :key="item.prop"
-              :label="item.label"
-              :prop="item.prop"
-              :align="item.align"
-              :width="item.width"
+              label="体检项目"
+              prop="itemAssemName"
+              align="left"
+              width="160px"
               show-overflow-tooltip
             >
-              <template #default="scope" v-if="item.prop == 'isPrint'">
-                <el-radio
-                  :model-value="scope.row.isPrint === '1'"
-                  @change="onChangeShow(scope.row, $event)"
-                  label="是"
-                />
-              </template>
+              <!-- <template #default="scope" v-if="item.prop == 'isPrint'">
+                
+              </template> -->
             </el-table-column>
+            <el-table-column
+              label="体检结果"
+              prop="peResult"
+              align="left"
+              show-overflow-tooltip
+            ></el-table-column>
+            <el-table-column
+              label="结果单位"
+              prop="units"
+              align="left"
+              width="100px"
+              show-overflow-tooltip
+            ></el-table-column>
+            <el-table-column
+              label="正常单位"
+              prop="normalValue"
+              align="left"
+              width="120px"
+              show-overflow-tooltip
+            ></el-table-column>
+            <el-table-column
+              label="体检日期"
+              prop="peResultDate"
+              align="left"
+              width="120px"
+              show-overflow-tooltip
+            ></el-table-column>
+            <el-table-column
+              label="次数"
+              prop="peVisitId"
+              align="left"
+              width="60px"
+              show-overflow-tooltip
+            ></el-table-column>
+            <el-table-column
+              label="体检科室"
+              prop="peDeptName"
+              align="left"
+              width="120px"
+              show-overflow-tooltip
+            ></el-table-column>
           </el-table>
         </div>
       </div>
@@ -606,9 +711,16 @@
       </div>
       <template #footer>
         <div class="dialog-footer">
-          <el-button type="primary" @click="fenkeJieguo">分科结果 </el-button>
+          <el-button type="primary" :disabled="itemDetail.resultStatus == '9'" @click="fenkeJieguo"
+            >分科结果
+          </el-button>
           <el-button @click="fenkeDialogVisible = false">取消</el-button>
-          <el-button type="primary" @click="saveFenkeInfo">保存</el-button>
+          <el-button
+            type="primary"
+            :disabled="itemDetail.resultStatus == '9'"
+            @click="saveFenkeInfo"
+            >保存</el-button
+          >
         </div>
       </template>
     </Dialog>
@@ -624,7 +736,7 @@
         <div class="dict-dialog-title">选择科普知识</div>
       </template>
       <div class="trage_search">
-        <!-- <div class="search1" style="padding: 0 0 6px 0">
+        <div class="search1" style="padding: 0 0 6px 0">
           <div class="div1">
             <span class="span1">症状名称：</span>
             <el-input
@@ -639,7 +751,7 @@
             <el-button @click="searchKnowledge">查询</el-button>
             <el-button @click="resetKnowledgeSearch">重置</el-button>
           </div>
-        </div> -->
+        </div>
         <div>
           <el-table
             :data="knowledgeTableData"
@@ -657,14 +769,10 @@
             <el-table-column
               prop="knowledgeName"
               label="症状"
-              width="200"
+              width="120"
               show-overflow-tooltip
             ></el-table-column>
-            <el-table-column
-              prop="knowledgeText"
-              label="科普知识"
-              show-overflow-tooltip
-            ></el-table-column>
+            <el-table-column prop="knowledgeText" label="科普知识"></el-table-column>
           </el-table>
 
           <el-pagination
@@ -808,11 +916,7 @@
               width="200"
               show-overflow-tooltip
             ></el-table-column>
-            <el-table-column
-              prop="suggestText"
-              label="建议内容"
-              show-overflow-tooltip
-            ></el-table-column>
+            <el-table-column prop="suggestText" label="建议内容"></el-table-column>
           </el-table>
 
           <el-pagination
@@ -888,6 +992,130 @@
         </div>
       </template>
     </Dialog>
+    <Dialog
+      :model-value="openFujianVisible"
+      :fullscreen="false"
+      :close-on-click-modal="false"
+      class="dict-dialog"
+      title="体检复检计划"
+      @close="() => (openFujianVisible = false)"
+      top="15vh"
+      width="750px"
+    >
+      <div>
+        <div class="quoteCon" style="padding-bottom: 15px">
+          <span style="font-size: 16px; color: #3263fe; font-weight: bold; line-height: 24px"
+            >本次体检的阳性体征及危急值</span
+          >
+          <el-table
+            :data="yxjwjzTiXingData"
+            style="width: 100%"
+            height="200px"
+            highlight-current-row
+            stripe
+            border
+          >
+            <el-table-column
+              label="检验项目名称"
+              prop="itemAssemName"
+              align="center"
+              width="120px"
+              show-overflow-tooltip
+            />
+            <el-table-column
+              label="项目名称"
+              prop="itemName"
+              align="center"
+              width="160px"
+              show-overflow-tooltip
+            />
+            <el-table-column
+              label="结果"
+              align="center"
+              show-overflow-tooltip
+              prop="peResult"
+            ></el-table-column>
+            <el-table-column
+              label="参考值"
+              width="140px"
+              align="center"
+              show-overflow-tooltip
+              prop="printContext"
+            >
+            </el-table-column>
+            <el-table-column
+              label="单位"
+              prop="units"
+              align="center"
+              width="120px"
+              show-overflow-tooltip
+            />
+            <el-table-column label="I" align="center" width="80px" show-overflow-tooltip>
+              <template #default="scope">
+                <span
+                  v-if="scope.row.abnormalIndicator == 'H'"
+                  style="
+                    color: #f33d21;
+                    display: flex;
+                    width: 100%;
+                    align-items: center;
+                    justify-content: center;
+                  "
+                >
+                  <img :src="shang" style="width: 16px; height: 16px" />{{
+                    scope.row.abnormalIndicator
+                  }}</span
+                >
+                <span
+                  v-if="scope.row.abnormalIndicator == 'L'"
+                  style="
+                    color: #3263fe;
+                    display: flex;
+                    width: 100%;
+                    align-items: center;
+                    justify-content: center;
+                  "
+                >
+                  <img :src="xia" style="width: 16px; height: 16px" />{{
+                    scope.row.abnormalIndicator
+                  }}</span
+                >
+              </template>
+            </el-table-column>
+          </el-table>
+        </div>
+        <div style="display: flex; align-items: center; margin-bottom: 8px">
+          <span>预计复检日期：</span>
+          <el-date-picker
+            type="date"
+            style="display: flex; width: 160px"
+            v-model="recheckDate"
+            value-format="YYYY-MM-DD"
+          />
+        </div>
+        <div style="display: flex; align-items: center; margin-bottom: 8px">
+          <span>复检原因描述：</span>
+          <el-input
+            v-model="recheckMsg"
+            style="width: 85%"
+            :autosize="{ minRows: 3, maxRows: 3 }"
+            type="textarea"
+            placeholder="请输入"
+            maxlength="200"
+          />
+        </div>
+        <div style="width: 100%; display: flex; align-items: center; justify-content: center">
+          <el-button
+            style="color: #3263fe; background: #fff; border-color: #3263fe"
+            @click="recheckCancel"
+            >取消</el-button
+          >
+          <el-button style="color: #fff; background-color: #3263fe" @click="recheckConfirm"
+            >确定</el-button
+          >
+        </div>
+      </div>
+    </Dialog>
   </div>
 </template>
 <script setup lang="ts">
@@ -905,7 +1133,7 @@ import ai from '@/assets/images/ai.svg'
 import stop from '@/assets/images/stop.svg'
 import * as Api from '@/api/PerPhyExamination/geTrage/index'
 import type { Ref } from 'vue'
-import { ElTable, ElLoading, ElMessage } from 'element-plus'
+import { ElTable, ElLoading, ElMessage, ElMessageBox } from 'element-plus'
 import perExaminationReport from '@/views/PhyExamManage/components/examinationReport/perExaminationReport.vue'
 import html2Canvas from 'html2canvas'
 import JsPDF from 'jspdf'
@@ -916,6 +1144,9 @@ import { debounce } from 'lodash'
 import axios from 'axios'
 import { parse } from 'path'
 import { result } from 'lodash-es'
+import { getPeAbnormalItemList } from '@/api/PerPhyExamination/DoctorTriageDesk/index'
+import shang from '@/assets/imgs/shang.png'
+import xia from '@/assets/imgs/xia.png'
 
 const router = useRouter()
 interface User {
@@ -936,6 +1167,12 @@ const company = ref('')
 const checkList = ref(['Value1', 'Value2'])
 const dateType = ref<number | null>(1) // 1: 报到时间区间, 2: 预约时间区间
 const personList = ref([
+  {
+    label: '审核状态',
+    prop: 'resultStatus',
+    align: 'center',
+    width: 120
+  },
   {
     label: '体检号',
     prop: 'peId',
@@ -969,7 +1206,8 @@ const personList = ref([
     label: '体检日期',
     // prop: 'pePreDate',
     prop: 'peQueueDate',
-    align: 'center'
+    align: 'center',
+    width: 120
   }
 ])
 const duibiDialogVisible = ref(false)
@@ -1088,11 +1326,59 @@ const shenhe = () => {
 const tabChanges = (val: number) => {
   console.log(val)
 }
-
+const duibiData = ref([])
 const contrast = () => {
-  console.log('对比')
-  duibiDialogVisible.value = true
+  console.log('对比', itemDetail.value)
+  if (historyExamList.value.length > 0) {
+    if (itemDetail.value && itemDetail.value.idNo) {
+      Api.pastExamResultList({ idNo: itemDetail.value.idNo }).then((res) => {
+        const groupedByItemAssemName = splitArrayById(res, 'itemAssemName')
+        const result = groupedByItemAssemName.map((group) => splitArrayById(group, 'itemAssemName'))
+
+        result.forEach((it, index) => {
+          it.forEach((item, k) => {
+            if (item.length > 0) {
+              item[0].isTermHead = true
+              item[item.length - 1].isSummary = true
+
+              item.forEach((g) => {
+                g.itemAssemName = item[0].itemAssemName
+                if (typeof g.content === 'string') {
+                  g.content = JSON.parse(`[${JSON.stringify(g.content)}]`)
+                } else if (!g.content) {
+                  g.content = []
+                }
+              })
+
+              if (k === 0 && item.length) {
+                item[0].isDeptHead = true
+              }
+            }
+          })
+        })
+        console.log('result', result)
+        duibiData.value = result
+        duibiDialogVisible.value = true
+      })
+    }
+  }
 }
+const splitArrayById = (() => {
+  const cache = new Map()
+  return (arr, idKey) => {
+    const key = JSON.stringify(arr.map((item) => item[idKey]))
+    if (cache.has(key)) return cache.get(key)
+
+    const result = arr.reduce((acc, cur) => {
+      const index = acc.findIndex((item) => item[0][idKey] === cur[idKey])
+      index === -1 ? acc.push([cur]) : acc[index].push(cur)
+      return acc
+    }, [])
+
+    cache.set(key, result)
+    return result
+  }
+})()
 //汇总分科建议
 const addDivisionSugges = () => {
   const abnormalList = []
@@ -1310,8 +1596,9 @@ const cbAuditDept = async () => {
     .then((res) => {
       if (res) {
         ElMessage.success('分科审核成功')
+        getPePatList()
         // 获取数据
-        getExaminePatList(itemDetail.value)
+        // getExaminePatList(itemDetail.value)
       }
     })
     .catch((error) => {
@@ -1332,8 +1619,9 @@ const firstAudit = async () => {
     .then((res) => {
       if (res) {
         ElMessage.success('初步审核成功')
+        getPePatList()
         // 获取数据
-        getExaminePatList(itemDetail.value)
+        // getExaminePatList(itemDetail.value)
       }
     })
     .catch((error) => {
@@ -1342,24 +1630,45 @@ const firstAudit = async () => {
 }
 // 个人体检-主检医生审核-最终审核
 const cbLastAuditDept = async () => {
-  await Api.cbLastAuditDept({
-    peId: itemDetail.value.peId || '',
-    peVisitId: itemDetail.value.peVisitId || '',
-    suggest: mle_suggest.value || '',
-    examineDiseaseList: diaseseList.value || [],
-    knowledgeRecordList: knowledgeRecordList.value || [],
-    peDeptCheckList: peDeptCheckList.value || []
+  ElMessageBox.confirm('是否确认最终审核', '提示', {
+    confirmButtonText: '确定',
+    cancelButtonText: '取消',
+    type: 'warning'
+  }).then(async () => {
+    await Api.cbLastAuditDept({
+      peId: itemDetail.value.peId || '',
+      peVisitId: itemDetail.value.peVisitId || '',
+      suggest: mle_suggest.value || '',
+      examineDiseaseList: diaseseList.value || [],
+      knowledgeRecordList: knowledgeRecordList.value || [],
+      peDeptCheckList: peDeptCheckList.value || []
+    })
+      .then((res) => {
+        if (res) {
+          ElMessage.success('最终审核成功')
+          // 获取数据
+          getPePatList()
+          // getExaminePatList(itemDetail.value)
+        }
+      })
+      .catch((error) => {
+        console.error('审核失败:', error)
+      })
   })
-    .then((res) => {
+}
+//撤销终审
+const revokeAppeal = async () => {
+  if (itemDetail.value && itemDetail.value.peId) {
+    Api.updateResultStatus({
+      peId: itemDetail.value.peId,
+      peVisitId: itemDetail.value.peVisitId
+    }).then((res) => {
       if (res) {
-        ElMessage.success('最终审核成功')
-        // 获取数据
-        getExaminePatList(itemDetail.value)
+        ElMessage.success('撤销成功')
+        getPePatList()
       }
     })
-    .catch((error) => {
-      console.error('审核失败:', error)
-    })
+  }
 }
 const showJson = ref(false)
 const jsonData = ref({})
@@ -1513,17 +1822,20 @@ const knowledgeColum = [
   {
     label: '序号',
     prop: 'sortNo',
-    width: '60px'
+    width: '60px',
+    showTooltip: true
   },
   {
     label: '症状',
     prop: 'knowledgeName',
-    width: '120px'
+    width: '120px',
+    showTooltip: true
   },
   {
     label: '科普知识',
     prop: 'knowledgeText',
-    width: ''
+    width: '',
+    showTooltip: false
   }
   // {
   //   label: '操作',
@@ -1668,8 +1980,9 @@ const debouncedItemClick = debounce((row) => {
   getExaminePatList(itemDetail.value)
 }, 500)
 
-const itemClick = (row) => {
-  Api.getNoFinishItem({ peId: row.peId, peVisitId: row.peVisitId }).then((res) => {
+const itemClick = async (row) => {
+  await debouncedItemClick(row)
+  await Api.getNoFinishItem({ peId: row.peId, peVisitId: row.peVisitId }).then((res) => {
     if (res) {
       let newStr = res.split(';').join('<br />')
       ElMessageBox.alert(
@@ -1682,7 +1995,6 @@ const itemClick = (row) => {
       )
     }
   })
-  debouncedItemClick(row)
 }
 const historyExamList = ref([])
 // 个人体检-主检医生审核-汇总审核-历史记录
@@ -1727,8 +2039,10 @@ const getPeKnowledge = async (pageNo = 1) => {
 
 // 打开科普知识弹窗
 const openKnowledgeDialog = () => {
-  konwledgeDialogVisible.value = true
-  getPeKnowledge(1)
+  if (itemInfo.value.peId && itemInfo.value.peVisitId) {
+    konwledgeDialogVisible.value = true
+    getPeKnowledge(1)
+  }
 }
 
 // 分页变化处理
@@ -2123,17 +2437,33 @@ const sendMsg = async (flag) => {
   if (flag == '1') {
     data.value = aiSearch.value
     askMsg.value = aiSearch.value
-  } else if (flag == '2') {
+  } else if (flag && flag != '1') {
     if (peDeptCheckList.value && peDeptCheckList.value.length > 0) {
+      let positiveList = []
+      let abnormalList = []
       peDeptCheckList.value.forEach((item) => {
-        if (item.conclusion) {
-          conclusionStr += item.conclusion
+        if (item.positive) {
+          positiveList.push(`${item.deptName}:${item.positive}`)
+        } else if (item.abnormal) {
+          abnormalList.push(`${item.deptName}:${item.abnormal}`)
         }
       })
+      conclusionStr = positiveList.join('；') + '。' + abnormalList.join('；')
     }
     if (conclusionStr && conclusionStr.length > 0) {
-      data.value = `你现在的身份是一个体检系统的总检医生，需要你根据患者此次各个科室体检的小结给出本次体检的建议指导。以下是该患者各科室体检的小结信息（${conclusionStr}）`
-      askMsg.value = '患者本次体检的建议指导'
+      if (flag == '2') {
+        data.value = `你现在的身份是一个体检系统的总检医生，需要你根据患者此次体检的阳性体征和初步诊断智能分析出患者此次的异常指标并提供一份简单的可视化报告，并标注重点关注项。以下是该患者各科室体检的阳性体征和初步诊断（${conclusionStr}）`
+        askMsg.value = '患者本次体检报告智能分析'
+      } else if (flag == '3') {
+        data.value = `你现在的身份是一个体检系统的总检医生，需要你根据患者此次体检的阳性体征和初步诊断智能分析出患者此次健康风险，并大概评估患者是否有慢性病如（糖尿病，高血压）的风险。以下是该患者各科室体检的阳性体征和初步诊断（${conclusionStr}）`
+        askMsg.value = '患者健康风险评估'
+      } else if (flag == '4') {
+        data.value = `你现在的身份是一个体检系统的总检医生，需要你根据患者此次体检的阳性体征和初步诊断给出患者本次体检的个性化健康建议。以下是该患者各科室体检的阳性体征和初步诊断（${conclusionStr}）`
+        askMsg.value = '患者个性化健康建议'
+      } else if (flag == '5') {
+        data.value = `你现在的身份是一个体检系统的总检医生，需要你根据患者此次体检的阳性体征和初步诊断给出患者未来的健康趋势，并提供健康改善意见。以下是该患者各科室体检的阳性体征和初步诊断（${conclusionStr}）`
+        askMsg.value = '患者健康趋势预测'
+      }
     } else {
       data.value = ''
       askMsg.value = ''
@@ -2295,6 +2625,40 @@ function flushPendingChars() {
   }
 }
 
+//复检计划
+const openFujianVisible = ref(false)
+const recheckDate = ref('')
+const recheckMsg = ref('')
+const yxjwjzTiXingData = ref([])
+const fujianData = ref({})
+const addFuJian = (row) => {
+  fujianData.value = row
+  getPeAbnormalItemList({ peId: row.peId, peVisitId: row.peVisitId }).then((res) => {
+    if (res && res.length > 0) {
+      yxjwjzTiXingData.value = res
+    }
+  })
+  openFujianVisible.value = true
+}
+const recheckConfirm = () => {
+  let parmas = {
+    peId: fujianData.value.peId,
+    peVisitId: fujianData.value.peVisitId,
+    abnormalItemRemark: recheckMsg.value,
+    reCheckDate: recheckDate.value
+  }
+  if (recheckMsg.value && recheckDate.value) {
+    Api.updateReCheckPlan(parmas).then((res) => {
+      ElMessage.success('添加复检计划成功')
+      recheckCancel()
+    })
+  }
+}
+const recheckCancel = () => {
+  openFujianVisible.value = false
+  recheckMsg.value = ''
+  recheckDate.value = ''
+}
 // 在组件销毁时清理
 onUnmounted(() => {
   if (controller) {
@@ -2700,6 +3064,15 @@ onUnmounted(() => {
   }
 }
 :deep(.ai_drawer) {
+  .tishi_msg {
+    span {
+      color: #ed2226;
+      font-size: 14px;
+      display: block;
+      line-height: 20px;
+      font-weight: bold;
+    }
+  }
   .el-drawer__header {
     margin-bottom: 0;
     padding: 15px 15px;
@@ -2710,7 +3083,7 @@ onUnmounted(() => {
   }
   .ai_top {
     width: 100%;
-    height: 85%;
+    height: 58%;
     background: #f5f6f7;
     .ai_con {
       height: calc(100% - 83px);

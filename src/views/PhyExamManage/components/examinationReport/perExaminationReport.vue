@@ -3,8 +3,8 @@
     <div class="report_con page">
       <div class="title"> </div>
       <div class="center">
-        <div> {{ jsonData.peVisitListRespVo.hospitalname }}体检报告 </div>
-        <div> 健 康 体 检 报 告 </div>
+        <div> {{ jsonData.peVisitListRespVo.hospitalname }} </div>
+        <div> 体 检 报 告 </div>
       </div>
       <div class="info">
         <div class="info_flex">
@@ -13,11 +13,17 @@
         </div>
         <div class="info_flex">
           <div>性&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;别：</div>
-          <div class="d_border">{{ jsonData.peVisitListRespVo.sex }}</div>
+          <div class="d_border" style="width: 90px; padding-left: 30px">{{
+            jsonData.peVisitListRespVo.sex
+          }}</div>
+          <div style="margin-left: 10px">年&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;龄：</div>
+          <div class="d_border" style="width: 90px; padding-left: 30px">{{
+            jsonData.peVisitListRespVo.age
+          }}</div>
         </div>
         <div class="info_flex">
-          <div>年&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;龄：</div>
-          <div class="d_border">{{ jsonData.peVisitListRespVo.age }}</div>
+          <div>参检单位：</div>
+          <div class="d_border">{{ jsonData.peVisitListRespVo.unitName }}</div>
         </div>
         <div class="info_flex">
           <div>联系电话：</div>
@@ -27,10 +33,9 @@
           <div>体检编码：</div>
           <div class="d_border">{{ jsonData.peVisitListRespVo.peId }}</div>
         </div>
-        <div class="info_flex">
-          <div>参检单位：</div>
-          <div class="d_border">{{ jsonData.peVisitListRespVo.unitName }}</div>
-        </div>
+        <!-- <div class="info_flex">
+          
+        </div> -->
         <div class="info_flex">
           <div>体检日期：</div>
           <div class="d_border">{{ jsonData.peVisitListRespVo.pePreDate }}</div>
@@ -96,11 +101,26 @@
         <div class="con1"> 初审医生：{{ jsonData.peVisitListRespVo.chiefDoctor }}</div>
         <div class="con1">初审日期：{{ jsonData.peVisitListRespVo.chiefAuditDate }}</div>
       </div>
+      <div class="pagination">第{{ 1 }}页/共{{ newDeptResultA.length + 2 }}页</div>
+    </div>
+    <div class="report_jiben page">
+      <div class="biaoti">
+        <!-- <div class="mr_20">中国人民解放军63710部队医院</div> -->
+        <div>体检Id：{{ jsonData.peVisitListRespVo.peId }}</div>
+        <div>姓名：{{ jsonData.peVisitListRespVo.name }}</div>
+        <div>性别：{{ jsonData.peVisitListRespVo.sex }}</div>
+        <div>年龄：{{ jsonData.peVisitListRespVo.age }}岁</div>
+        <div>第{{ jsonData.peVisitListRespVo.peVisitId }}次体检</div>
+      </div>
+      <div class="logo_ti">
+        <!-- <img :src="avatar" alt="" /> -->
+        <div>{{ jsonData.peVisitListRespVo.hospitalname }}</div>
+      </div>
+      <div class="back_c">主检报告</div>
       <div class="jianyi">健康建议</div>
       <div class="jianyi_c" v-for="(item2, index2) in jsonData.guideResultDO" :key="index2">
         <div>{{ index2 + 1 }}、{{ item2.guideTitle }}</div>
         <div
-          :style="jsonData.guideResultDO.length > 10 ? 'font-size:12px;line-height:16px' : ''"
           v-html="
             item2.guideContent &&
             (item2.guideContent.includes('\r\n') || item2.guideContent.includes('\n'))
@@ -119,7 +139,7 @@
         <div class="con1"> 终审医生：{{ jsonData.peVisitListRespVo.auditDoctor }}</div>
         <div class="con1">终审日期：{{ jsonData.peVisitListRespVo.lastAuditDate }}</div>
       </div>
-      <div class="pagination">第{{ 1 }}页/共{{ newDeptResultA.length + 1 }}页</div>
+      <div class="pagination">第{{ 2 }}页/共{{ newDeptResultA.length + 2 }}页</div>
     </div>
     <div class="report_jiben page" v-for="(itemValue, p) in newDeptResultA" :key="p">
       <div class="biaoti">
@@ -218,7 +238,7 @@
           <!-- </div> -->
         </div>
       </div>
-      <div class="pagination">第{{ p + 2 }}页/共{{ newDeptResultA.length + 1 }}页</div>
+      <div class="pagination">第{{ p + 3 }}页/共{{ newDeptResultA.length + 2 }}页</div>
     </div>
   </div>
   <img ref="imgRef" style="display: none" />
@@ -546,7 +566,7 @@ watch(
     // border-bottom: 1px solid #000dd;
     // margin-bottom: 10px; */
     .title {
-      margin-bottom: 200px;
+      margin-bottom: 140px;
       .title_div {
         margin-bottom: 10px;
       }
@@ -558,7 +578,7 @@ watch(
       div {
         margin-bottom: 10px;
         font-weight: bold;
-        font-size: 50px;
+        font-size: 30px;
       }
     }
     .info {
@@ -573,7 +593,7 @@ watch(
       .dreess {
         font-size: 14px;
         font-family: 'SimSun', '宋体';
-        margin-top: 200px;
+        margin-top: 360px;
         position: relative;
         .position {
           text-align: center;
