@@ -559,6 +559,18 @@
                       width="80px"
                       show-overflow-tooltip
                     />
+                    <el-table-column
+                      label="结果引入"
+                      align="center"
+                      show-overflow-tooltip
+                      width="86px"
+                    >
+                      <template #default="scope">
+                        <el-button type="text" @click="introduce(scope.row, scope.$index)"
+                          >引入</el-button
+                        >
+                      </template>
+                    </el-table-column>
                   </el-table>
                 </div>
                 <div
