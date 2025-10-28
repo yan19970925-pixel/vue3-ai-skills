@@ -442,6 +442,7 @@
                           placeholder="请输入"
                           maxlength="50"
                           :disabled="isCanDisableInput"
+                          readonly
                         />
                         <el-select
                           v-else
@@ -597,7 +598,7 @@
                         <el-input
                           v-model="scope.row.keyName"
                           style="width: 100%"
-                          :autosize="{ minRows: 3, maxRows: 3 }"
+                          :autosize="{ minRows: 7, maxRows: 7 }"
                           type="textarea"
                           placeholder="请输入"
                           maxlength="200"
@@ -611,11 +612,12 @@
                         <el-input
                           v-model="scope.row.value"
                           style="width: 100%"
-                          :autosize="{ minRows: 3, maxRows: 3 }"
+                          :autosize="{ minRows: 7, maxRows: 7 }"
                           type="textarea"
                           placeholder="请输入"
                           maxlength="200"
                           :disabled="isCanDisableInput"
+                          readonly
                         />
                       </template>
                     </el-table-column>

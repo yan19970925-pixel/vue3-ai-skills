@@ -301,6 +301,10 @@
               :width="item.width"
               show-overflow-tooltip
             >
+              <template #default="scope" v-if="item.prop == 'recycleFlag'">
+                <span v-if="scope.row.recycleFlag == '1'" style="color: #3473d1">已回收</span>
+                <span v-else style="color: #ed2226">未回收</span>
+              </template>
             </el-table-column>
             <el-table-column label="回收指引单" width="120" align="center" fixed="right">
               <template #default="scope">
@@ -960,7 +964,8 @@ import {
   healthCertificateInfoUpload,
   upPdfEmployees,
   peSign,
-  updateFinishedSignList
+  updateFinishedSignList,
+  recyclePeGuidSheet
 } from '@/api/PerPhyExamination/printGuidanceSheet/index'
 import { formatDate } from '@/utils/formatTime'
 import PrintPdf from './printPdf.vue'
@@ -997,10 +1002,16 @@ const printParams = ref({
 const time = ref([formatDate(new Date(), 'YYYY-MM-DD'), formatDate(new Date(), 'YYYY-MM-DD')])
 const personList = ref([
   {
+    label: '回收标记',
+    prop: 'recycleFlag',
+    align: 'center',
+    width: '86'
+  },
+  {
     label: '体检类型',
     prop: 'peTypeName',
     align: 'center',
-    width: '180'
+    width: '170'
   },
   {
     label: '套餐名称',
@@ -1012,7 +1023,7 @@ const personList = ref([
     label: '体检号',
     prop: 'peId',
     align: 'center',
-    width: 120
+    width: 100
   },
   {
     label: '姓名',
@@ -1024,7 +1035,7 @@ const personList = ref([
     label: '体检次数',
     prop: 'peVisitId',
     align: 'center',
-    width: 90
+    width: 86
   },
   {
     label: '性别',
@@ -1048,19 +1059,19 @@ const personList = ref([
     label: '婚姻状况',
     prop: 'maritalStatus',
     align: 'center',
-    width: 100
+    width: 90
   },
   {
     label: '出生日期',
     prop: 'dateOfBirth',
     align: 'center',
-    width: 140
+    width: 110
   },
   {
     label: '联系电话',
     prop: 'phoneNumber',
     align: 'center',
-    width: 120
+    width: 110
   },
   {
     label: '团检单位',
@@ -2073,7 +2084,20 @@ const recycleZYD = (row) => {
   })
 }
 const recycleConfirm = () => {
-  recycleVisible.value = false
+  let isAllfinsh = allRecycleData.value.some((item) => item.finishedSign == '未完成')
+  if (isAllfinsh) {
+    ElMessage.warning('患者还有未完成项目，无法回收')
+  } else {
+    let params = {
+      peId: recheckData.value.peId,
+      peVisitId: recheckData.value.peVisitId
+    }
+    recyclePeGuidSheet(params).then((res) => {
+      recycleVisible.value = false
+      ElMessage.success('回收成功')
+      search()
+    })
+  }
 }
 const recycleCancel = () => {
   recycleVisible.value = false

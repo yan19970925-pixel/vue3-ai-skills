@@ -59,3 +59,7 @@ export const upPdfEmployees = (data) => {
 export const updateFinishedSignList = (data) => {
   return request.post({ url: '/health-api/health/audit/updateFinishedSignList', data })
 }
+//回收指引单
+export const recyclePeGuidSheet = (data) => {
+  return request.post({ url: '/health-api/health/personChart/recyclePeGuidSheet', data })
+}

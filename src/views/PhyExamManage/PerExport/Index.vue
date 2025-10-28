@@ -105,16 +105,16 @@
             />
           </div>
           <div class="unSelectpackage mt-12px" v-if="!isShowDetail">
-            <el-radio-group v-model="unPrintChecked">
-              <el-radio
+            <el-checkbox-group v-model="unPrintChecked">
+              <el-checkbox
                 v-for="item in unPrintList"
-                :key="item.peId"
-                :label="item.peId"
+                :key="item.peId + item.peVisitId"
+                :label="item.peId + item.peVisitId"
                 size="large"
               >
                 {{ item.name }}
-              </el-radio>
-            </el-radio-group>
+              </el-checkbox>
+            </el-checkbox-group>
           </div>
           <el-table
             ref="adviceTableRef"
@@ -151,11 +151,16 @@
             />
           </div>
           <div class="selectedpackage mt-12px">
-            <el-radio-group v-model="printChecked">
-              <el-radio v-for="item in printList" :key="item.peId" :label="item.peId" size="large">
+            <el-checkbox-group v-model="printChecked">
+              <el-checkbox
+                v-for="item in printList"
+                :key="item.peId + item.peVisitId"
+                :label="item.peId + item.peVisitId"
+                size="large"
+              >
                 {{ item.name }}
-              </el-radio>
-            </el-radio-group>
+              </el-checkbox>
+            </el-checkbox-group>
           </div>
         </div>
       </div>
@@ -182,7 +187,7 @@
       </div>
     </Dialog>
     <div ref="printMe" id="pdfDom" class="pdfDom" v-if="showJson">
-      <perExaminationReport :jsonData="jsonData" />
+      <perExaminationReport v-for="(item, index) in duogeJsonData" :key="index" :jsonData="item" />
     </div>
   </div>
 </template>
@@ -221,8 +226,8 @@ const allUnPrintList = ref<any>([])
 const allPrintList = ref<any>([])
 const unPrintName = ref('')
 const printName = ref('')
-const unPrintChecked = ref('')
-const printChecked = ref('')
+const unPrintChecked = ref([])
+const printChecked = ref([])
 const isShowDetail = ref(false)
 // 提取数据按钮点击事件
 const searchByUnitCode = async () => {
@@ -291,57 +296,47 @@ const searchByPeId = async () => {
     })
     .catch((err) => {})
 }
-const jsonData = ref<any>({})
+const jsonData = ref({})
 const yulanDialogVisible = ref(false)
 const showJson = ref(false)
 const printMe = ref(null)
+const duogeJsonData = ref([])
 const getFinalReport = async (bool, printBool, upload) => {
-  let itemDetail = {}
-  if (unPrintChecked.value) {
-    itemDetail = unPrintList.value.find((item) => item.peId === unPrintChecked.value)
-  } else if (printChecked.value) {
-    itemDetail = printList.value.find((item) => item.peId === printChecked.value)
-  }
-  console.log('itemDetail', itemDetail)
-
-  if (!itemDetail || !itemDetail.peId || !itemDetail.peVisitId) {
+  if (unPrintChecked.value.length == 0 && printChecked.value.length == 0) {
     ElMessage.error('请选择要打印的体检人')
     return
   } else {
-    await finalReport({
-      peId: itemDetail.peId || '',
-      peVisitId: itemDetail.peVisitId || ''
+    let printDataList = [...printChecked.value, ...unPrintChecked.value],
+      dataList = [...printList.value, ...unPrintList.value],
+      newPrintList = dataList.filter((obj) => printDataList.includes(obj.peId + obj.peVisitId))
+    duogeJsonData.value = []
+    newPrintList.forEach((item) => {
+      finalReport({
+        peId: item.peId || '',
+        peVisitId: item.peVisitId || ''
+      })
+        .then(async (res) => {
+          if (!bool && printBool) {
+            peReportPrint({ peId: item.peId, peVisitId: item.peVisitId })
+          }
+          if (res) {
+            // 获取数据
+            showJson.value = true
+            duogeJsonData.value.push(res)
+          }
+        })
+        .catch((error) => {
+          console.error('数据加载失败', error)
+        })
     })
-      .then(async (res) => {
-        if (!bool && printBool) {
-          peReportPrint({ peId: itemDetail.peId, peVisitId: itemDetail.peVisitId })
-        }
-
-        if (res) {
-          // 获取数据
-          jsonData.value = res
-          showJson.value = true
-          console.log('jsonData', jsonData)
-          jsonData.value.peVisitListRespVo.peVisitId = itemDetail.peVisitId
-          setTimeout(() => {
-            nextTick(async () => {
-              await printTjbg()
-              jsonData.value = {}
-              showJson.value = false
-            })
-          }, 500)
-          // if (bool) {
-          //   yulanDialogVisible.value = bool
-          // } else {
-          //   getPdf2(printBool, itemDetail, upload)
-          // }
-          // jsonData.value.user = itemDetail.value
-          // getPePatList()
-        }
+    setTimeout(() => {
+      nextTick(async () => {
+        await printTjbg()
+        setTimeout(() => {
+          showJson.value = false
+        }, 500)
       })
-      .catch((error) => {
-        console.error('数据加载失败', error)
-      })
+    }, 1000)
   }
 }
 const printTjbg = () => {
@@ -531,8 +526,8 @@ const base64PdfToFile = (base64Pdf, fileName = 'document.pdf') => {
 }
 
 const clearChecked = () => {
-  unPrintChecked.value = ''
-  printChecked.value = ''
+  unPrintChecked.value = []
+  printChecked.value = []
 }
 const selectPrintList = (val) => {
   if (val) {
@@ -548,7 +543,6 @@ const selectUnPrintList = (val) => {
     unPrintList.value = allUnPrintList.value
   }
 }
-
 onMounted(() => {
   searchByDate()
 })

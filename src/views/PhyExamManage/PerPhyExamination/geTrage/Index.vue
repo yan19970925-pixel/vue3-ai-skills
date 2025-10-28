@@ -72,7 +72,7 @@
         </div> -->
         <div class="div1">
           <el-radio-group v-model="dateType" @change="handleDateTypeChange">
-            <el-radio :label="1" size="large">预约时间区间</el-radio>
+            <el-radio :label="1" size="large">预约时间区间：</el-radio>
           </el-radio-group>
           <el-date-picker
             type="date"
@@ -168,7 +168,7 @@
             </el-table-column>
             <!-- 在 el-table-column 循环后添加操作列 -->
             <!-- <el-table-column label="操作" width="74" fixed="right"> -->
-            <el-table-column label="复检计划" width="90" align="center" fixed="right">
+            <el-table-column label="操作" width="160" align="center" fixed="right">
               <template #default="scope">
                 <!-- <el-button
                   style="font-size: 18px; color: #fff"
@@ -178,7 +178,8 @@
                 >
                   <el-icon><Avatar /></el-icon>
                 </el-button> -->
-                <el-button type="text" @click="addFuJian(scope.row)">增加</el-button>
+                <el-button type="text" @click="addFuJian(scope.row)">增加复检计划</el-button>
+                <el-button type="text" @click="openPacsVisible(scope.row)">PACS</el-button>
               </template>
             </el-table-column>
           </el-table>
@@ -711,9 +712,7 @@
       </div>
       <template #footer>
         <div class="dialog-footer">
-          <el-button type="primary" :disabled="itemDetail.resultStatus == '9'" @click="fenkeJieguo"
-            >分科结果
-          </el-button>
+          <el-button type="primary" @click="fenkeJieguo">分科结果 </el-button>
           <el-button @click="fenkeDialogVisible = false">取消</el-button>
           <el-button
             type="primary"
@@ -1116,9 +1115,47 @@
         </div>
       </div>
     </Dialog>
+    <!-- pacs列表弹框 -->
+    <Dialog
+      :model-value="pacsVisible"
+      :fullscreen="false"
+      :close-on-click-modal="false"
+      width="60%"
+      class="dict-dialog"
+      @close="() => (pacsVisible = false)"
+    >
+      <template #title>
+        <div class="dict-dialog-title">检查详情</div>
+      </template>
+      <div>
+        <el-table :data="detailTableData" style="width: 100%" border height="400px">
+          <el-table-column prop="name" label="姓名" width="100" align="center" />
+          <el-table-column prop="peId" label="体检号" width="120" align="center" />
+          <el-table-column prop="peVisitId" label="体检次数" width="100" align="center" />
+          <el-table-column prop="itemAssemName" label="项目名称" show-overflow-tooltip />
+          <el-table-column label="操作" width="180" align="center">
+            <template #default="scope">
+              <div style="display: flex; align-items: center">
+                <el-button type="text" size="small" @click="goPacsImg(scope.row)">
+                  查看影像
+                </el-button>
+                <el-button type="text" size="small" @click="goPacsPdf(scope.row)">
+                  查看报告
+                </el-button>
+              </div>
+            </template>
+          </el-table-column>
+        </el-table>
+      </div>
+      <template #footer>
+        <div class="dialog-footer">
+          <el-button @click="pacsVisible = false">关闭</el-button>
+        </div>
+      </template>
+    </Dialog>
   </div>
 </template>
-<script setup lang="ts">
+<script setup lang="ts" name="GeTrage">
 import { VuePrintNext } from 'vue-print-next'
 import fenkeshenhe from '@/assets/images/fenkeshenhe.svg'
 import fenkejieguo from '@/assets/images/fenkejieguo.svg'
@@ -1182,8 +1219,7 @@ const personList = ref([
   {
     label: '姓名',
     prop: 'name',
-    align: 'center',
-    width: 120
+    align: 'center'
   },
   {
     label: '性别',
@@ -1607,12 +1643,28 @@ const cbAuditDept = async () => {
 }
 // 个人体检-主检医生审核-初步审核
 const firstAudit = async () => {
+  let newDiaseseList = []
+  if (diaseseList.value && diaseseList.value.length > 0) {
+    diaseseList.value.forEach((item) => {
+      if (item.name.includes('\r\n') || item.name.includes('\n')) {
+        let itemNames = item.name.replace(/\r?\n/g, '\r\n')
+        let itemName = itemNames.split('\r\n').filter((it) => it != '')
+        itemName.forEach((element) => {
+          let pushJson = JSON.parse(JSON.stringify(item))
+          pushJson.name = element
+          newDiaseseList.push(pushJson)
+        })
+      } else {
+        newDiaseseList.push(item)
+      }
+    })
+  }
   await Api.firstAudit({
     peId: itemDetail.value.peId || '',
     peVisitId: itemDetail.value.peVisitId || '',
     suggest: mle_suggest.value || '',
     is_rslt_status: 0,
-    examineDiseaseList: diaseseList.value || [],
+    examineDiseaseList: newDiaseseList || [],
     knowledgeRecordList: knowledgeRecordList.value || [],
     peDeptCheckList: peDeptCheckList.value || []
   })
@@ -2658,6 +2710,16 @@ const recheckCancel = () => {
   openFujianVisible.value = false
   recheckMsg.value = ''
   recheckDate.value = ''
+}
+const pacsVisible = ref(false)
+const openPacsVisible = () => {
+  pacsVisible.value = true
+}
+const goPacsImg = (row) => {
+  window.open(`http://10.10.10.72:9090/html/image.htm?apply_no=${row.examNo}`)
+}
+const goPacsPdf = (row) => {
+  window.open(`http://10.10.10.72:9090/html/report.htm?apply_no=${row.examNo}`)
 }
 // 在组件销毁时清理
 onUnmounted(() => {
