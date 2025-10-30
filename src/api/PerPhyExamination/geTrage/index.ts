@@ -76,3 +76,7 @@ export const updateResultStatus = (data) => {
 export const updateReCheckPlan = (data) => {
   return request.post({ url: '/health-api/health/reCheck/updateReCheckPlan', data })
 }
+//查询患者检查申请列表
+export const getExamApplyNoList = (data) => {
+  return request.post({ url: '/health-api/health/audit/getExamApplyNoList', data })
+}

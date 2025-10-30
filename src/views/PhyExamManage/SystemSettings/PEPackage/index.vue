@@ -466,19 +466,20 @@ const getItems = async () => {
 }
 
 watch(setCode, () => {
-  getAllItems()
+  getAllItems('')
+  selectedCategory.value = '全部'
 })
 
 // 获取项目组合数据
-const getAllItems = () => {
+const getAllItems = (form) => {
   allDataUnselect.value = []
   allDataSelected.value = []
-  getItemUnselectList(setCode.value)
+  getItemUnselectList(setCode.value, form)
   getItemSelectedList(setCode.value)
 }
 
 // 获取可选项目
-const getItemUnselectList = async (setCode, form = '') => {
+const getItemUnselectList = async (setCode, form) => {
   const res = await Api.getPeSetItemUnselectList({
     pageNo: 1,
     pageSize: 10000000,
@@ -599,7 +600,7 @@ const handleUnSelectClick = async (val, type) => {
       }
     })
   }
-  getAllItems()
+  getAllItems(selectedCategory.value)
 }
 
 // 获取分类

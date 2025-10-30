@@ -13,7 +13,7 @@ export const getMaxGroupNo = (data: any) => {
 }
 // 单位体检-单位登记-获取单位信息
 export const getUnitInfo = (data: any) => {
-  return request.post({ url: '/health-api/health/peUnitVisit/getUnitInfo', data })
+  return request.post({ url: '/health-api/health/peUnitVisit/getUnitPeInfoList', data })
 }
 // 单位体检-单位登记-单位和分组保存
 export const updateUnitAndUnitGroup = (data: any) => {

@@ -23,7 +23,7 @@
         </div>
         <div class="info_flex">
           <div>参检单位：</div>
-          <div class="d_border">{{ jsonData.peVisitListRespVo.unitName }}</div>
+          <div class="d_border">{{ jsonData.peVisitListRespVo.unitname }}</div>
         </div>
         <div class="info_flex">
           <div>联系电话：</div>

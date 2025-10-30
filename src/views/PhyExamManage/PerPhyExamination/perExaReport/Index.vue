@@ -113,7 +113,7 @@
         <div class="div1">
           <!-- <el-button class="read" @click="print"> <img :src="dayin" />打印 </el-button> -->
           <!-- <el-button class="read" @click="readIdCard"> <img :src="readCard" />读卡 </el-button> -->
-          <!-- <el-button class="read" @click="peCheckIn"> <img :src="report" />报到 </el-button> -->
+          <el-button class="read" @click="peCheckIn"> <img :src="report" />报到 </el-button>
           <el-button class="read" @click="canclePeCheckIn">
             <img :src="noReport" />取消报到
           </el-button>

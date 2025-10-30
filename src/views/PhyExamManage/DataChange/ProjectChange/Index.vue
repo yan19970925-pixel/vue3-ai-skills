@@ -1028,24 +1028,8 @@ const searchByUnitCode = async () => {
     unitCode: formInfo.unitCode
   })
   if (res) {
-    formInfo.unitVisitId = res.unitVisitId || 1
-    if (res.unitVisitId) {
-      formInfo.unitName = res.unitName || ''
-      formInfo.unitAlias = res.unitAlias || ''
-      formInfo.connecter = res.connecter || ''
-      formInfo.phone = res.phone || ''
-      formInfo.address = res.address || ''
-      formInfo.unitNumber = res.unitNumber || ''
-      formInfo.poststTypename = res.poststTypename || ''
-      formInfo.peType = res.peType || ''
-      formInfo.inputCode = res.inputCode || ''
-      formInfo.parentUnitCode = res.parentUnitCode || ''
-      formInfo.status = res.status || ''
-      formInfo.appointsDate = res.appointsDate || ''
-    }
-    formInfo.optionFlag = res.optionFlag
-    if (res.groupingDictDOList && res.groupingDictDOList.length > 0) {
-      itemsList.value = res.groupingDictDOList
+    itemsList.value = res
+    if (itemsList.value.length > 0) {
       itemsList.value.forEach((item) => {
         item.operateType = 'del'
       })
@@ -1073,7 +1057,52 @@ const searchByUnitCode = async () => {
       zuheSearch.value = ''
       formInfo.setCode = ''
     }
-    unitNameRef.value.focus()
+    // formInfo.unitVisitId = res.unitVisitId || 1
+    // if (res.unitVisitId) {
+    //   formInfo.unitName = res.unitName || ''
+    //   formInfo.unitAlias = res.unitAlias || ''
+    //   formInfo.connecter = res.connecter || ''
+    //   formInfo.phone = res.phone || ''
+    //   formInfo.address = res.address || ''
+    //   formInfo.unitNumber = res.unitNumber || ''
+    //   formInfo.poststTypename = res.poststTypename || ''
+    //   formInfo.peType = res.peType || ''
+    //   formInfo.inputCode = res.inputCode || ''
+    //   formInfo.parentUnitCode = res.parentUnitCode || ''
+    //   formInfo.status = res.status || ''
+    //   formInfo.appointsDate = res.appointsDate || ''
+    // }
+    // formInfo.optionFlag = res.optionFlag
+    // if (res.groupingDictDOList && res.groupingDictDOList.length > 0) {
+    //   itemsList.value = res.groupingDictDOList
+    //   itemsList.value.forEach((item) => {
+    //     item.operateType = 'del'
+    //   })
+    //   choseRow(itemsList.value[0])
+    // } else {
+    //   itemsList.value = []
+    //   currentGroupRow.value = {}
+    //   peSetList.value = await getPeSetList({ displayFlag: '0,2', displayFlagGroup: [] })
+    //   let res = await getPeItemAssembledList({
+    //     pageNo: 1,
+    //     pageSize: 10000000,
+    //     form: '',
+    //     clinicFlag: 1
+    //   })
+    //   allDataUnselect.value = res.records || []
+    //   shaixuanAllDataList.value = res.records || []
+    //   checkedPeSetListData.value = ''
+    //   allDataSelected.value = []
+    //   xuanzhongData.value = {}
+    //   shaixuanpeSetList.value = peSetList.value
+    //   setCode.value = ''
+    //   shaixuanChecked.value = []
+    //   xuanzhongChecked.value = []
+    //   taocanSearch.value = ''
+    //   zuheSearch.value = ''
+    //   formInfo.setCode = ''
+    // }
+    // unitNameRef.value.focus()
   }
 }
 const handleDeleteAppoint = async () => {
@@ -1145,7 +1174,10 @@ const appiontDateConfirms = async () => {
   }
 }
 const setRowClassName = ({ row }) => {
-  if (row.groupingCode === currentGroupRow.value.groupingCode) {
+  if (
+    row.peId === currentGroupRow.value.peId &&
+    row.peVisitId === currentGroupRow.value.peVisitId
+  ) {
     return 'table-checked-row-style'
   }
   return 'text-black'
@@ -1191,114 +1223,120 @@ const isUnit = ref<boolean>(false)
  * @param row - 被点击的表格行数据对象
  */
 const choseRow = async (row) => {
-  // 保存已选数据
-  YiXuanSet.value = row.selectedSets
-  YiXuanItemLists.value = row.selectedItems
-  YiXuanItemLists.value.forEach((item) => {
-    if (!item.changed) {
-      item.changed = '保留'
-    }
-  })
-  currentGroupRow.value = row
-  if (!row.unitCode || row.unitCode == '****') {
-    isUnit.value = true
-  } else {
-    isUnit.value = false
-  }
-  const list = [...row.noSelectedSets, ...row.selectedSets]
-  // 初始化数据
-  if (list.length > 0) {
-    peSetList.value = [...row.noSelectedSets, ...row.selectedSets] || []
-  } else {
-    peSetList.value = (await getPeSetList({ displayFlag: '0,2', displayFlagGroup: [] })) || []
-  }
-
-  let res = await getPeItemAssembledList({
-    pageNo: 1,
-    pageSize: 10000000,
-    form: '',
-    clinicFlag: 1
-  })
-
-  // 重置所有相关数据
-  allDataUnselect.value = res.records || []
-  shaixuanAllDataList.value = res.records || []
-  allDataSelected.value = []
-  xuanzhongData.value = {}
-  checkedPeSetListData.value = ''
-  shaixuanpeSetList.value = [...peSetList.value] // 显示完整套餐列表
-  setCode.value = ''
-  shaixuanChecked.value = []
-  xuanzhongChecked.value = []
-  taocanSearch.value = ''
-  zuheSearch.value = ''
-  formInfo.setCode = ''
-
-  // 处理已选套餐（如果有）
-  if (row.selectedSets && row.selectedSets.length > 0) {
-    // 设置第一个已选套餐为当前选中
-    xuanzhongData.value = row.selectedSets[0]
-    checkedPeSetListData.value = row.selectedSets[0].setCode
-    setCode.value = row.selectedSets[0].setCode
-
-    // 从未选套餐列表中移除已选套餐
-    shaixuanpeSetList.value = shaixuanpeSetList.value.filter(
-      (item) => item.setCode !== row.selectedSets[0].setCode
-    )
-
-    // 获取选中套餐包含的项目列表
-    let arr = await getPeSetItemSelectedList({
-      form: '',
-      pageNo: 1,
-      pageSize: 10000000,
-      setCode: row.selectedSets[0].setCode
-    })
-
-    // 将套餐内项目添加到已选项目列表
-    // if (arr && arr.length > 0) {
-    //   arr.forEach((item) => {
-    //     allDataSelected.value.push({
-    //       ...item,
-    //       isTaocan: true
-    //     })
-    //   })
-    //   allDataSelected.value = []
-    //   console.log('%c Line:1264 🍞 arr', 'color:#93c0a4', arr)
-    //   allDataSelected.value = arr
-    //   console.log('%c Line:1265 🌰 allDataSelected.value', 'color:#465975', allDataSelected.value)
-    //   fuzhiAllDataSelected.value = [...allDataSelected.value]
-    // }
-  }
-
-  // 处理已选项目（非套餐内项目）
-  if (row.selectedItems && row.selectedItems.length > 0) {
-    row.selectedItems.forEach((item) => {
-      allDataSelected.value.unshift({
-        ...item,
-        isTaocan: false
+  formInfo.peId = row.peId
+  formInfo.peVisitId = row.peVisitId
+  await updateApi
+    .getPePatInfo({ peId: formInfo.peId || '', peVisitId: formInfo.peVisitId || '' })
+    .then(async (resData) => {
+      // 保存已选数据
+      YiXuanSet.value = resData.selectedSets
+      YiXuanItemLists.value = resData.selectedItems
+      YiXuanItemLists.value.forEach((item) => {
+        if (!item.changed) {
+          item.changed = '保留'
+        }
       })
-    })
-  }
+      currentGroupRow.value = resData
+      if (!resData.unitCode || resData.unitCode == '****') {
+        isUnit.value = true
+      } else {
+        isUnit.value = false
+      }
+      const list = [...resData.noSelectedSets, ...resData.selectedSets]
+      // 初始化数据
+      if (list.length > 0) {
+        peSetList.value = [...resData.noSelectedSets, ...resData.selectedSets] || []
+      } else {
+        peSetList.value = (await getPeSetList({ displayFlag: '0,2', displayFlagGroup: [] })) || []
+      }
 
-  // 计算总费用并更新项目筛选列表
-  if (allDataSelected.value && allDataSelected.value.length > 0) {
-    let num = 0
-    allDataSelected.value.forEach((item) => {
-      num += item.personPrice * 100
-      item.groupingCode = row.groupingCode
-    })
-    formInfo.totalCharges = (num / 100).toFixed(2)
-
-    // 根据已选项目更新未选项目列表
-    if (allDataSelected.value.length > 0) {
-      const allDataSelectedItemCodes = new Set(
-        allDataSelected.value.map((item) => item.itemAssemCode)
-      )
-      shaixuanAllDataList.value = allDataUnselect.value.filter((item) => {
-        return !allDataSelectedItemCodes.has(item.itemAssemCode)
+      let res = await getPeItemAssembledList({
+        pageNo: 1,
+        pageSize: 10000000,
+        form: '',
+        clinicFlag: 1
       })
-    }
-  }
+
+      // 重置所有相关数据
+      allDataUnselect.value = res.records || []
+      shaixuanAllDataList.value = res.records || []
+      allDataSelected.value = []
+      xuanzhongData.value = {}
+      checkedPeSetListData.value = ''
+      shaixuanpeSetList.value = [...peSetList.value] // 显示完整套餐列表
+      setCode.value = ''
+      shaixuanChecked.value = []
+      xuanzhongChecked.value = []
+      taocanSearch.value = ''
+      zuheSearch.value = ''
+      formInfo.setCode = ''
+
+      // 处理已选套餐（如果有）
+      if (resData.selectedSets && resData.selectedSets.length > 0) {
+        // 设置第一个已选套餐为当前选中
+        xuanzhongData.value = resData.selectedSets[0]
+        checkedPeSetListData.value = resData.selectedSets[0].setCode
+        setCode.value = resData.selectedSets[0].setCode
+
+        // 从未选套餐列表中移除已选套餐
+        shaixuanpeSetList.value = shaixuanpeSetList.value.filter(
+          (item) => item.setCode !== resData.selectedSets[0].setCode
+        )
+
+        // 获取选中套餐包含的项目列表
+        let arr = await getPeSetItemSelectedList({
+          form: '',
+          pageNo: 1,
+          pageSize: 10000000,
+          setCode: resData.selectedSets[0].setCode
+        })
+
+        // 将套餐内项目添加到已选项目列表
+        // if (arr && arr.length > 0) {
+        //   arr.forEach((item) => {
+        //     allDataSelected.value.push({
+        //       ...item,
+        //       isTaocan: true
+        //     })
+        //   })
+        //   allDataSelected.value = []
+        //   console.log('%c Line:1264 🍞 arr', 'color:#93c0a4', arr)
+        //   allDataSelected.value = arr
+        //   console.log('%c Line:1265 🌰 allDataSelected.value', 'color:#465975', allDataSelected.value)
+        //   fuzhiAllDataSelected.value = [...allDataSelected.value]
+        // }
+      }
+
+      // 处理已选项目（非套餐内项目）
+      if (resData.selectedItems && resData.selectedItems.length > 0) {
+        resData.selectedItems.forEach((item) => {
+          allDataSelected.value.unshift({
+            ...item,
+            isTaocan: false
+          })
+        })
+      }
+
+      // 计算总费用并更新项目筛选列表
+      if (allDataSelected.value && allDataSelected.value.length > 0) {
+        let num = 0
+        allDataSelected.value.forEach((item) => {
+          num += item.personPrice * 100
+          item.groupingCode = resData.groupingCode
+        })
+        formInfo.totalCharges = (num / 100).toFixed(2)
+
+        // 根据已选项目更新未选项目列表
+        if (allDataSelected.value.length > 0) {
+          const allDataSelectedItemCodes = new Set(
+            allDataSelected.value.map((item) => item.itemAssemCode)
+          )
+          shaixuanAllDataList.value = allDataUnselect.value.filter((item) => {
+            return !allDataSelectedItemCodes.has(item.itemAssemCode)
+          })
+        }
+      }
+    })
 }
 
 // const allDataUnselect = ref([]) // 可选项目列表

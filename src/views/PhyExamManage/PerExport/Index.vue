@@ -112,7 +112,7 @@
                 :label="item.peId + item.peVisitId"
                 size="large"
               >
-                {{ item.name }}
+                {{ item.name }}（{{ item.reportPrnCount || 0 }}）
               </el-checkbox>
             </el-checkbox-group>
           </div>
@@ -127,15 +127,47 @@
           >
             <el-table-column
               show-overflow-tooltip
-              type="index"
-              label="体检人"
-              width="120"
+              prop="name"
+              label="姓名"
+              width="140"
+              align="center"
             ></el-table-column>
-            <el-table-column show-overflow-tooltip prop="diagnosis" label="体检次数" width="120" />
-            <el-table-column show-overflow-tooltip prop="diagnosis" label="年龄" width="120" />
-            <el-table-column show-overflow-tooltip prop="total" label="性别" width="120" />
-            <el-table-column show-overflow-tooltip prop="maleCount" label="婚姻" width="120" />
-            <el-table-column show-overflow-tooltip prop="femaleCount" label="级别" width="auto" />
+            <el-table-column show-overflow-tooltip prop="peId" label="体检号" width="120" />
+            <el-table-column show-overflow-tooltip prop="peVisitId" label="体检次数" width="90" />
+            <el-table-column
+              show-overflow-tooltip
+              prop="reportPrnCount"
+              label="打印次数"
+              width="90"
+              align="center"
+            />
+            <el-table-column
+              show-overflow-tooltip
+              prop="age"
+              label="年龄"
+              width="60"
+              align="center"
+            />
+            <el-table-column
+              show-overflow-tooltip
+              prop="sex"
+              label="性别"
+              width="60"
+              align="center"
+            />
+            <el-table-column
+              show-overflow-tooltip
+              prop="maritalStatus"
+              label="婚姻"
+              width="70"
+              align="center"
+            />
+            <el-table-column
+              show-overflow-tooltip
+              prop="dateOfBirth"
+              label="出生日期"
+              width="140"
+            />
           </el-table>
         </div>
         <div class="export-r"
@@ -158,7 +190,7 @@
                 :label="item.peId + item.peVisitId"
                 size="large"
               >
-                {{ item.name }}
+                {{ item.name }}（{{ item.reportPrnCount || 0 }}）
               </el-checkbox>
             </el-checkbox-group>
           </div>

@@ -2086,7 +2086,7 @@ const perListRowClick = async (row) => {
   await Object.assign(formInfo, {
     joinUnit: row.joinUnit || 0,
     unitCode: row.unitCode || '',
-    unitName: row.unitName || '',
+    unitName: row.unitname || '',
     taxId: row.taxId || '',
     unitNumber: row.unitNumber || '',
     pePreDate: row.pePreDate || '',
@@ -2129,6 +2129,7 @@ const perListRowClick = async (row) => {
       // formInfo.itemList = res.selectedItems //已选套餐
       formInfo.peVisitId = res.peVisitId //体检次数
       formInfo.occupation = res.occupation // 职业
+      formInfo.unitCode = res.unitCode //单位代码
       xuanzhongData.value = res.selectedSets[0] ? res.selectedSets[0] : {} //套餐信息
       allDataSelected.value = res.selectedItems //选中项目
 

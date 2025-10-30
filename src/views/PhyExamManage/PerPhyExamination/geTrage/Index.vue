@@ -103,7 +103,7 @@
             <el-option label="已预约" value="0" />
             <el-option label="已执行" value="1" />
             <el-option label="待审核" value="2" />
-            <el-option label="已分科审核" value="5" />
+            <!-- <el-option label="已分科审核" value="5" /> -->
             <el-option label="已初步审核" value="7" />
             <el-option label="已最终审核" value="9" />
             <el-option label="非正常结束" value="A" />
@@ -185,7 +185,7 @@
           </el-table>
         </div>
         <div class="btn">
-          <el-button
+          <!-- <el-button
             @click="cbAuditDept"
             :disabled="
               isFenke ||
@@ -197,10 +197,10 @@
             "
           >
             <img :src="fenkeshenhe" />分科审核
-          </el-button>
+          </el-button> -->
           <!-- <el-button @click="fenkeJieguo"> <img :src="fenkejieguo" />分科结果 </el-button> -->
 
-          <el-button @click="firstAudit" :disabled="isChubu || itemDetail.resultStatus != '5'">
+          <el-button @click="firstAudit" :disabled="isChubu">
             <img :src="chubushenhe" />初步审核
           </el-button>
 
@@ -1128,11 +1128,11 @@
         <div class="dict-dialog-title">检查详情</div>
       </template>
       <div>
-        <el-table :data="detailTableData" style="width: 100%" border height="400px">
-          <el-table-column prop="name" label="姓名" width="100" align="center" />
-          <el-table-column prop="peId" label="体检号" width="120" align="center" />
-          <el-table-column prop="peVisitId" label="体检次数" width="100" align="center" />
-          <el-table-column prop="itemAssemName" label="项目名称" show-overflow-tooltip />
+        <el-table :data="pacsExamTableData" style="width: 100%" border height="400px">
+          <el-table-column prop="finishedSign" label="完成状态" width="100" align="center" />
+          <!-- <el-table-column prop="peId" label="体检号" width="120" align="center" />
+          <el-table-column prop="pevisitId" label="体检次数" width="100" align="center" /> -->
+          <el-table-column prop="itemName" label="项目名称" show-overflow-tooltip />
           <el-table-column label="操作" width="180" align="center">
             <template #default="scope">
               <div style="display: flex; align-items: center">
@@ -1631,8 +1631,8 @@ const cbAuditDept = async () => {
   })
     .then((res) => {
       if (res) {
-        ElMessage.success('分科审核成功')
-        getPePatList()
+        // ElMessage.success('分科审核成功')
+        // getPePatList()
         // 获取数据
         // getExaminePatList(itemDetail.value)
       }
@@ -1643,6 +1643,7 @@ const cbAuditDept = async () => {
 }
 // 个人体检-主检医生审核-初步审核
 const firstAudit = async () => {
+  await cbAuditDept()
   let newDiaseseList = []
   if (diaseseList.value && diaseseList.value.length > 0) {
     diaseseList.value.forEach((item) => {
@@ -2711,15 +2712,19 @@ const recheckCancel = () => {
   recheckMsg.value = ''
   recheckDate.value = ''
 }
+const pacsExamTableData = ref([])
 const pacsVisible = ref(false)
-const openPacsVisible = () => {
-  pacsVisible.value = true
+const openPacsVisible = (row) => {
+  Api.getExamApplyNoList({ peId: row.peId, peVisitId: row.peVisitId }).then((res) => {
+    pacsExamTableData.value = res
+    pacsVisible.value = true
+  })
 }
 const goPacsImg = (row) => {
-  window.open(`http://10.10.10.72:9090/html/image.htm?apply_no=${row.examNo}`)
+  window.open(`http://10.10.10.72:9090/html/image.htm?apply_no=${row.applyNo}`)
 }
 const goPacsPdf = (row) => {
-  window.open(`http://10.10.10.72:9090/html/report.htm?apply_no=${row.examNo}`)
+  window.open(`http://10.10.10.72:9090/html/report.htm?apply_no=${row.applyNo}`)
 }
 // 在组件销毁时清理
 onUnmounted(() => {
