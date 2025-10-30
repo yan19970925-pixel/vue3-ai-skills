@@ -446,10 +446,10 @@
                   />
                 </div> -->
                 <div class="flex mt-10px">
-                  <span class="cont-span" style="color: red">加项请选择加项标记：</span>
+                  <span class="cont-span" style="color: red">团检加项请选择加项标记：</span>
                   <el-radio-group v-model="AddItemFlag">
-                    <el-radio label="正常" value="1">正常</el-radio>
-                    <el-radio label="加项" value="2">加项</el-radio>
+                    <el-radio label="正常">正常</el-radio>
+                    <el-radio label="加项">加项</el-radio>
                   </el-radio-group>
                 </div>
                 <div class="selectedpackage mt-6px"
@@ -459,7 +459,7 @@
                       @change="xuanzhongHandleItem(item, xuanzhongChecked)"
                     >
                       <el-checkbox :label="item.itemAssemCode">
-                        <span :style="!item.isTaocan ? 'color:#3473d1' : 'color:#333'">{{
+                        <span :style="item.addItem == '加项' ? 'color:#3473d1' : 'color:#333'">{{
                           item.itemAssemName
                         }}</span>
                       </el-checkbox>
@@ -827,19 +827,26 @@ const zuheFiter = () => {
   })
 }
 const shaixuanHandleItem = (item, checked) => {
-  console.log(item, checked)
   item.isTaocan = false
   item.changed = '新增'
-  YiXuanItemLists.value.forEach((yixuanItem) => {
-    if (yixuanItem.itemAssemCode === item.itemAssemCode) {
-      yixuanItem.changed = '保留'
-    } else {
-      if (AddItemFlag.value == '正常') {
-        item.addItem = AddItemFlag.value
-        item.changed = '新增'
-      }
-    }
-  })
+  if (choseRowData.value.chargeType == '个检') {
+    item.addItem = '加项'
+  } else {
+    item.addItem = AddItemFlag.value
+  }
+  YiXuanItemLists.value.push(item)
+  // YiXuanItemLists.value.forEach((yixuanItem) => {
+  //   if (yixuanItem.itemAssemCode === item.itemAssemCode) {
+  //   yixuanItem.changed = '保留'
+  //   item.addItem = AddItemFlag.value
+  // } else {
+  //   if (AddItemFlag.value == '正常') {
+  //     item.addItem = AddItemFlag.value
+  //     item.changed = '新增'
+  //   }
+  // }
+  // })
+  console.log(YiXuanItemLists.value, item)
   allDataSelected.value.unshift(item)
   const allDataSelectedItemCodes = new Set(allDataSelected.value.map((item) => item.itemAssemCode))
   if (zuheSearch.value) {
@@ -1222,7 +1229,10 @@ const isUnit = ref<boolean>(false)
  *
  * @param row - 被点击的表格行数据对象
  */
+//点击选中的人
+const choseRowData = ref({})
 const choseRow = async (row) => {
+  choseRowData.value = row
   formInfo.peId = row.peId
   formInfo.peVisitId = row.peVisitId
   await updateApi
@@ -1585,9 +1595,9 @@ const addUniqueItemsToList = (item, list) => {
   justify-content: space-between;
   align-content: flex-start;
   gap: 0;
-  div {
+  > div {
     width: 49%;
-    height: 30px;
+    height: 28px;
     overflow: hidden;
     display: flex;
     align-items: center;
@@ -1607,7 +1617,7 @@ const addUniqueItemsToList = (item, list) => {
   justify-content: space-between;
   align-content: flex-start;
   gap: 0;
-  div {
+  > div {
     width: 49%;
     height: 30px;
     overflow: hidden;
@@ -1615,6 +1625,7 @@ const addUniqueItemsToList = (item, list) => {
     align-items: center;
     word-break: break-all;
     white-space: nowrap;
+    text-overflow: ellipsis;
   }
 }
 .project-class {

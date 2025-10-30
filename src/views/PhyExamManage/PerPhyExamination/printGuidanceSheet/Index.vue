@@ -467,7 +467,7 @@
                 </el-row>
               </div>
             </div>
-            <div
+            <!-- <div
               class="tishi_in"
               v-if="perItem.peVisitListRespVo.sumCharges"
               style="border-top: none"
@@ -485,7 +485,7 @@
                   </el-col>
                 </el-row>
               </div>
-            </div>
+            </div> -->
           </div>
         </div>
         <div class="print_con">
@@ -507,11 +507,8 @@
                       :src="item.imgUrl"
                       alt=""
                   /></el-col>
-                  <el-col :span="1">{{ index + 1 }}</el-col>
-                  <el-col :span="10"
-                    >{{ item.assemName
-                    }}{{ item.charges ? '（' + item.charges + '元）' : '' }}</el-col
-                  >
+                  <el-col :span="1">{{ item.index }}</el-col>
+                  <el-col :span="10">{{ item.assemName }}</el-col>
                   <el-col :span="2">{{}}</el-col>
                   <el-col
                     :class="item.chartGuide && item.chartGuide.length > 18 ? col_LH : ''"
@@ -1314,7 +1311,7 @@ const print = () => {
         // selectPeGuidSheetPrint({ peId: 'TJ10000030' }).then((res) => {
         // console.log(res, '指引单打印数据')
         if (res && res.length > 0) {
-          printData = res
+          printData = splitListByLength(res, 22)
           if (printData.length > 0) {
             // zhiyindan
             // mediaPrintData.value = jsonTo3DArray(printData, 26)
@@ -1392,44 +1389,7 @@ const print = () => {
               document.head.appendChild(style)
               new VuePrintNext({
                 el: '#printMe',
-                // paperSize: 'A4' // 设置纸张尺寸为 A4
-                // orientation: 'landscape', // 设置纸张方向为横向
-                // preview: true, // 启用预览模式
-                // previewTitle: '打印指引单', // 设置弹出窗口的标题
-                // previewPrintBtnLabel: '确认打印', // 预览按钮文本
-                // paperSize: 'custom', // 设置为自定义尺寸
-                // customSize: {
-                //   width: '210', // 宽度
-                //   height: 'auto', // 高度
-                //   unit: 'mm' // 单位：mm、cm、in、px
-                // }
-                // extraCss: 'https://cdn.example.com/print-styles.css' // 可选：外部打印样式
-
-                // windowMode: true // 启用窗口模式
-                // defaultScale: 0.7, // 设置默认缩放比例
-                // standard: 'css', // 使用 CSS 控制打印样式
                 popTitle: '页码', // 弹出窗口的标题，可以为空字符串以避免显示网址或标题栏
-                // openCallback: (vm) => {
-                //   // 在打印前隐藏头部和底部
-                //   height = '290'
-                //   const header = document.querySelector('.header')
-                //   const footer = document.querySelector('.footer')
-                //   if (header) header.style.display = 'none'
-                //   if (footer) footer.style.display = 'none'
-                //   document.getElementById('printMe').style = 'width: 100%; height: 100%'
-                //   console.log('打印前执行的操作', vm, header, footer)
-                // },
-                // previewBeforeOpenCallback: (vm) => {
-                // height = '580'
-                // // 打印后恢复显示
-                // const header = document.querySelector('.header')
-                // const footer = document.querySelector('.footer')
-                // if (header) header.style.display = ''
-                // if (footer) footer.style.display = ''
-                // document.getElementById('printMe').style = 'width: 100%; height: 100%;overflow-y: auto;'
-                // console.log('打印后执行的操作', vm, header, footer)
-
-                // },
                 previewOpenCallback: () => {
                   document.head.removeChild(style)
                 }
@@ -1525,6 +1485,24 @@ const print = () => {
     ElMessage.error('请选择要打印的数据')
     return
   }
+}
+const splitListByLength = (list, chunkSize) => {
+  const result = []
+  for (const item of list) {
+    const { peVisitListRespVo, personalItemToPrintRespVoList } = item
+    personalItemToPrintRespVoList.forEach((item, index) => {
+      item.index = index + 1
+    })
+    if (personalItemToPrintRespVoList.length <= chunkSize) {
+      result.push({ peVisitListRespVo, personalItemToPrintRespVoList })
+      continue
+    }
+    for (let i = 0; i < personalItemToPrintRespVoList.length; i += chunkSize) {
+      const chunk = personalItemToPrintRespVoList.slice(i, i + chunkSize)
+      result.push({ peVisitListRespVo, personalItemToPrintRespVoList: chunk })
+    }
+  }
+  return result
 }
 const uploadPdf = () => {
   if (multipleSelection.value.length > 0) {
@@ -1806,6 +1784,7 @@ const SignUrl = ref<string>('')
 import { onMounted, ref } from 'vue'
 import PluginNSV from '@/utils/writeSign/js-NSV'
 import { display } from 'html2canvas/dist/types/css/property-descriptors/display'
+import { chunk } from 'lodash-es'
 
 interface PluginInstance {
   DestroyPlugin?(): void
@@ -2293,7 +2272,7 @@ const recycleCancel = () => {
   .print_con {
     .table {
       width: 100%;
-      height: calc(290mm - 300px);
+      height: calc(290mm - 270px);
       overflow: hidden !important;
       .table_t {
         width: 100%;

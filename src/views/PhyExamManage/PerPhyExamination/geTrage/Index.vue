@@ -667,6 +667,14 @@
               show-overflow-tooltip
             ></el-table-column>
           </el-table>
+          <div class="r-left-inp">
+            <p
+              class="message-title"
+              style="color: #3263fe; font-size: 18px; width: 100%; text-align: center"
+              >检验结果项目图例</p
+            >
+            <div ref="checkupAllRef" style="width: 100%; height: 400px; position: relative"></div>
+          </div>
         </div>
       </div>
     </Dialog>
@@ -1184,6 +1192,8 @@ import { result } from 'lodash-es'
 import { getPeAbnormalItemList } from '@/api/PerPhyExamination/DoctorTriageDesk/index'
 import shang from '@/assets/imgs/shang.png'
 import xia from '@/assets/imgs/xia.png'
+import * as echarts from 'echarts'
+import { da } from 'element-plus/es/locale'
 
 const router = useRouter()
 interface User {
@@ -1368,9 +1378,14 @@ const contrast = () => {
   if (historyExamList.value.length > 0) {
     if (itemDetail.value && itemDetail.value.idNo) {
       Api.pastExamResultList({ idNo: itemDetail.value.idNo }).then((res) => {
+        let echartsData = []
+        res.forEach((echartsItem) => {
+          if (echartsItem.peDeptName == '检验病理科') {
+            echartsData.push(echartsItem)
+          }
+        })
         const groupedByItemAssemName = splitArrayById(res, 'itemAssemName')
         const result = groupedByItemAssemName.map((group) => splitArrayById(group, 'itemAssemName'))
-
         result.forEach((it, index) => {
           it.forEach((item, k) => {
             if (item.length > 0) {
@@ -1395,6 +1410,9 @@ const contrast = () => {
         console.log('result', result)
         duibiData.value = result
         duibiDialogVisible.value = true
+        nextTick(() => {
+          showAllCheckupChart(echartsData) //异常结果项目
+        })
       })
     }
   }
@@ -2725,6 +2743,46 @@ const goPacsImg = (row) => {
 }
 const goPacsPdf = (row) => {
   window.open(`http://10.10.10.72:9090/html/report.htm?apply_no=${row.applyNo}`)
+}
+
+const checkupAllRef = ref<HTMLDivElement | null>(null)
+const showAllCheckupChart = (data: []) => {
+  if (data.length > 0) {
+    let xData = [],
+      yData = []
+    data.forEach((item) => {
+      xData.push(item.peItemName)
+      yData.push(item.peResult)
+    })
+    if (checkupAllRef.value) {
+      const chartInstance2 = echarts.init(checkupAllRef.value)
+      window.addEventListener('resize', () => {
+        chartInstance2.resize()
+      })
+      let option = {
+        xAxis: [
+          {
+            type: 'category',
+            data: xData
+          }
+        ],
+        yAxis: {
+          type: 'value'
+        },
+        series: [
+          {
+            data: yData,
+            type: 'bar',
+            color: '#ed2226'
+          }
+        ],
+        tooltip: {
+          trigger: 'axis'
+        }
+      }
+      chartInstance2.setOption(option)
+    }
+  }
 }
 // 在组件销毁时清理
 onUnmounted(() => {

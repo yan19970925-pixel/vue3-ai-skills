@@ -69,3 +69,7 @@ export const getPePatInfo = (data) => {
 export const homePageCountInfo = (data) => {
   return request.post({ url: '/health-api/health/homePage/homePageCountInfo', data })
 }
+//个人体检-分科医生检查-查询异常项目名称
+export const getPeAbnormalItemList = (data) => {
+  return request.post({ url: '/health-api/health/peDoctorCheck/getPeAbnormalItemList', data })
+}

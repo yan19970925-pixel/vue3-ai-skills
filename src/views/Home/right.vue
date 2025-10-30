@@ -196,9 +196,9 @@
         <p class="message-title">危急值提醒</p>
         <div class="crisis">
           <div class="crisis-item-top">
-            <div class="crisis-item-top-l">姓名</div>
-            <div class="crisis-item-top-l">单位</div>
+            <div class="crisis-item-top-l">项目名称</div>
             <div class="crisis-item-top-l">危急值</div>
+            <div class="crisis-item-top-l">提示</div>
           </div>
           <div style="flex: 1; overflow: auto" v-if="crisisData.length > 0">
             <div
@@ -207,13 +207,27 @@
               :key="index"
             >
               <div class="crisis-item-content">
-                {{ item.name }}
+                {{ item.itemName }}
               </div>
               <div class="crisis-item-content">
-                {{ item.unit }}
+                {{ item.peResult }}
               </div>
-              <div class="crisis-item-content">
-                {{ item.content }}
+              <div
+                class="crisis-item-content"
+                :style="[
+                  item.abnormalIndicator == 'H'
+                    ? { color: 'red', fontWeight: 'bold' }
+                    : item.abnormalIndicator == 'L'
+                    ? { color: 'green', fontWeight: 'bold' }
+                    : {}
+                ]"
+                >{{
+                  item.abnormalIndicator == 'H'
+                    ? '⬆ 偏高'
+                    : item.abnormalIndicator == 'L'
+                    ? '⬇ 偏低'
+                    : ''
+                }}
               </div>
             </div>
           </div>
@@ -243,7 +257,10 @@ import reInspection from '@/assets/imgs/re-inspection.png'
 import * as echarts from 'echarts'
 import { useUserStore } from '@/store/modules/user'
 import { formatDate } from '@/utils/formatTime'
-import { homePageCountInfo } from '@/api/PerPhyExamination/perExamination/index'
+import {
+  homePageCountInfo,
+  getPeAbnormalItemList
+} from '@/api/PerPhyExamination/perExamination/index'
 import { it } from 'node:test'
 const userStore = useUserStore()
 const userInfo = computed(() => userStore.getUser)
@@ -255,6 +272,7 @@ onMounted(async () => {
   // await queryInpPatCountTrendApi()
   // await queryToDoListApi()
   medicalData.value = await homePageCountInfo()
+  await getWeiJiZhiList()
   nextTick(() => {
     showCheckupChart() //近一个月体检人数
     showAllCheckupChart() //近一个月体检总人数分布
@@ -264,6 +282,11 @@ onMounted(async () => {
     showBusiness() // 当日业务
   })
 })
+const getWeiJiZhiList = () => {
+  getPeAbnormalItemList({ startDate: '', endDate: '' }).then((res) => {
+    crisisData.value = res
+  })
+}
 const checkupRef = ref<HTMLDivElement | null>(null)
 const showCheckupChart = () => {
   let xdata = []
@@ -1007,15 +1030,16 @@ defineExpose({
             text-align: left;
             padding-left: 10px;
             margin-right: 1px;
+            overflow: hidden;
           }
           .crisis-item-top-l:nth-child(1) {
-            width: 100px;
+            width: 300px;
           }
           .crisis-item-top-l:nth-child(2) {
-            width: 200px;
+            width: 100px;
           }
           .crisis-item-top-l:nth-child(3) {
-            width: 200px;
+            width: 100px;
           }
         }
         .crisis-item-row {
@@ -1036,14 +1060,15 @@ defineExpose({
             margin-right: 1px;
           }
           .crisis-item-content:nth-child(1) {
-            width: 100px;
+            width: 300px;
           }
           .crisis-item-content:nth-child(2) {
-            width: 200px;
+            text-align: center;
+            color: #ff0b0b !important;
+            width: 100px;
           }
           .crisis-item-content:nth-child(3) {
-            color: #ff0b0b !important;
-            width: 200px;
+            width: 100px;
           }
         }
       }
