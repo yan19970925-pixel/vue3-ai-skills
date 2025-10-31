@@ -143,7 +143,7 @@
               "
               >{{ item.applyNo }}</div
             >
-            <div style="position: absolute; right: 0; top: 28px; font-size: 12px; zoom: 0.9">{{
+            <div style="position: absolute; right: 0; top: 10px; font-size: 12px; zoom: 0.9">{{
               item.cuvette
             }}</div>
           </div>
@@ -159,11 +159,11 @@
         <div
           style="
             width: 100%;
-            height: 12px;
-            line-height: 12px;
+            height: 28px;
+            line-height: 14px;
             font-size: 12px;
             overflow: hidden;
-            zoom: 0.6;
+            /* zoom: 0.6; */
           "
         >
           {{ item.name }} {{ item.sex }} {{ item.age
@@ -175,10 +175,10 @@
         <div
           style="
             width: 100%;
-            height: 12px;
-            line-height: 12px;
+            height: 28px;
+            line-height: 14px;
             font-size: 12px;
-            zoom: 0.6;
+            /* zoom: 0.6; */
             overflow: hidden;
           "
         >
@@ -376,7 +376,7 @@ const print = () => {
             paperSize: 'custom', // 设置为自定义尺寸
             customSize: {
               width: '50', // 宽度
-              height: '20', // 高度
+              height: '30', // 高度
               unit: 'mm' // 单位：mm、cm、in、px
             },
             defaultScale: 0.7 // 设置默认缩放比例
@@ -468,8 +468,8 @@ onMounted(() => {
   font-weight: 400;
   color: #333333;
   width: 100%;
-  height: calc(100vh - 54px);
-  overflow: hidden;
+  // height: calc(100vh - 54px);
+  // overflow: hidden;
   padding: 40px 8px 0;
   box-sizing: border-box;
   .report_search {
@@ -551,7 +551,7 @@ onMounted(() => {
   width: 100%;
   .print_con {
     width: 50mm;
-    height: 19.5mm;
+    height: 29.5mm;
     padding: 5px 10px;
     box-sizing: border-box;
     margin: 0;

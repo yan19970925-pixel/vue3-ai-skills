@@ -556,7 +556,8 @@ import {
   deleteGroup,
   appointSaveAll,
   appointmentExam,
-  getPeUnitList
+  getPeUnitList,
+  getUnitPeInfoList
 } from '@/api/allProcess/index'
 import * as updateApi from '@/api/PerPhyExamination/DataChange/ProjectChange/index.ts'
 import { formatDate } from '@/utils/formatTime'
@@ -1031,7 +1032,7 @@ const saveUpdate = async () => {
 //单位代码查询
 const searchByUnitCode = async () => {
   //
-  let res = await getUnitInfo({
+  let res = await getUnitPeInfoList({
     unitCode: formInfo.unitCode
   })
   if (res) {
