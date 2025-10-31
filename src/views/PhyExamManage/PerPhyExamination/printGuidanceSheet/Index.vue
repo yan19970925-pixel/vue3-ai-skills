@@ -391,7 +391,7 @@
               </div>
             </div>
 
-            <div style="position: absolute; right: 20px; top: 73px; width: 160px">
+            <div style="position: absolute; right: 20px; top: 70px; width: 160px">
               <img
                 :src="perItem.peVisitListRespVo.HisImgUrl"
                 style="width: 100%; height: auto"
@@ -402,7 +402,7 @@
           <div class="tishi">
             <div class="tishi_in">
               <div class="tishi_t" style="width: 55px">温馨<br />提示</div>
-              <div class="tishi_con" style="width: calc(100% - 55px)">
+              <div class="tishi_con" style="width: calc(100% - 55px); color: #333333">
                 <div v-if="perItem.peVisitListRespVo.kindReminder">
                   <div v-if="perItem.peVisitListRespVo.kindReminderList.length > 0">
                     <el-row
@@ -2255,7 +2255,7 @@ const recycleCancel = () => {
       }
       .tishi_con {
         width: calc(100% - 121px);
-        color: #666666;
+        color: #333333;
         word-break: break-all;
         overflow: hidden;
         /* line-height: 20px; */
@@ -2615,7 +2615,7 @@ const recycleCancel = () => {
   @page {
     height: 100%;
     width: 100%;
-    padding: 10px 20px;
+    padding: 20px 25px 0 25px;
     margin: 15px;
   }
   html,
