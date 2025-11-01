@@ -27,7 +27,7 @@
           />
         </div>
         <div class="div1">
-          <span class="span1" style="width: 70px">时间区间：</span>
+          <span class="span1" style="width: 100px">报到时间区间：</span>
           <el-date-picker
             type="date"
             style="display: flex; width: 140px"
@@ -161,7 +161,7 @@
               show-overflow-tooltip
             />
             <el-table-column
-              label="体检日期"
+              label="报到日期"
               prop="peQueueDate"
               align="center"
               width="140px"

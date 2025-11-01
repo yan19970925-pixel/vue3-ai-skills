@@ -329,17 +329,17 @@
           <div class="title">体检指引单</div>
           <div class="per_msg">
             <el-row>
-              <el-col :span="4">姓名：{{ perItem.peVisitListRespVo.name }}</el-col>
+              <el-col :span="6">姓名：{{ perItem.peVisitListRespVo.name }}</el-col>
               <el-col :span="6"
                 >性别：{{
                   perItem.peVisitListRespVo.sex ? perItem.peVisitListRespVo.sex : ''
                 }}</el-col
               >
-              <el-col :span="5">年龄：{{ perItem.peVisitListRespVo.age }}</el-col>
-              <el-col :span="5">婚姻：{{ perItem.peVisitListRespVo.maritalStatus }}</el-col>
+              <el-col :span="6">年龄：{{ perItem.peVisitListRespVo.age }}</el-col>
+              <el-col :span="6">婚姻：{{ perItem.peVisitListRespVo.maritalStatus }}</el-col>
             </el-row>
             <el-row>
-              <el-col :span="4"
+              <el-col :span="6"
                 >体检性质：{{
                   perItem.peVisitListRespVo.chargeType ? perItem.peVisitListRespVo.chargeType : ''
                 }}</el-col
@@ -349,14 +349,14 @@
                   perItem.peVisitListRespVo.peTypeName ? perItem.peVisitListRespVo.peTypeName : ''
                 }}</el-col
               >
-              <el-col :span="5"
+              <el-col :span="6"
                 >体检日期：{{
                   perItem.peVisitListRespVo.pePreDate
                     ? formatDate(perItem.peVisitListRespVo.pePreDate, 'YYYY-MM-DD')
                     : ''
                 }}</el-col
               >
-              <el-col :span="5"
+              <el-col :span="6"
                 >体检次数：{{
                   perItem.peVisitListRespVo.peVisitId ? perItem.peVisitListRespVo.peVisitId : ''
                 }}</el-col
@@ -371,9 +371,9 @@
           : ''
       }}</el-col
     > -->
-              <el-col :span="4">优先级：{{ perItem.peVisitListRespVo.peLevel }}</el-col>
-              <el-col :span="7">体检套餐：{{ perItem.peVisitListRespVo.setCode }}</el-col>
-              <el-col :span="9"
+              <el-col :span="6">优先级：{{ perItem.peVisitListRespVo.peLevel }}</el-col>
+              <el-col :span="8">体检套餐：{{ perItem.peVisitListRespVo.setCode }}</el-col>
+              <el-col :span="10"
                 >体检单位：{{
                   perItem.peVisitListRespVo.unitname ? perItem.peVisitListRespVo.unitname : ''
                 }}</el-col
@@ -391,7 +391,7 @@
               </div>
             </div>
 
-            <div style="position: absolute; right: 20px; top: 70px; width: 160px">
+            <div style="position: absolute; right: 0px; top: -25px; width: 160px">
               <img
                 :src="perItem.peVisitListRespVo.HisImgUrl"
                 style="width: 100%; height: auto"
@@ -2615,8 +2615,8 @@ const recycleCancel = () => {
   @page {
     height: 100%;
     width: 100%;
-    padding: 20px 25px 0 25px;
-    margin: 15px;
+    padding: 10px;
+    margin: 30px 40px 0 40px;
   }
   html,
   body {

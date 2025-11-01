@@ -296,7 +296,7 @@ const personList = ref([
     label: '体检号',
     prop: 'peId',
     align: 'left',
-    width: 120
+    width: 110
   },
   {
     label: '次数',
@@ -308,7 +308,7 @@ const personList = ref([
     label: '姓名',
     prop: 'name',
     align: 'center',
-    width: 120,
+    width: 110,
     align: 'left'
   },
   {
@@ -338,8 +338,14 @@ const personList = ref([
     width: 100
   },
   {
-    label: '报到日期',
+    label: '预约日期',
     prop: 'pePreDate',
+    align: 'left',
+    width: 120
+  },
+  {
+    label: '报道日期',
+    prop: 'peQueueDate',
     align: 'left',
     width: 120
   },
