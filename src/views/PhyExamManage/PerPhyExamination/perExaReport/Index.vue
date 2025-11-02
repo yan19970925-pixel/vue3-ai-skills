@@ -355,15 +355,15 @@ const personList = ref([
     align: 'left',
     width: 80
   }, */
-  {
-    label: '部门',
-    prop: 'department',
-    align: 'left',
-    width: 120
-  },
+  // {
+  //   label: '部门',
+  //   prop: 'department',
+  //   align: 'left',
+  //   width: 120
+  // },
   {
     label: '单位名称',
-    prop: 'unitName',
+    prop: 'unitname',
     align: 'left',
     width: 160
   },
@@ -374,17 +374,16 @@ const personList = ref([
     align: 'left',
     width: 120
   },
-
-  {
-    label: '单位体检',
-    prop: 'unitPe',
-    align: 'center',
-    width: 100,
-    showOverflowTooltip: true,
-    formatter: (row) => {
-      return row.unitName == '[个人体检]' ? '否' : '是'
-    }
-  },
+  // {
+  //   label: '单位体检',
+  //   prop: 'unitPe',
+  //   align: 'center',
+  //   width: 100,
+  //   showOverflowTooltip: true,
+  //   formatter: (row) => {
+  //     return row.unitname == '[个人体检]' ? '否' : '是'
+  //   }
+  // },
   {
     label: '优先级',
     prop: 'peLevel',
@@ -401,38 +400,38 @@ const personList = ref([
     label: '地址',
     prop: 'address',
     align: 'left',
-    width: ''
+    width: '160'
   },
   {
     label: '体检类型',
     prop: 'peTypeName',
     align: 'left',
     width: 100
-  },
-  {
-    label: '婚检编号',
-    prop: 'premaritalCode',
-    align: 'left',
-    width: 100
-  },
-  {
-    label: '两癌编码',
-    prop: 'screeningCode',
-    align: 'left',
-    width: 100
-  },
-  {
-    label: '单位部门',
-    prop: 'department',
-    align: 'left',
-    width: 100
-  },
-  {
-    label: '工作单位',
-    prop: 'unitInContract',
-    align: 'left',
-    width: 100
   }
+  // {
+  //   label: '婚检编号',
+  //   prop: 'premaritalCode',
+  //   align: 'left',
+  //   width: 100
+  // },
+  // {
+  //   label: '两癌编码',
+  //   prop: 'screeningCode',
+  //   align: 'left',
+  //   width: 100
+  // },
+  // {
+  //   label: '单位部门',
+  //   prop: 'department',
+  //   align: 'left',
+  //   width: 100
+  // },
+  // {
+  //   label: '工作单位',
+  //   prop: 'unitInContract',
+  //   align: 'left',
+  //   width: 100
+  // }
 ])
 const personMsgList = ref([
   {

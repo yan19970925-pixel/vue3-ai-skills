@@ -1218,25 +1218,21 @@ const PrintZhiYinDan = (params = {}) => {
   }).then((res) => {
     console.log(res, '指引单打印数据')
     if (res && res.length > 0) {
-      printData = res
+      printData = splitListByLength(res, 22)
       if (printData.length > 0) {
         // zhiyindan
-        // mediaPrintData.value = jsonTo3DArray(printData, 20)
+        // mediaPrintData.value = jsonTo3DArray(printData, 26)
         let jiaxiangList = []
         let noJiaxiangList = []
 
         printData.forEach((item) => {
           // 手写电子签名
-          /*  if (item.peVisitListRespVo.signValueString) {
-            item.peVisitListRespVo.signValueString =
-              'data:image/png;base64,' + item.peVisitListRespVo.signValueString
-            console.log(
-              '%c Line:822 🍑 手写电子签名',
-              'color:#7f2b82',
-              item.peVisitListRespVo.signValueString
-            )
-          } */
-          // PeId条形码
+          /* if (item.peVisitListRespVo.signValueString) {
+                item.peVisitListRespVo.signValueString =
+                  'data:image/png;base64,' + item.peVisitListRespVo.signValueString
+              } */
+          jiaxiangList = []
+          noJiaxiangList = []
           JsBarcode(tijianSrc.value, item.peVisitListRespVo.peId, {
             // displayValue: false,
             fontSize: 18,
@@ -1245,7 +1241,6 @@ const PrintZhiYinDan = (params = {}) => {
             margin: 4
           })
           item.peVisitListRespVo.imgUrl = tijianSrc.value?.src || ''
-
           // HIS患者ID条形码
           JsBarcode(HisSrc.value, item.peVisitListRespVo.patientId, {
             fontSize: 18,
@@ -1254,7 +1249,15 @@ const PrintZhiYinDan = (params = {}) => {
             margin: 4
           })
           item.peVisitListRespVo.HisImgUrl = HisSrc.value?.src || ''
-
+          if (
+            item.peVisitListRespVo.kindReminder &&
+            item.peVisitListRespVo.kindReminder.includes('\r\n')
+          ) {
+            item.peVisitListRespVo.kindReminderList =
+              item.peVisitListRespVo.kindReminder.split('\r\n')
+          } else {
+            item.peVisitListRespVo.kindReminderList = []
+          }
           if (item.personalItemToPrintRespVoList && item.personalItemToPrintRespVoList.length > 0) {
             item.personalItemToPrintRespVoList.forEach((item1) => {
               if (item1.addItem) {
@@ -1278,6 +1281,7 @@ const PrintZhiYinDan = (params = {}) => {
           }
         })
         mediaPrintData.value = printData
+        console.log('%c Line:931 🍤 mediaPrintData.value', 'color:#6ec1c2', mediaPrintData.value)
         console.log(mediaPrintData.value, '指引单打印数据')
         nextTick(() => {
           let style = document.createElement('style')
@@ -1285,6 +1289,7 @@ const PrintZhiYinDan = (params = {}) => {
           document.head.appendChild(style)
           new VuePrintNext({
             el: '#printMe',
+            popTitle: '页码', // 弹出窗口的标题，可以为空字符串以避免显示网址或标题栏
             previewOpenCallback: () => {
               document.head.removeChild(style)
             }

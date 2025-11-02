@@ -22,6 +22,21 @@
             <el-input v-model="searchVisitId" placeholder="请输入" style="width: 180px" />
             <span class="label-fixed-width">名称:</span>
             <el-input v-model="searchCertName" readonly placeholder="请输入" style="width: 180px" />
+            <span class="label-fixed-width">体检分组:</span>
+            <el-select
+              v-model="groupingCode"
+              placeholder="体检分组"
+              style="width: 160px"
+              class="select-item"
+              filterable
+            >
+              <el-option
+                v-for="item in groupingDictDOList"
+                :key="item.groupingCode"
+                :label="item.groupingName"
+                :value="item.groupingCode"
+              />
+            </el-select>
           </div>
 
           <el-button type="primary" @click="handleSearch">查询</el-button>
@@ -321,11 +336,14 @@ const handleQueryItem = async () => {
   })
 }
 const selectUnitCodeClick = async (row) => {
+  groupingCode.value = ''
   searchKeyword.value = row.unitCode
   searchCertName.value = row.unitName
   selectUnitCodeVisiable.value = false
   await searchByUnitCode()
 }
+const groupingDictDOList = ref([])
+const groupingCode = ref('')
 const searchByUnitCode = async () => {
   if (searchKeyword.value) {
     let res = await getUnitInfo({
@@ -335,6 +353,7 @@ const searchByUnitCode = async () => {
       searchUnitInfo.value = res
       searchVisitId.value = res.unitVisitId
       searchCertName.value = res.unitName
+      groupingDictDOList.value = res.groupingDictDOList
     } else {
       searchParams.value.unitName = ''
       searchParams.value.connecter = ''
@@ -365,15 +384,16 @@ onMounted(async () => {
   endDate.value = formatDate(res, 'YYYY-MM-DD')
 })
 const handleSearch = async () => {
-  if (searchKeyword.value && searchVisitId.value) {
+  if (searchKeyword.value && searchVisitId.value && groupingCode.value) {
     tableList.value = await getPeUnitVisitPersonalList({
       unitCode: searchKeyword.value,
       unitVisitId: searchVisitId.value,
+      groupingCode: groupingCode.value,
       pePreDateStart: '',
       pePreDateEnd: ''
     })
   } else {
-    ElMessage.error('请先查询单位信息')
+    ElMessage.error('请先查询单位信息并选择体检分组信息')
   }
 }
 const changeDate = async () => {
@@ -392,8 +412,12 @@ const costDetailsVisiable = ref(false)
 const costDetailsList = ref<any>([])
 
 const emportData = async () => {
-  if (searchKeyword.value && searchVisitId.value) {
-    await getPeUnitBill({ unitCode: searchKeyword.value, unitVisitId: searchVisitId.value })
+  if (searchKeyword.value && searchVisitId.value && groupingCode.value) {
+    await getPeUnitBill({
+      unitCode: searchKeyword.value,
+      unitVisitId: searchVisitId.value,
+      groupingCode: groupingCode.value
+    })
       .then((res) => {
         costDetailsList.value = res || []
         costDetailsVisiable.value = true
@@ -411,7 +435,8 @@ const submitCostDetails = () => {
   updateUnitBillDetail(costDetailsList.value).then((res) => {
     peUnitBillUploadHis({
       unitCode: searchKeyword.value,
-      unitVisitId: searchVisitId.value
+      unitVisitId: searchVisitId.value,
+      groupingCode: groupingCode.value
     })
       .then((res) => {
         ElMessage.success('费用上传成功')

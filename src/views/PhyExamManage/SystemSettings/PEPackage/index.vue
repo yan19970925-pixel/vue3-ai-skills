@@ -640,8 +640,10 @@ const savePeSet = async () => {
 // 根据折扣率重新计算团检价格
 const rateChange = (val) => {
   if (val && formInfo.value.setDiscountPrice) {
-    formInfo.value.setUnitPrice =
-      Number(formInfo.value.setDiscountPrice) * Number(formInfo.value.discountRate)
+    formInfo.value.setUnitPrice = (
+      (Number(formInfo.value.setDiscountPrice) * Number(formInfo.value.discountRate) * 100) /
+      100
+    ).toFixed(2)
   } else {
     formInfo.value.setUnitPrice = 0
   }
