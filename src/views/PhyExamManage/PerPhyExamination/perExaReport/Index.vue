@@ -133,6 +133,7 @@
           border
           @row-click="clickRow"
           highlight-current-row
+          :row-class-name="setAssemRowClassName"
         >
           <!-- :row-class-name="setRowClassName" -->
           <el-table-column
@@ -513,10 +514,11 @@ const visitListInfo = ref({
   unitCode: '',
   unitVisitId: '',
   peId: '',
-  peVisitId: 0,
+  peVisitId: '',
   idNo: '',
   number: '',
-  name: ''
+  name: '',
+  queueFlag: ''
 })
 const setRowClassName = ({ row }) => {
   if (row.peId == rowInfo.value.peId) {
@@ -536,10 +538,11 @@ const selectPeVisitList = async (flag = '') => {
       unitCode: '',
       unitVisitId: '',
       peId: '',
-      peVisitId: 0,
+      peVisitId: '',
       idNo: '',
       number: '',
-      name: ''
+      name: '',
+      queueFlag: '1'
     }
   }
   try {
@@ -601,7 +604,12 @@ const clickRow = (row) => {
   selectPeVisitDetailList(row)
   rowInfo.value = row
 }
-
+const setAssemRowClassName = ({ row }) => {
+  if (row.peId === rowInfo.value.peId && row.peVisitId === rowInfo.value.peVisitId) {
+    return 'table-checked-row-style'
+  }
+  return 'text-black'
+}
 // 获取体检详细列表
 const selectPeVisitDetailList = async (selectDetailInfo) => {
   peDetailList.value = []
