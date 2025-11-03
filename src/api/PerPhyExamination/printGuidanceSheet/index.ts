@@ -63,3 +63,7 @@ export const updateFinishedSignList = (data) => {
 export const recyclePeGuidSheet = (data) => {
   return request.post({ url: '/health-api/health/personChart/recyclePeGuidSheet', data })
 }
+//回收指引单
+export const getUnitInfo = (data) => {
+  return request.post({ url: '/health-api/health/peUnitVisit/getUnitInfo', data })
+}

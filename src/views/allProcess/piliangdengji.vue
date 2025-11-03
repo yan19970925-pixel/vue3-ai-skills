@@ -17,6 +17,13 @@
             placeholder="对应单位"
             class="select-item !w-120px ml-6px mr-12px"
           />
+          <span class="ml-16px">姓名:</span>
+          <el-input
+            v-model="name"
+            placeholder="姓名"
+            class="select-item !w-100px ml-6px mr-12px"
+            @keyup.enter="getList()"
+          />
           <p class="!w-328px" style="color: red"
             ><span
               >对单位的人员来源用三种：1：对该单位以前的人员<br />进行调整，2：对人员进行excel导入3：已经存在数<br />据库里面的人员进行单位修改（在基本信息里修改）</span
@@ -556,16 +563,18 @@ const handleExceed = (): void => {
 const excelUploadError = (): void => {
   ElMessage.error('导入数据失败，请您重新上传！')
 }
+const name = ref('')
 onMounted(() => {})
 const getList = async () => {
   if (searchUnitCode.value) {
     newTableList.value = await getPeUnitPersonalList({
-      unitCode: searchUnitCode.value
+      unitCode: searchUnitCode.value,
+      name: name.value
     })
     if (newTableList.value && newTableList.value.length > 0) {
       newTableList.value.forEach((item) => {
         item.optionFlag = 2
-        item.isChecked = true
+        item.isChecked = false
       })
     }
   }

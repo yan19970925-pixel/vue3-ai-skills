@@ -195,6 +195,26 @@
           />
         </div>
         <div class="div1">
+          <span class="span1">分组列表：</span>
+          <el-select
+            v-model="searchParams.groupingCode"
+            placeholder="体检类型"
+            style="width: 160px"
+            class="select-item"
+            filterable
+            clearable
+            default-first-option
+            @change="search()"
+          >
+            <el-option
+              v-for="item in groupingList"
+              :key="item.groupingCode"
+              :label="item.groupingName"
+              :value="item.groupingCode"
+            />
+          </el-select>
+          <div class="div1"> </div>
+
           <span class="span1">打印内容：</span>
           <el-checkbox @change="printType1" v-model="guidanceSheet" label="指引单" size="large" />
         </div>
@@ -463,6 +483,9 @@
                   >&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                   <el-col :span="6"
                     >血压：&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;mmHg</el-col
+                  >
+                  <el-col :span="6"
+                    >体重指数：&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;kg/m2</el-col
                   >
                 </el-row>
               </div>
@@ -962,7 +985,8 @@ import {
   upPdfEmployees,
   peSign,
   updateFinishedSignList,
-  recyclePeGuidSheet
+  recyclePeGuidSheet,
+  getUnitInfo
 } from '@/api/PerPhyExamination/printGuidanceSheet/index'
 import { formatDate } from '@/utils/formatTime'
 import PrintPdf from './printPdf.vue'
@@ -986,7 +1010,8 @@ const searchParams = ref({
   idNo: '',
   number: '',
   name: '',
-  peTypeName: ''
+  peTypeName: '',
+  groupingCode: ''
 })
 const pdfVisible = ref(false)
 const printParams = ref({
@@ -2008,6 +2033,7 @@ const unitInfo = ref<any>({})
 //   }
 // }
 const selectUnitCodeVisiable = ref(false)
+const groupingList = ref([])
 // 点击单位row数据进行赋值操作
 const selectUnitCodeClick = async (row) => {
   searchParams.value.unitCode = row.unitCode
@@ -2015,6 +2041,9 @@ const selectUnitCodeClick = async (row) => {
   searchParams.value.unitVisitId = row.unitVisitId
   unitInfo.value = row
   selectUnitCodeVisiable.value = false
+  getUnitInfo({ unitCode: row.unitCode }).then((res) => {
+    groupingList.value = res.groupingDictDOList
+  })
   // await getList()
 }
 const unitCodeList = ref<any>([])

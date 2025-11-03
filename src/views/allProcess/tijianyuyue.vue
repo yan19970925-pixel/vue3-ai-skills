@@ -1,5 +1,5 @@
 <template>
-  <div class="base-setting">
+  <div class="base-setting" v-loading="saveLoading" element-loading-text="努力加载中...">
     <div style="width: 100%; height: 100%; overflow: hidden">
       <div class="base-box mb-6px" style="background-color: #fff">
         <div class="base-cont">
@@ -405,6 +405,7 @@ import { formatDate } from '@/utils/formatTime'
 import download from '@/utils/download'
 import { print } from '@/print/index'
 import renyuanliebiaoHTML from '@/print/tj_renyuanliebiao'
+import { error } from 'console'
 const allDataSelected = ref<any>([]) //项目
 const copyAllDataSelected = ref<any>([])
 const selectItemCode = ref('')
@@ -513,6 +514,7 @@ const selectPeVisitList = ref<any>([])
 const handleSelectionChange = (val: any) => {
   selectPeVisitList.value = val
 }
+const saveLoading = ref(false)
 const handleAppoint = async () => {
   //预约
   if (!unitCode.value) {
@@ -544,6 +546,7 @@ const handleAppoint = async () => {
     cancelButtonText: '取消'
   })
     .then(async () => {
+      saveLoading.value = true
       await batchAppoint({
         unitCode: unitCode.value,
         unitVisitId: unitInfo.value.unitVisitId,
@@ -553,10 +556,18 @@ const handleAppoint = async () => {
         assemCode: selectGroupCode.value ? '' : selectItemCode.value,
         peVisitListRespList: selectPeVisitList.value
       })
-      ElMessage.success('预约成功')
-      searchByUnitCode()
+        .then((res) => {
+          saveLoading.value = false
+          ElMessage.success('预约成功')
+          searchByUnitCode()
+        })
+        .catch((error) => {
+          saveLoading.value = false
+        })
     })
-    .catch(() => {})
+    .catch(() => {
+      saveLoading.value = false
+    })
 }
 const moreAddItemList = async () => {
   if (!unitCode.value) {

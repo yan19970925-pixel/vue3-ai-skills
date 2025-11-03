@@ -1,5 +1,5 @@
 <template>
-  <div class="per_exma">
+  <div class="per_exma" v-loading="saveLoading" element-loading-text="努力加载中...">
     <div class="exma_search">
       <div class="search_div">
         <el-checkbox
@@ -1259,6 +1259,7 @@ import axios from 'axios'
 import { debounce } from 'lodash'
 import { open } from 'fs'
 import Dialog from '@/components/Dialog/src/Dialog.vue'
+import { error } from 'console'
 const printZhiYinDanRef = ref()
 const handlePrint = async (params) => {
   if (printZhiYinDanRef.value?.PrintZhiYinDan) {
@@ -1664,6 +1665,7 @@ const validatePhoneNumber = (phoneNumberHome) => {
   const phoneRegex = /^1[3-9]\d{9}$/
   return phoneRegex.test(phoneNumberHome)
 }
+const saveLoading = ref(false)
 // 保存信息
 const saveDengJi = async () => {
   saveDengJiTime()
@@ -1810,32 +1812,38 @@ const saveDengJiTime = debounce(() => {
   } else if (formInfo.sex == '0') {
     formInfo.sex = '女'
   }
+  saveLoading.value = true
   console.log('%c Line:1505 🍡 formInfo', 'color:#465975', formInfo)
-  createPePatInfo(formInfo).then(async (res) => {
-    ElMessage.success('保存成功')
-    formInfo.peId = res.peId
-    formInfo.peVisitId = res.peVisitId
-    // // 获取 formInfo 的所有属性名
-    // const keys = Object.keys(formInfo)
+  createPePatInfo(formInfo)
+    .then(async (res) => {
+      saveLoading.value = false
+      ElMessage.success('保存成功')
+      formInfo.peId = res.peId
+      formInfo.peVisitId = res.peVisitId
+      // // 获取 formInfo 的所有属性名
+      // const keys = Object.keys(formInfo)
 
-    // // 遍历属性名，重置属性值
-    // keys.forEach((key) => {
-    //   // 根据属性名重置属性值
-    //   formInfo[key] = '' // 默认重置为空字符串，对于数字类型的属性需要特殊处理
+      // // 遍历属性名，重置属性值
+      // keys.forEach((key) => {
+      //   // 根据属性名重置属性值
+      //   formInfo[key] = '' // 默认重置为空字符串，对于数字类型的属性需要特殊处理
 
-    //   // 对于数字类型的属性，我们需要检查其初始值是否为 0，如果是，则保持为 0
-    //   if (['joinUnit', 'totalCharges'].includes(key)) {
-    //     // 假设 joinUnit 和 totalCharges 是数字类型
-    //     formInfo[key] = 0
-    //   }
-    // })
-    // // }
-    // formInfo.peId = await getMaxPeId()
-    // allDataSelected.value = []
-    // shaixuanAllDataList.value = []
-    await handlePrint(formInfo)
-    clearMsg()
-  })
+      //   // 对于数字类型的属性，我们需要检查其初始值是否为 0，如果是，则保持为 0
+      //   if (['joinUnit', 'totalCharges'].includes(key)) {
+      //     // 假设 joinUnit 和 totalCharges 是数字类型
+      //     formInfo[key] = 0
+      //   }
+      // })
+      // // }
+      // formInfo.peId = await getMaxPeId()
+      // allDataSelected.value = []
+      // shaixuanAllDataList.value = []
+      await handlePrint(formInfo)
+      clearMsg()
+    })
+    .catch((error) => {
+      saveLoading.value = false
+    })
 }, 500)
 const clearMsg = async () => {
   allDisabled.value = false

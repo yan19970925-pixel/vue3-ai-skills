@@ -1,5 +1,5 @@
 <template>
-  <div class="per_report">
+  <div class="per_report" v-loading="saveLoading" element-loading-text="努力加载中...">
     <div class="report_search">
       <div class="search1" style="padding-bottom: 6px">
         <div class="div1">
@@ -131,10 +131,13 @@
           style="width: 100%; padding: 0 8px; margin-top: 10px"
           height="calc(100vh - 270px)"
           border
+          @selection-change="handleSelectionChange"
+          ref="multipleTableRef"
           @row-click="clickRow"
           highlight-current-row
           :row-class-name="setAssemRowClassName"
         >
+          <el-table-column type="selection" align="center" width="60" />
           <!-- :row-class-name="setRowClassName" -->
           <el-table-column
             v-for="item in personList"
@@ -275,7 +278,7 @@ const tableData = ref([])
 const rowInfo = ref({})
 const peDetailList = ref([])
 // const time = ref<string[] | null>(null)
-
+const saveLoading = ref(false)
 watch(time, (newValue) => {
   if (newValue == null || []) {
     visitListInfo.value.preBeginDate = ''
@@ -557,51 +560,84 @@ const selectPeVisitList = async (flag = '') => {
     console.error('获取体检主记录列表失败:', error)
   }
 }
+const multipleSelection = ref([])
+const multipleTableRef = ref(null)
+const handleSelectionChange = (val: User[]) => {
+  multipleSelection.value = val
+}
 // 体检人员报到
 const peCheckIn = async () => {
   try {
-    if (!rowInfo.value.peId) {
+    if (multipleSelection.value.length == 0) {
       ElMessage.warning('请选择要报到的体检人员')
       return
     }
-    if (!rowInfo.value.joinUnit) {
-      rowInfo.value.joinUnit = '0'
-    }
-    const res = await Api.peCheckIn([rowInfo.value])
+    // if (!rowInfo.value.joinUnit) {
+    //   rowInfo.value.joinUnit = '0'
+    // }
+    multipleSelection.value.forEach((item) => {
+      if (!item.joinUnit) {
+        item.joinUnit = '0'
+      }
+    })
+    saveLoading.value = true
+    const res = await Api.peCheckIn(multipleSelection.value)
     // 处理返回数据
 
     if (res) {
       ElMessage.success('报到成功')
       selectPeVisitList()
+    } else {
+      saveLoading.value = false
     }
   } catch (error) {
     console.error('体检人员报到失败:', error)
+    saveLoading.value = false
   }
 }
 // 取消报到
 const canclePeCheckIn = async () => {
   try {
-    const hasFinishedItem = peDetailList.value.some((item) => item.finishedSign === '完成')
+    if (multipleSelection.value.length == 0) {
+      ElMessage.warning('请选择要报到的体检人员')
+      return
+    }
+    let newPeDetailList = []
+    for (let i = 0; i < multipleSelection.value.length; i++) {
+      await Api.selectPeVisitDetailList(multipleSelection.value[i]).then((res) => {
+        if (res && res.length > 0) {
+          for (let o = 0; o < res.length; o++) {
+            newPeDetailList.push(res[o])
+          }
+        }
+      })
+    }
+    saveLoading.value = true
+    const hasFinishedItem = newPeDetailList.some((item) => item.finishedSign === '完成')
 
     if (hasFinishedItem) {
-      ElMessage.success('该受检人员已有完成项目，不可取消报到')
+      ElMessage.error('受检人员已有完成项目，不可取消报到')
+      saveLoading.value = false
       return
     }
 
-    const res = await Api.canclePeCheckIn([rowInfo.value])
+    const res = await Api.canclePeCheckIn([multipleSelection.value])
     if (res) {
       ElMessage.success('取消成功')
+      saveLoading.value = false
       selectPeVisitList()
     }
   } catch (error) {
     console.error('取消报到失败:', error)
     ElMessage.error('取消报到失败')
+    saveLoading.value = false
   }
 }
 
 // 点击行
 const clickRow = (row) => {
   selectPeVisitDetailList(row)
+  multipleTableRef.value?.toggleRowSelection(row)
   rowInfo.value = row
 }
 const setAssemRowClassName = ({ row }) => {
@@ -610,6 +646,7 @@ const setAssemRowClassName = ({ row }) => {
   }
   return 'text-black'
 }
+
 // 获取体检详细列表
 const selectPeVisitDetailList = async (selectDetailInfo) => {
   peDetailList.value = []

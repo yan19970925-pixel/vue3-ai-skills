@@ -36,6 +36,17 @@
           />
         </div>
         <div class="div1">
+          <span class="span1">姓名：</span>
+          <el-input
+            style="width: 100px; margin-right: 12px"
+            v-model="searchParams.name"
+            placeholder="请输入"
+            class="select-item"
+            clearable
+            @keyup.enter="getTableList"
+          />
+        </div>
+        <div class="div1">
           <span class="span1">次数：</span>
           <el-input
             style="width: 70px"
@@ -224,7 +235,8 @@ const searchParams = reactive({
   unitVisitId: '', //单位次数
   peId: '', //体检号
   peVisitId: '', //个人次数
-  applyNoPrint: '0' // 已打1，未打0
+  applyNoPrint: '0', // 已打1，未打0
+  name: '' //姓名
 })
 watch(printFlag, (newVal, oldFlag) => {
   if (newVal == '1') {

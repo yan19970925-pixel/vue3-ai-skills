@@ -1373,9 +1373,9 @@ const reportChange = () => {
     // console.log(res, '当天挂号信息')
     personDeptList.value = res
     if (res && res.length > 0) {
-      personCode.value = res[0].peId
-      everySearchData.value = res[0]
-      personalClick(res[0])
+      // personCode.value = res[0].peId
+      // everySearchData.value = res[0]
+      // personalClick(res[0])
     } else {
       perItemData.value = []
       checkPerDeptList.value = []
