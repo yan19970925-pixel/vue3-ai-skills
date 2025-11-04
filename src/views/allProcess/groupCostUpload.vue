@@ -427,7 +427,7 @@ const emportData = async () => {
 }
 const handleNumChange = (index, row) => {
   console.log(index, row)
-  row.sumcharges = Number(row.amount) * Number(row.charges)
+  row.sumcharges = ((Number(row.amount) * Number(row.charges) * 10000) / 10000).toFixed(2)
 }
 const submitCostDetails = () => {
   if (costDetailsList.value.length === 0) return ElMessage.error('暂无可上传费用明细')

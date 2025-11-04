@@ -141,8 +141,8 @@
         :style="index < printLists.length ? 'page-break-after: always' : ''"
       >
         <div style="display: flex; justify-content: space-around; position: relative">
-          <div style="width: 35mm; height: calc(20mm - 35px)">
-            <img style="width: 100%; height: calc(100% - 15px)" :src="item.testNoImg" alt="" />
+          <div style="width: 40mm; height: calc(30mm - 56px)">
+            <img style="width: 80%; height: 46px; margin-left: 18px" :src="item.testNoImg" alt="" />
             <div
               style="
                 height: 15px;
@@ -159,9 +159,9 @@
             }}</div>
           </div>
           <div style="display: flex; flex-direction: column; align-items: center">
-            <span style="font-size: 12px; line-height: 12px">
+            <!-- <span style="font-size: 12px; line-height: 12px">
               {{ item.priorityIndicator == 0 ? '普通' : item.priorityIndicator == 1 ? '急诊' : '' }}
-            </span>
+            </span> -->
             <span style="font-size: 12px">
               {{ item.tubeColor ? '(' + item.tubeColor + ')' : '' }}
             </span>
@@ -170,9 +170,9 @@
         <div
           style="
             width: 100%;
-            height: 28px;
-            line-height: 14px;
-            font-size: 12px;
+            height: 12px;
+            line-height: 12px;
+            font-size: 10px;
             overflow: hidden;
             /* zoom: 0.6; */
           "
@@ -181,14 +181,14 @@
           }}{{ item.age && Number(item.age) < 1 ? '月' : '岁' }}
           {{ item.bedLabel ? item.bedLabel + '床' : '' }}
           {{ item.pePreDate?.substring(0, 10) || '' }}
-          {{ item.peDeptName }} &nbsp; 次数：{{ item.peVisitId }}
+          <!-- {{ item.peDeptName }} &nbsp; 次数：{{ item.peVisitId }} -->
         </div>
         <div
           style="
             width: 100%;
-            height: 28px;
-            line-height: 14px;
-            font-size: 12px;
+            height: 24px;
+            line-height: 12px;
+            font-size: 10px;
             /* zoom: 0.6; */
             overflow: hidden;
           "
@@ -375,10 +375,9 @@ const print = () => {
         printLists.value.forEach((item) => {
           JsBarcode(textNoImg.value, item.applyNo, {
             displayValue: false,
-            fontSize: 18,
-            width: 2,
-            height: 30,
-            margin: 4
+            width: 3,
+            height: 60,
+            margin: 2
           })
           item.testNoImg = textNoImg.value?.src || ''
         })

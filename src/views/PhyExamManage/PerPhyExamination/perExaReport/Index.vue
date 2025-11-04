@@ -586,6 +586,7 @@ const peCheckIn = async () => {
 
     if (res) {
       ElMessage.success('报到成功')
+      saveLoading.value = false
       selectPeVisitList()
     } else {
       saveLoading.value = false
@@ -621,7 +622,7 @@ const canclePeCheckIn = async () => {
       return
     }
 
-    const res = await Api.canclePeCheckIn([multipleSelection.value])
+    const res = await Api.canclePeCheckIn(multipleSelection.value)
     if (res) {
       ElMessage.success('取消成功')
       saveLoading.value = false
