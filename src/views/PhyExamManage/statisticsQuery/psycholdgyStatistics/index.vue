@@ -23,7 +23,7 @@
         </div>
       </div>
       <div class="mt-4px" style="padding: 10px; background-color: #fff">
-        <el-table
+        <!-- <el-table
           ref="adviceTableRef"
           :data="tableData"
           border
@@ -40,20 +40,18 @@
             :width="item.width"
             show-overflow-tooltip
           >
-            <template v-slot="{ row }">
-              <!-- 判断是否是统计行 -->
-              <div v-if="row._isSummary" v-html="row.unitName" style="text-align: left"></div>
-              <div v-else>{{ row[item.prop] }}</div>
-            </template>
           </el-table-column>
-        </el-table>
+        </el-table> -->
         <div class="r-left-inp">
           <p
             class="message-title"
             style="color: #333; font-size: 18px; width: 100%; text-align: center; font-weight: bold"
-            >科室工作量统计</p
+            >心理问卷统计</p
           >
-          <div ref="checkupAllRef" style="width: 95%; height: 480px; position: relative"></div>
+          <div
+            ref="checkupAllRef"
+            style="width: 98%; height: calc(100vh - 190px); position: relative"
+          ></div>
         </div>
       </div>
     </div>
@@ -65,66 +63,86 @@ import * as echarts from 'echarts'
 import { ref, computed } from 'vue'
 import { formatDate } from '@/utils/formatTime'
 import * as Api from '@/api/PerPhyExamination/QuestionSurvey/index'
-const allColumns = [
-  { prop: 'peDeptName', label: '科室名称', align: 'center', width: '300px' },
-  { prop: 'peDeptCode', label: '科室编码', align: 'center', width: '110px' },
-  { prop: 'peItemCount', label: '工作量', align: 'center', width: '120px' }
-]
+import { da } from 'element-plus/es/locale'
+// const allColumns = [
+//   { prop: 'peDeptName', label: '科室名称', align: 'center', width: '300px' },
+//   { prop: 'peDeptCode', label: '科室编码', align: 'center', width: '110px' },
+//   { prop: 'peItemCount', label: '工作量', align: 'center', width: '120px' }
+// ]
 const searchParams = ref({
   preBeginDate: formatDate(new Date(new Date().getTime() - 30 * 24 * 60 * 60 * 1000), 'YYYY-MM-DD'),
   preEndDate: formatDate(new Date(), 'YYYY-MM-DD')
 })
 const tableData = ref([])
 const search = async () => {
-  tableData.value = await Api.deptWorkLoadCount(searchParams.value)
+  tableData.value = await Api.getQuestionnairePercent(searchParams.value)
   nextTick(() => {
     showAllCheckupChart(tableData.value)
   })
 }
 const checkupAllRef = ref<HTMLDivElement | null>(null)
 const showAllCheckupChart = (data: []) => {
-  if (data.length > 0) {
-    let xData = [],
-      yData = []
-    data.forEach((item) => {
-      xData.push(item.peDeptName)
-      yData.push(item.peItemCount)
-    })
+  if (data) {
+    // let xData = [],
+    //   yData = []
+    // data.forEach((item) => {
+    //   xData.push(item.peDeptName)
+    //   yData.push(item.peItemCount)
+    // })
     if (checkupAllRef.value) {
-      const chartInstance2 = echarts.init(checkupAllRef.value)
+      const chartInstance = echarts.init(checkupAllRef.value)
       window.addEventListener('resize', () => {
-        chartInstance2.resize()
+        chartInstance.resize()
       })
-      let option = {
-        xAxis: [
-          {
-            type: 'category',
-            data: xData,
-            axisLabel: {
-              rotate: 45
-            }
-          }
-        ],
-        yAxis: {
-          type: 'value'
+      const option: echarts.EChartsOption = {
+        tooltip: {
+          trigger: 'item'
+        },
+        legend: {
+          top: '5%',
+          left: 'center'
+          // show: false // 隐藏图例
         },
         series: [
           {
-            data: yData,
-            type: 'bar',
-            color: '#4169e1',
+            name: '',
+            type: 'pie',
+            radius: ['40%', '70%'],
+            avoidLabelOverlap: false,
             label: {
-              show: true,
-              position: 'top',
-              formatter: '{c}'
-            }
+              show: false,
+              position: 'center'
+            },
+            labelLine: {
+              show: false // 隐藏引导线
+            },
+            emphasis: {
+              label: {
+                show: true,
+                fontSize: 40,
+                fontWeight: 'bold'
+              }
+            },
+            data: [
+              {
+                value: data.questionPeople,
+                name: '已完成',
+                itemStyle: {
+                  color: '#165DFF' // 为“团检”设置颜色，例如番茄红
+                }
+              },
+              {
+                value: data.visitCount - data.questionPeople,
+                name: '未完成',
+                itemStyle: {
+                  color: '#F7BA1E' // 为“个检”设置颜色，例如钢蓝色
+                }
+              }
+            ]
           }
-        ],
-        tooltip: {
-          trigger: 'axis'
-        }
+        ]
       }
-      chartInstance2.setOption(option)
+      chartInstance.setOption(option)
     }
   }
 }
@@ -231,6 +249,7 @@ onMounted(() => {
   display: flex;
   justify-content: space-between;
   .r-left-inp {
+    height: 100%;
     width: calc(100vw - 550px);
   }
 }

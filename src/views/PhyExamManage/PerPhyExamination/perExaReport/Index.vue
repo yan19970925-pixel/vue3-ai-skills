@@ -3,7 +3,11 @@
     <div class="report_search">
       <div class="search1" style="padding-bottom: 6px">
         <div class="div1">
-          <span class="span1">预约时间区间：</span>
+          <el-radio-group v-model="radio" @change="changeDateType">
+            <el-radio label="1" size="large">按预约时间</el-radio>
+            <el-radio label="2" size="large">按报道时间</el-radio>
+          </el-radio-group>
+          <span class="span1" style="margin-left: 10px"> 时间区间：</span>
           <!-- format="YYYY-MM-DD" -->
           <el-date-picker
             v-model="time"
@@ -13,6 +17,7 @@
             end-placeholder="结束日期"
             class="!w-230px"
             clearable
+            @change="selectPeVisitList"
             :default-time="[
               formatDate(new Date(), 'YYYY-MM-DD'),
               formatDate(new Date(), 'YYYY-MM-DD')
@@ -83,6 +88,8 @@
             clearable
           />
         </div>
+      </div>
+      <div class="search1" style="padding-top: 6px">
         <div class="div1">
           <span><b style="color: #ed2226">*</b>体检类型：</span>
           <el-select
@@ -102,8 +109,6 @@
             />
           </el-select>
         </div>
-      </div>
-      <div class="search1" style="padding-top: 6px">
         <div class="div1">
           <el-button @click="selectPeVisitList">查询</el-button>
         </div>
@@ -125,6 +130,7 @@
       <div class="table_item">
         <div class="heard_title">
           <span>人员列表</span>
+          <span style="position: absolute; right: 0px">人数（{{ tableData.length }}人）</span>
         </div>
         <el-table
           :data="tableData"
@@ -274,6 +280,7 @@ import { formatDate } from '@/utils/formatTime'
 import { Search } from '@element-plus/icons-vue'
 import { getPeUnitList, queryDictByConfig } from '@/api/PerPhyExamination/perExamination/index'
 const time = ref([formatDate(new Date(), 'YYYY-MM-DD'), formatDate(new Date(), 'YYYY-MM-DD')])
+const radio = ref('1')
 const tableData = ref([])
 const rowInfo = ref({})
 const peDetailList = ref([])
@@ -514,6 +521,8 @@ const delReport = () => {}
 const visitListInfo = ref({
   preBeginDate: time.value[0] || '',
   preEndDate: time.value[1] || '',
+  queueStartDate: '',
+  queueEndDate: '',
   unitCode: '',
   unitVisitId: '',
   peId: '',
@@ -523,6 +532,25 @@ const visitListInfo = ref({
   name: '',
   queueFlag: ''
 })
+const changeDateType = (val) => {
+  if (val == '1' && time.value && time.value.length > 0) {
+    visitListInfo.value.preBeginDate = time.value[0]
+    visitListInfo.value.preEndDate = time.value[1]
+    visitListInfo.value.queueStartDate = ''
+    visitListInfo.value.queueEndDate = ''
+  } else if (val == '2' && time.value && time.value.length > 0) {
+    visitListInfo.value.queueStartDate = time.value[0]
+    visitListInfo.value.queueEndDate = time.value[1]
+    visitListInfo.value.preBeginDate = ''
+    visitListInfo.value.preEndDate = ''
+  } else {
+    visitListInfo.value.preBeginDate = ''
+    visitListInfo.value.preEndDate = ''
+    visitListInfo.value.queueStartDate = ''
+    visitListInfo.value.queueEndDate = ''
+  }
+  selectPeVisitList()
+}
 const setRowClassName = ({ row }) => {
   if (row.peId == rowInfo.value.peId) {
     return 'table-checked-row-style'
@@ -532,8 +560,8 @@ const setRowClassName = ({ row }) => {
 
 // 获取体检主记录列表
 const selectPeVisitList = async (flag = '') => {
-  visitListInfo.value.preBeginDate = time.value[0] || ''
-  visitListInfo.value.preEndDate = time.value[1] || ''
+  // visitListInfo.value.preBeginDate = time.value[0] || ''
+  // visitListInfo.value.preEndDate = time.value[1] || ''
   if (flag == 'all') {
     visitListInfo.value = {
       preBeginDate: '',
@@ -793,6 +821,7 @@ const changePeType = (val) => {
       /* padding-left: 20px; */
       /* margin-bottom: 11px; */
       border-bottom: 1px solid #c5dcff;
+      position: relative;
       span {
         display: inline-block;
         width: auto;
