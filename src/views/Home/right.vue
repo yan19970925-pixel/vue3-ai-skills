@@ -144,7 +144,7 @@
         <div class="examli">
           <div class="li-top">
             <div class="li-row" v-for="item in medicalData.futureWeekCount" :key="item.FUTURE_DATE">
-              <div>{{ item.FUTURE_DATE || '' }}</div>
+              <div>{{ formatDate(item.FUTURE_DATE, 'MM-DD') || '' }}</div>
               <div>{{ item.COUNT }}人</div>
             </div>
           </div>
@@ -197,6 +197,7 @@
         <div class="crisis">
           <div class="crisis-item-top">
             <div class="crisis-item-top-l">项目名称</div>
+            <div class="crisis-item-top-l">姓名</div>
             <div class="crisis-item-top-l">危急值</div>
             <div class="crisis-item-top-l">提示</div>
           </div>
@@ -208,6 +209,9 @@
             >
               <div class="crisis-item-content">
                 {{ item.itemName }}
+              </div>
+              <div class="crisis-item-content">
+                {{ item.name }}
               </div>
               <div class="crisis-item-content">
                 {{ item.peResult }}
@@ -246,6 +250,37 @@
         </div> -->
       </div>
     </div>
+    <Dialog
+      v-model="showWeiZuo"
+      title="未做项目提醒"
+      width="800"
+      @close="showWeiZuo = false"
+      class="package-advice-container"
+    >
+      <el-table :data="weiZuoList" border style="width: 100%; height: 450px">
+        <el-table-column
+          align="center"
+          label="项目名称"
+          show-overflow-tooltip
+          prop="itemAssemName"
+        />
+        <el-table-column align="left" label="姓名" width="110" show-overflow-tooltip prop="name" />
+        <el-table-column
+          align="center"
+          label="体检号"
+          width="120"
+          show-overflow-tooltip
+          prop="peId"
+        />
+        <el-table-column
+          align="center"
+          label="体检次数"
+          width="100"
+          show-overflow-tooltip
+          prop="peVisitId"
+        />
+      </el-table>
+    </Dialog>
   </div>
 </template>
 <script setup lang="ts">
@@ -259,7 +294,8 @@ import { useUserStore } from '@/store/modules/user'
 import { formatDate } from '@/utils/formatTime'
 import {
   homePageCountInfo,
-  getPeAbnormalItemList
+  getPeAbnormalItemList,
+  nofinishedItemCount
 } from '@/api/PerPhyExamination/perExamination/index'
 import { it } from 'node:test'
 const userStore = useUserStore()
@@ -268,10 +304,18 @@ const currenHospitalId = computed(() => userStore.getHospitalId)
 const zhuyuanType = ref('2')
 const crisisData = ref<any>([])
 const medicalData = ref<any>({})
+const weiZuoList = ref<any>([])
+const showWeiZuo = ref(false)
 onMounted(async () => {
   // await queryInpPatCountTrendApi()
   // await queryToDoListApi()
   medicalData.value = await homePageCountInfo()
+  await nofinishedItemCount().then((res) => {
+    weiZuoList.value = res
+    if (weiZuoList.value.length > 0) {
+      showWeiZuo.value = true
+    }
+  })
   await getWeiJiZhiList()
   nextTick(() => {
     showCheckupChart() //近一个月体检人数
@@ -1033,12 +1077,15 @@ defineExpose({
             overflow: hidden;
           }
           .crisis-item-top-l:nth-child(1) {
-            width: 300px;
+            width: 200px;
           }
           .crisis-item-top-l:nth-child(2) {
             width: 100px;
           }
           .crisis-item-top-l:nth-child(3) {
+            width: 100px;
+          }
+          .crisis-item-top-l:nth-child(4) {
             width: 100px;
           }
         }
@@ -1060,14 +1107,17 @@ defineExpose({
             margin-right: 1px;
           }
           .crisis-item-content:nth-child(1) {
-            width: 300px;
+            width: 200px;
           }
           .crisis-item-content:nth-child(2) {
+            width: 100px;
+          }
+          .crisis-item-content:nth-child(3) {
             text-align: center;
             color: #ff0b0b !important;
             width: 100px;
           }
-          .crisis-item-content:nth-child(3) {
+          .crisis-item-content:nth-child(4) {
             width: 100px;
           }
         }

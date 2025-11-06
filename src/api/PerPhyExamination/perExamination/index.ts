@@ -73,3 +73,7 @@ export const homePageCountInfo = (data) => {
 export const getPeAbnormalItemList = (data) => {
   return request.post({ url: '/health-api/health/peDoctorCheck/getPeAbnormalItemList', data })
 }
+//首页未完成项目统计
+export const nofinishedItemCount = (data) => {
+  return request.post({ url: '/health-api/health/countReport/nofinishedItemCount', data })
+}

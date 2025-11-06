@@ -23,3 +23,11 @@ export const deptWorkLoadCount = (data) => {
 export const getQuestionnairePercent = (data) => {
   return request.post({ url: '/health-api/health/countReport/getQuestionnairePercent', data })
 }
+// 统计报表-总项目数统计
+export const getTimeItemCount = (data) => {
+  return request.post({ url: '/health-api/health/countReport/getTimeItemCount', data })
+}
+// 统计报表-包含指定项目人员信息
+export const getTimeItemPerson = (data) => {
+  return request.post({ url: '/health-api/health/countReport/getTimeItemPerson', data })
+}

@@ -326,12 +326,7 @@
                     <!-- 添加选择列 -->
                     <el-table-column type="selection" width="60" />
                     <el-table-column type="index" label="序号" width="60" align="center" />
-                    <el-table-column
-                      label="疾病诊断阳性体征"
-                      width="200"
-                      align="center"
-                      show-overflow-tooltip
-                    >
+                    <el-table-column label="疾病诊断阳性体征" width="200" align="center">
                       <template #default="scope">
                         <span
                           :style="scope.row.isdisease == 1 ? 'color:#ed2226' : 'color:#3473d1'"
@@ -1234,6 +1229,12 @@ const personList = ref([
   {
     label: '性别',
     prop: 'sex',
+    align: 'center',
+    width: 80
+  },
+  {
+    label: '年龄',
+    prop: 'age',
     align: 'center',
     width: 80
   },

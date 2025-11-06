@@ -53,19 +53,36 @@
                 style="width: 100%; overflow: auto"
                 highlight-current-row
                 stripe
-                height="210"
+                height="190"
                 @row-click="getItemDetail"
               >
+                <el-table-column label="序号" prop="orderNo" show-overflow-tooltip width="60" />
                 <el-table-column
                   label="项目属性"
                   prop="keyName"
-                  width="120"
+                  width="160"
                   show-overflow-tooltip
                 />
                 <el-table-column label="描述" prop="itemDesc" show-overflow-tooltip />
-                <el-table-column label="输入码" prop="inputCode" show-overflow-tooltip />
-                <el-table-column label="异常标志" prop="diseaseSign" show-overflow-tooltip />
-                <el-table-column label="序号" prop="orderNo" show-overflow-tooltip />
+                <el-table-column
+                  label="输入码"
+                  width="160"
+                  prop="inputCode"
+                  show-overflow-tooltip
+                />
+                <el-table-column
+                  label="异常标志"
+                  width="160"
+                  prop="diseaseSign"
+                  show-overflow-tooltip
+                />
+                <el-table-column label="操作" width="120" align="center">
+                  <template #default="scope">
+                    <el-button type="danger" size="small" @click="deleteRow(scope.row)">
+                      删除
+                    </el-button>
+                  </template>
+                </el-table-column>
               </el-table>
             </div>
           </div>
@@ -225,7 +242,7 @@ const getPeItemList = async (row) => {
 // 项目属性-属性查询
 const getPeItemReportWriteList = async (row) => {
   peItemCode.value = row.peItemCode // 存储选中的体检项目代码
-
+  addFlag.value = '0'
   try {
     const res = await Api.getPeItemReportWriteList({
       peItemCode: row.peItemCode || ''
@@ -322,7 +339,7 @@ const handleSaveDocument = () => {
     })
   }
 }
-
+const deleteRow = (row) => {}
 onMounted(() => {
   getPeDeptList()
 })

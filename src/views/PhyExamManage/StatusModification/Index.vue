@@ -168,8 +168,9 @@ import { ref, computed, onMounted } from 'vue'
 import {} from '@/api/PerPhyExamination/PerExport/index'
 import * as Api from '@/api/PerPhyExamination/geTrage/index'
 import { formatDate } from '@/utils/formatTime'
-import { fa } from 'element-plus/es/locale'
-
+import { useUserStore } from '@/store/modules/user'
+const userStore = useUserStore()
+const dbUser = userStore.getUser.username
 const ExaminePatListInfo = ref({
   startDate: formatDate(new Date(), 'YYYY-MM-DD'),
   endDate: formatDate(new Date(), 'YYYY-MM-DD'),
@@ -241,14 +242,25 @@ const itemDetail = ref({})
 // 显示详情弹窗
 const showDetail = async (row) => {
   itemDetail.value = row
-  const getDetailTableDataParams = reactive({
-    peId: row.peId || '',
-    peVisitId: row.peVisitId || 0,
-    pePreDate: row.pePreDate || row.peQueueDate || ''
-  })
-  await Api.updateFinishedSignList(getDetailTableDataParams).then((res) => {
-    detailTableData.value = res
-  })
+  await Api.getSelectedDept({ dbUser: dbUser })
+    .then((res) => {
+      let peDeptCode = ''
+      if (res && res.length > 0) {
+        peDeptCode = res[0].peDeptCode
+      } else {
+        peDeptCode = ''
+      }
+      const getDetailTableDataParams = reactive({
+        peId: row.peId || '',
+        peVisitId: row.peVisitId || 0,
+        pePreDate: row.pePreDate || row.peQueueDate || '',
+        peDeptCode: peDeptCode
+      })
+      Api.updateFinishedSignList(getDetailTableDataParams).then((res) => {
+        detailTableData.value = res
+      })
+    })
+    .catch((err) => {})
 }
 // 修改完成状态方法（暂时为空）
 const changeFinishStatus = async (row) => {

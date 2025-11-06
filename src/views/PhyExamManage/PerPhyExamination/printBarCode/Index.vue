@@ -479,8 +479,8 @@ onMounted(() => {
   font-weight: 400;
   color: #333333;
   width: 100%;
-  // height: calc(100vh - 54px);
-  // overflow: hidden;
+  height: calc(100vh - 54px);
+  overflow: hidden;
   padding: 40px 8px 0;
   box-sizing: border-box;
   .report_search {

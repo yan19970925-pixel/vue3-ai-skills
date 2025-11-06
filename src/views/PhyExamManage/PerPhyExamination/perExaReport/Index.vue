@@ -5,7 +5,7 @@
         <div class="div1">
           <el-radio-group v-model="radio" @change="changeDateType">
             <el-radio label="1" size="large">按预约时间</el-radio>
-            <el-radio label="2" size="large">按报道时间</el-radio>
+            <el-radio label="2" size="large">按报到时间</el-radio>
           </el-radio-group>
           <span class="span1" style="margin-left: 10px"> 时间区间：</span>
           <!-- format="YYYY-MM-DD" -->
@@ -86,6 +86,7 @@
             placeholder="请输入"
             class="select-item"
             clearable
+            @keyup.enter="selectPeVisitList"
           />
         </div>
       </div>
@@ -533,22 +534,22 @@ const visitListInfo = ref({
   queueFlag: ''
 })
 const changeDateType = (val) => {
-  if (val == '1' && time.value && time.value.length > 0) {
-    visitListInfo.value.preBeginDate = time.value[0]
-    visitListInfo.value.preEndDate = time.value[1]
-    visitListInfo.value.queueStartDate = ''
-    visitListInfo.value.queueEndDate = ''
-  } else if (val == '2' && time.value && time.value.length > 0) {
-    visitListInfo.value.queueStartDate = time.value[0]
-    visitListInfo.value.queueEndDate = time.value[1]
-    visitListInfo.value.preBeginDate = ''
-    visitListInfo.value.preEndDate = ''
-  } else {
-    visitListInfo.value.preBeginDate = ''
-    visitListInfo.value.preEndDate = ''
-    visitListInfo.value.queueStartDate = ''
-    visitListInfo.value.queueEndDate = ''
-  }
+  // if (val == '1' && time.value && time.value.length > 0) {
+  //   visitListInfo.value.preBeginDate = time.value[0]
+  //   visitListInfo.value.preEndDate = time.value[1]
+  //   visitListInfo.value.queueStartDate = ''
+  //   visitListInfo.value.queueEndDate = ''
+  // } else if (val == '2' && time.value && time.value.length > 0) {
+  //   visitListInfo.value.queueStartDate = time.value[0]
+  //   visitListInfo.value.queueEndDate = time.value[1]
+  //   visitListInfo.value.preBeginDate = ''
+  //   visitListInfo.value.preEndDate = ''
+  // } else {
+  //   visitListInfo.value.preBeginDate = ''
+  //   visitListInfo.value.preEndDate = ''
+  //   visitListInfo.value.queueStartDate = ''
+  //   visitListInfo.value.queueEndDate = ''
+  // }
   selectPeVisitList()
 }
 const setRowClassName = ({ row }) => {
@@ -575,6 +576,22 @@ const selectPeVisitList = async (flag = '') => {
       name: '',
       queueFlag: '1'
     }
+  }
+  if (radio.value == '1' && time.value && time.value.length > 0) {
+    visitListInfo.value.preBeginDate = time.value[0]
+    visitListInfo.value.preEndDate = time.value[1]
+    visitListInfo.value.queueStartDate = ''
+    visitListInfo.value.queueEndDate = ''
+  } else if (radio.value == '2' && time.value && time.value.length > 0) {
+    visitListInfo.value.queueStartDate = time.value[0]
+    visitListInfo.value.queueEndDate = time.value[1]
+    visitListInfo.value.preBeginDate = ''
+    visitListInfo.value.preEndDate = ''
+  } else {
+    visitListInfo.value.preBeginDate = ''
+    visitListInfo.value.preEndDate = ''
+    visitListInfo.value.queueStartDate = ''
+    visitListInfo.value.queueEndDate = ''
   }
   try {
     tableData.value = []

@@ -80,3 +80,7 @@ export const updateReCheckPlan = (data) => {
 export const getExamApplyNoList = (data) => {
   return request.post({ url: '/health-api/health/audit/getExamApplyNoList', data })
 }
+// 体检医生已选科室
+export const getSelectedDept = (data) => {
+  return request.post({ url: '/health-api/health/doctor/getSelectedDept', data })
+}

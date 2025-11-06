@@ -101,6 +101,23 @@
         <div class="con1"> 初审医生：{{ jsonData.peVisitListRespVo.chiefDoctor }}</div>
         <div class="con1">初审日期：{{ jsonData.peVisitListRespVo.chiefAuditDate }}</div>
       </div>
+
+      <div class="pagination">第{{ 1 }}页/共{{ newDeptResultA.length + 3 }}页</div>
+    </div>
+    <div class="report_jiben page">
+      <div class="biaoti">
+        <!-- <div class="mr_20">中国人民解放军63710部队医院</div> -->
+        <div>体检Id：{{ jsonData.peVisitListRespVo.peId }}</div>
+        <div>姓名：{{ jsonData.peVisitListRespVo.name }}</div>
+        <div>性别：{{ jsonData.peVisitListRespVo.sex }}</div>
+        <div>年龄：{{ jsonData.peVisitListRespVo.age }}岁</div>
+        <div>第{{ jsonData.peVisitListRespVo.peVisitId }}次体检</div>
+      </div>
+      <div class="logo_ti">
+        <!-- <img :src="avatar" alt="" /> -->
+        <div>{{ jsonData.peVisitListRespVo.hospitalname }}</div>
+      </div>
+      <div class="back_c">主检报告</div>
       <div class="back_t">终检结论</div>
       <div class="back_for">
         <div
@@ -118,7 +135,11 @@
         <div class="con1"> 终审医生：{{ jsonData.peVisitListRespVo.auditDoctor }}</div>
         <div class="con1">终审日期：{{ jsonData.peVisitListRespVo.lastAuditDate }}</div>
       </div>
-      <div class="pagination">第{{ 1 }}页/共{{ newDeptResultA.length + 2 }}页</div>
+      <!-- <div class="ganxie"></div> -->
+      <!-- <div class="ganxie_c">
+          我们需要提示您注意的是：本次体检反映的是您当前的健康状况。因人体存在个体生物差异及您选择的检查项目并未涵盖全身所有脏器。因此医生所做的医学诊断和健康状况建议，是依据您的陈述和本次检查的结果综合分析评估而产生的。我们建议您对异常的结果进行相关的进一步检查或跟踪复查。
+        </div> -->
+      <div class="pagination">第{{ 2 }}页/共{{ newDeptResultA.length + 3 }}页</div>
     </div>
     <div class="report_jiben page">
       <div class="biaoti">
@@ -151,7 +172,7 @@
       <!-- <div class="ganxie_c">
           我们需要提示您注意的是：本次体检反映的是您当前的健康状况。因人体存在个体生物差异及您选择的检查项目并未涵盖全身所有脏器。因此医生所做的医学诊断和健康状况建议，是依据您的陈述和本次检查的结果综合分析评估而产生的。我们建议您对异常的结果进行相关的进一步检查或跟踪复查。
         </div> -->
-      <div class="pagination">第{{ 2 }}页/共{{ newDeptResultA.length + 2 }}页</div>
+      <div class="pagination">第{{ 3 }}页/共{{ newDeptResultA.length + 3 }}页</div>
     </div>
     <div class="report_jiben page" v-for="(itemValue, p) in newDeptResultA" :key="p">
       <div class="biaoti">
@@ -250,7 +271,7 @@
           <!-- </div> -->
         </div>
       </div>
-      <div class="pagination">第{{ p + 3 }}页/共{{ newDeptResultA.length + 2 }}页</div>
+      <div class="pagination">第{{ p + 4 }}页/共{{ newDeptResultA.length + 3 }}页</div>
     </div>
   </div>
   <img ref="imgRef" style="display: none" />
@@ -371,7 +392,13 @@ const processData = () => {
         )
         items.forEach((its) => {
           if (!its.height) {
+            // if (its.peResult && 36 < its.peResult.length < 72 && !item.isJy) {
+            //   its.height = 60
+            // } else if (its.peResult && its.peResult.length > 72 && !item.isJy) {
+            //   its.height = 90
+            // } else {
             its.height = 30
+            // }
           }
         })
         // items.push({ xiaojie: '小结', height: 30 })
