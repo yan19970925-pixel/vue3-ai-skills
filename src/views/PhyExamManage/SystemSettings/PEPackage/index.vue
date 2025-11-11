@@ -25,6 +25,31 @@
                   :value="item.value"
                 />
               </el-select>
+              <el-button
+                style="
+                  border: 1px solid #3473d1;
+                  background: #fff;
+                  color: #3473d1;
+                  height: 32px;
+                  padding: 5px 12px;
+                "
+                @click="importPackage"
+              >
+                <img :src="importPng" style="margin-right: 5px" />导入
+              </el-button>
+              <el-button
+                style="
+                  border: 1px solid #3473d1;
+                  background: #fff;
+                  color: #3473d1;
+                  height: 32px;
+                  padding: 5px 12px;
+                  margin-left: 0px;
+                "
+                @click="exportPackage"
+              >
+                <img :src="exportPng" style="margin-right: 5px" />导出
+              </el-button>
             </div>
 
             <!-- 套餐表格 -->
@@ -375,6 +400,46 @@
         </el-col>
       </el-row>
     </div>
+    <Dialog
+      append-to-body
+      v-model="addDialog"
+      title="导入文件"
+      width="500"
+      :before-close="addClose"
+    >
+      <div>
+        <el-upload
+          ref="uploadRef"
+          accept=".xls,.xlsx"
+          :limit="1"
+          :headers="upload.headers"
+          :action="upload.url"
+          :disabled="upload.isUploading"
+          :on-progress="handleFileUploadProgress"
+          :on-success="handleFileSuccess"
+          :on-exceed="handleExceed"
+          name="excelFile"
+          :on-error="excelUploadError"
+          :auto-upload="false"
+          drag
+        >
+          <!-- :data="uploadData" -->
+          <Icon icon="ep:upload" />
+          <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
+          <template #tip>
+            <div class="el-upload__tip text-center">
+              <span>仅允许导入xls,xlsx格式文件。</span>
+            </div>
+          </template>
+        </el-upload>
+      </div>
+      <template #footer>
+        <div class="dialog-footer">
+          <el-button type="primary" @click="submitForm">确定</el-button>
+          <el-button @click="resetForm()">关闭</el-button>
+        </div>
+      </template>
+    </Dialog>
   </div>
 </template>
 
@@ -382,6 +447,10 @@
 import { ref, computed, watch, onMounted } from 'vue'
 import * as Api from '@/api/systemSetting/PEPackage/index'
 import { ElMessage } from 'element-plus'
+import importPng from '@/assets/imgs/import.png'
+import exportPng from '@/assets/imgs/export.png'
+import { getAccessToken } from '@/utils/auth'
+import download from '@/utils/download'
 // ===================== 响应式数据 =====================
 const deptList = ref([]) // 套餐列表数据
 const option = ref('0,1,2') // 套餐类型选择
@@ -708,6 +777,85 @@ const customSortBySortField = (a, b) => {
 const handleSortChange = ({ column, prop, order }) => {
   if (prop === 'sort') {
     deptList.value.sort((a, b) => customSortBySortField(a, b))
+  }
+}
+const addDialog = ref(false)
+const importPackage = () => {
+  addDialog.value = true
+}
+const uploadRef = ref()
+const upload = reactive({
+  // // 是否显示弹出层（模板导入）
+  // open: false,
+  // 弹出层标题（模板导入）
+  title: '导入',
+  // 是否禁用上传
+  isUploading: false,
+  // 设置上传的请求头部
+  headers: {
+    Authorization: 'Bearer ' + getAccessToken()
+  },
+  // 上传的地址
+  url: import.meta.env.VITE_BASE_URL + '/health-api/health/itemAssemSet/importPeItemSet'
+})
+const submitForm = () => {
+  // addDialog.value = false
+  uploadRef.value?.submit()
+}
+const resetForm = () => {
+  addDialog.value = false
+}
+const addClose = () => {
+  addDialog.value = false
+  uploadRef.value?.clearFiles()
+}
+const closeDialog = () => {
+  addDialog.value = false
+  uploadRef.value?.clearFiles()
+}
+const handleFileSuccess = (response: any) => {
+  console.log(response)
+
+  if (response.code !== 0) {
+    ElMessage.error(response.msg)
+    setTimeout(() => {
+      uploadRef.value?.clearFiles()
+      upload.isUploading = false
+    }, 1000)
+    return
+  }
+  upload.isUploading = false
+  uploadRef.value?.clearFiles()
+  // 拼接提示语
+  const data = response.data
+  if (data && data.length > 0) {
+    data.forEach((item) => {
+      if (item.name) {
+        item.isChecked = false
+        newTableList.value.push(item)
+      }
+    })
+  }
+  // ElMessage.warning(data)
+  closeDialog()
+  ElMessage.success('导入成功')
+}
+// 文件数超出提示
+const handleExceed = (): void => {
+  ElMessage.error('最多只能上传一个文件！')
+}
+// 上传错误提示
+const excelUploadError = (): void => {
+  ElMessage.error('导入数据失败，请您重新上传！')
+}
+const exportPackage = () => {
+  if (formInfo.value && formInfo.value.setCode) {
+    Api.exportPeItemSet([{ setCode: formInfo.value.setCode }]).then((res) => {
+      download.excel(res, '体检套餐.xlsx')
+      ElMessage.success('导出成功')
+    })
+  } else {
+    ElMessage.error('请先选择要导出的套餐')
   }
 }
 </script>

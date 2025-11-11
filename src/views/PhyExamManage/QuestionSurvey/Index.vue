@@ -156,11 +156,52 @@
             </div>
             <div class="save">
               <el-button class="btn" @click="savePingGu"> 保存 </el-button>
+              <el-button
+                style="
+                  border: 1px solid #3473d1;
+                  background: #fff;
+                  color: #3473d1;
+                  height: 32px;
+                  padding: 5px 12px;
+                "
+                @click="openAi"
+              >
+                <img :src="ai" style="margin-right: 5px; width: 16px; height: 16px" />AI心理评估
+              </el-button>
             </div>
           </div>
         </div>
       </div>
     </div>
+    <Dialog
+      v-model="AiVisible"
+      width="600px"
+      max-height="600px"
+      :fullscreen="false"
+      :close-on-click-modal="false"
+      title="AI智能心理评估"
+    >
+      <div
+        style="width: 100%; height: 500px; overflow-y: auto"
+        v-loading="loading"
+        element-loading-text="思考中..."
+      >
+        <span
+          style="
+            height: 500px;
+            width: 100%;
+            padding: 10px;
+            overflow-y: auto;
+            font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            line-height: 1.6;
+            color: #3473d1;
+            margin-bottom: 16px;
+            white-space: pre-wrap;
+          "
+          >{{ displayedText }}</span
+        >
+      </div>
+    </Dialog>
   </div>
 </template>
 
@@ -169,11 +210,13 @@ import { ref, computed, onMounted } from 'vue'
 import {} from '@/api/PerPhyExamination/PerExport/index'
 import * as Api from '@/api/PerPhyExamination/geTrage/index'
 import { formatDate } from '@/utils/formatTime'
+import ai from '@/assets/images/ai.svg'
 import {
   getQuestionnaireList,
   updateQuestionnaire
 } from '@/api/PerPhyExamination/QuestionSurvey/index'
 import { useUserStore } from '@/store/modules/user'
+import axios from 'axios'
 const userStore = useUserStore()
 const dbUser = userStore.getUser.username
 const ExaminePatListInfo = ref({
@@ -670,6 +713,221 @@ const savePingGu = () => {
     })
   }
 }
+const AiVisible = ref(false)
+const openAi = async () => {
+  if (pingGuList.value.length > 0) {
+    if (pingGuList.value.some((item) => item.questionAnswer != '')) {
+      AiVisible.value = true
+      await sendMsg()
+    } else {
+      ElMessage.error('请先填写问卷内容')
+    }
+  } else {
+    ElMessage.error('请先填写问卷内容')
+  }
+}
+const loading = ref(false)
+const aiSearch = ref('')
+const showStop = ref(false)
+
+const chatId = ref()
+// 定义 API 地址
+// 定义认证令牌
+const apiUrl = 'http://10.10.10.20:8080/chat/api/open'
+const authToken = 'application-18eaeeaace5fa66b41cb8b7d44b0ca76'
+const sendMsg = async () => {
+  let data = []
+  if (pingGuList.value.length > 0) {
+    pingGuList.value.forEach((item) => {
+      if (item.questionAnswer != '') {
+        data.push(
+          `心理问题：${item.questionNo}` +
+            item.questionDetail +
+            '患者回答：' +
+            (item.questionAnswer == '1'
+              ? '是'
+              : item.questionAnswer == '2'
+              ? '否'
+              : item.questionAnswer == '3'
+              ? '一般'
+              : item.questionAnswer == '4'
+              ? '其他'
+              : '')
+        )
+      }
+    })
+  }
+
+  let answer = `${data.join(
+    '；'
+  )}。请根据以上问题内容和患者的回答对患者进行心理评估，并给出相应的建议。`
+  console.log(answer)
+
+  if (data && data.length > 0) {
+    loading.value = true
+    try {
+      let result = await axios.get(apiUrl, {
+        headers: {
+          Accept: '*/*',
+          Authorization: `Bearer application-18eaeeaace5fa66b41cb8b7d44b0ca76`
+        }
+      })
+      if (result && result.data.code == 200) {
+        chatId.value = result.data.data
+      }
+      await fetchAiStream(answer)
+    } catch (err) {
+      loading.value = false
+    }
+  }
+}
+
+// 定义请求数据
+const requestData = {
+  message: '',
+  stream: true,
+  re_chat: true,
+  chat_record_id: chatId.value
+}
+let controller
+let reader
+
+// 封装请求配置
+const requestOptions = {
+  method: 'POST',
+  headers: {
+    Accept: 'application/json, text/plain, */*',
+    'Content-Type': 'application/json',
+    Authorization: `Bearer ${authToken}`
+  },
+  body: JSON.stringify(requestData)
+}
+
+// 停止当前请求的函数
+const stopRequest = () => {
+  if (controller) {
+    controller.abort()
+    loading.value = false
+    showStop.value = false
+  }
+}
+
+const outputRef = ref<HTMLDivElement | null>(null)
+const displayedText = ref('')
+const pendingChars = ref<string[]>([])
+const isStreaming = ref(false)
+let animationFrameId: number | null = null
+
+// 真实 API 集成（Fetch 流式）
+async function fetchAiStream(value) {
+  controller = new AbortController()
+  const signal = controller.signal
+  requestData.message = value
+  requestData.chat_record_id = chatId.value
+  // 更新请求体
+  requestOptions.body = JSON.stringify(requestData)
+  const response = await fetch(`http://10.10.10.20:8080/chat/api/chat_message/${chatId.value}`, {
+    ...requestOptions,
+    signal
+  })
+  if (!response.ok) throw new Error('API 请求失败')
+  const reader = response.body?.getReader()
+  if (!reader) throw new Error('无法读取响应流')
+  displayedText.value = ''
+  readStream(reader)
+}
+async function readStream(reader) {
+  const decoder = new TextDecoder('utf-8')
+  let buffer = ''
+  const { done, value } = await reader.read()
+
+  if (done) {
+    flushPendingChars()
+    return
+  }
+
+  const textChunk = decoder.decode(value)
+  // 按行分割接收到的数据
+  const lines = textChunk.split('\n')
+  for (const line of lines) {
+    if (line.startsWith('data: ')) {
+      try {
+        const dataStr = line.replace('data: ', '')
+        const dataObject = JSON.parse(dataStr)
+        const answer = dataObject.content
+        if (answer) {
+          loading.value = false
+          showStop.value = true
+          aiSearch.value = ''
+          processContent(answer)
+        }
+      } catch (parseError) {
+        console.error('解析数据时出错:', parseError)
+        loading.value = false
+        showStop.value = false
+      }
+    } else if (line.startsWith('event: ping')) {
+      // 跳过 ping 事件
+      continue
+    }
+  }
+  readStream(reader)
+}
+const parseUnicode = (str: string) =>
+  str.replace(/\\u([d\w]{4})/gi, (_, hex) => String.fromCodePoint(parseInt(hex, 16)))
+
+// 处理content内容
+function processContent(content: string) {
+  const parsedText = parseUnicode(content)
+  // 模拟分块（实际API可能已分块）
+  for (const char of parsedText) {
+    pendingChars.value.push(char)
+  }
+  startTypingEffect()
+}
+
+// 启动打字机效果
+function startTypingEffect() {
+  if (isStreaming.value || pendingChars.value.length === 0) return
+
+  isStreaming.value = true
+  typeNextChar()
+}
+
+// 逐字渲染
+function typeNextChar() {
+  if (pendingChars.value.length === 0) {
+    isStreaming.value = false
+    return
+  }
+
+  const char = pendingChars.value.shift()!
+  displayedText.value += char
+
+  // 滚动到底部
+  if (outputRef.value) {
+    outputRef.value.scrollTop = outputRef.value.scrollHeight
+  }
+  animationFrameId = window.requestAnimationFrame(typeNextChar)
+}
+
+// 清空待渲染字符
+function flushPendingChars() {
+  if (pendingChars.value.length > 0) {
+    displayedText.value += pendingChars.value.join('')
+    pendingChars.value = []
+  }
+}
+
+// 在组件销毁时清理
+onUnmounted(() => {
+  if (controller) {
+    controller.abort()
+  }
+  if (reader) {
+    reader.releaseLock()
+  }
+})
 onMounted(() => {
   getPePatList()
 })

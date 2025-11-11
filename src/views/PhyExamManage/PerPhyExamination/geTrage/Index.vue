@@ -2044,31 +2044,29 @@ const itemInfo = ref({
   peId: '',
   peVisitId: ''
 })
-const debouncedItemClick = debounce((row) => {
+const debouncedItemClick = debounce(async (row) => {
   itemInfo.value.peId = row.peId
   itemInfo.value.peVisitId = row.peVisitId
-  historyExam(row)
+  await historyExam(row)
   itemDetail.value = row
-  getExaminePatList(itemDetail.value)
+  await getExaminePatList(itemDetail.value)
+  await Api.getNoFinishItem({ peId: row.peId, peVisitId: row.peVisitId }).then((res) => {
+    if (res) {
+      let newStr = res.split(';').join('<br />')
+      ElMessageBox.alert(
+        `<span style="font-size:18px;font-weight:blod">该患者还有下列体检项目尚未完成!</span><br /><span style="color:#ed2226">${newStr}</span>`,
+        '提示',
+        {
+          confirmButtonText: '确定',
+          dangerouslyUseHTMLString: true
+        }
+      )
+    }
+  })
 }, 500)
 
 const itemClick = async (row) => {
   await debouncedItemClick(row)
-  setTimeout(() => {
-    Api.getNoFinishItem({ peId: row.peId, peVisitId: row.peVisitId }).then((res) => {
-      if (res) {
-        let newStr = res.split(';').join('<br />')
-        ElMessageBox.alert(
-          `<span style="font-size:18px;font-weight:blod">该患者还有下列体检项目尚未完成!</span><br /><span style="color:#ed2226">${newStr}</span>`,
-          '提示',
-          {
-            confirmButtonText: '确定',
-            dangerouslyUseHTMLString: true
-          }
-        )
-      }
-    })
-  }, 1000)
 }
 const historyExamList = ref([])
 // 个人体检-主检医生审核-汇总审核-历史记录

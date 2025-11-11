@@ -156,16 +156,18 @@
       </div>
       <div class="back_c">主检报告</div>
       <div class="jianyi">健康建议</div>
-      <div class="jianyi_c" v-for="(item2, index2) in jsonData.guideResultDO" :key="index2">
-        <div>{{ index2 + 1 }}、{{ item2.guideTitle }}</div>
-        <div
-          v-html="
-            item2.guideContent &&
-            (item2.guideContent.includes('\r\n') || item2.guideContent.includes('\n'))
-              ? item2.guideContent.replace(/\r?\n/g, '<br />')
-              : item2.guideContent
-          "
-        >
+      <div style="max-height: 215mm; overflow: hidden">
+        <div class="jianyi_c" v-for="(item2, index2) in jsonData.guideResultDO" :key="index2">
+          <div>{{ index2 + 1 }}、{{ item2.guideTitle }}</div>
+          <div
+            v-html="
+              item2.guideContent &&
+              (item2.guideContent.includes('\r\n') || item2.guideContent.includes('\n'))
+                ? item2.guideContent.replace(/\r?\n/g, '<br />')
+                : item2.guideContent
+            "
+          >
+          </div>
         </div>
       </div>
       <!-- <div class="ganxie"></div> -->

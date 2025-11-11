@@ -56,3 +56,10 @@ export const queryDictByConfig = (data) => {
     data
   })
 }
+// 体检套餐导出
+export const exportPeItemSet = (data) => {
+  return request.downloadByPOST({
+    url: '/health-api/health/itemAssemSet/exportPeItemSet',
+    data
+  })
+}
