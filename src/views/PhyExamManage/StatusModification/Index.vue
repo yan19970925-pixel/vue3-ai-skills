@@ -123,7 +123,13 @@
         </div>
         <div class="survey">
           <el-table :data="detailTableData" style="width: 100%" border height="calc(100vh - 195px)">
-            <el-table-column prop="name" label="姓名" width="100" align="center" />
+            <el-table-column
+              prop="name"
+              label="姓名"
+              width="100"
+              align="center"
+              show-overflow-tooltip
+            />
             <el-table-column prop="peId" label="体检号" width="120" align="center" />
             <el-table-column prop="peVisitId" label="体检次数" width="100" align="center" />
             <el-table-column
@@ -244,17 +250,19 @@ const showDetail = async (row) => {
   itemDetail.value = row
   await Api.getSelectedDept({ dbUser: dbUser })
     .then((res) => {
-      let peDeptCode = ''
+      let peDeptCode = []
       if (res && res.length > 0) {
-        peDeptCode = res[0].peDeptCode
+        res.forEach((item) => {
+          peDeptCode.push(item.peDeptCode)
+        })
       } else {
-        peDeptCode = ''
+        peDeptCode = []
       }
       const getDetailTableDataParams = reactive({
         peId: row.peId || '',
         peVisitId: row.peVisitId || 0,
         pePreDate: row.pePreDate || row.peQueueDate || '',
-        peDeptCode: peDeptCode
+        peDeptCodeArray: peDeptCode
       })
       Api.updateFinishedSignList(getDetailTableDataParams).then((res) => {
         detailTableData.value = res
