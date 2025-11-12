@@ -61,13 +61,13 @@
         <div class="base-title mb-2px">建议和生活指导详情</div>
 
         <div class="base-cont mt-4px">
-          <span class="cont-span">建议代码:</span>
+          <!-- <span class="cont-span">建议代码:</span>
           <el-input
             style="width: 16%"
             v-model="rowDetail.suggestCode"
             placeholder="请输入"
             class="select-item"
-          />
+          /> -->
           <span class="cont-span">建议名称:</span>
           <el-input
             style="width: 16%"
