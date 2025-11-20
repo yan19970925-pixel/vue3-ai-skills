@@ -452,7 +452,7 @@ const getGuideResultDO = () => {
     }
   })
 
-  const MAX_LENGTH = 35 // 每页最大长度，可以根据实际需求调整
+  const MAX_LENGTH = 34 // 每页最大长度，可以根据实际需求调整
   const result = []
   let currentChunk = []
   let currentLength = 0

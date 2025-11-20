@@ -680,7 +680,7 @@
                 />
               </div>
               <div class="div1">
-                <span class="span" @click="openQuote('2', '科室建议', 'peDeptSuggest')">引用</span>
+                <span class="span" @click="openInnerSuggest">引用</span>
                 <span class="span1 !w-80px" style="text-align: right">体检建议：</span>
                 <el-input
                   v-model="perItemData.mleSuggest"
@@ -1047,6 +1047,49 @@
         </el-table>
       </div>
     </Dialog>
+    <Dialog
+      v-model="innerSuggestVisible"
+      title="建议指导"
+      append-to-body
+      width="740px"
+      @close="innerSuggestClose"
+    >
+      <div>
+        <el-input
+          v-model="suggestNameSearch"
+          @keyup.enter="suggestNameChange(suggestNameSearch, 1)"
+          placeholder="请输入建议名称"
+          style="width: 300px; margin-bottom: 8px"
+        />
+        <el-table
+          :data="suggestInnerTableData"
+          style="width: 100%"
+          height="calc(100vh - 500px)"
+          border
+          @row-dblclick="innerSuggestRowDblClick"
+        >
+          <el-table-column
+            prop="suggestCode"
+            label="序号"
+            width="120"
+            align="center"
+          ></el-table-column>
+          <el-table-column prop="suggestName" label="建议名称" width="200"></el-table-column>
+          <el-table-column prop="suggestText" label="建议内容"></el-table-column>
+        </el-table>
+        <!-- 分页组件 -->
+        <el-pagination
+          v-if="suggestInnerTableData.length > 0"
+          layout="prev, pager, next"
+          :page-size="pageSize"
+          :total="total"
+          :current-page="currentPage"
+          @current-change="handleCurrentChange"
+          class="mt-4"
+          style="margin-top: 8px"
+        ></el-pagination>
+      </div>
+    </Dialog>
   </div>
 </template>
 <script setup lang="ts" name="doctorTriageDesk">
@@ -1079,7 +1122,7 @@ import { formatDate } from '@/utils/formatTime'
 import shang from '@/assets/imgs/shang.png'
 import xia from '@/assets/imgs/xia.png'
 import { useRoute, useRouter } from 'vue-router'
-
+import * as Api from '@/api/PerPhyExamination/geTrage/index'
 const route = useRoute()
 const router = useRouter()
 const userStore = useUserStore()
@@ -1932,6 +1975,48 @@ const summary = () => {
   } else {
     perItemData.value.mleConclusion = xiaojieList.join('\r\n')
   }
+}
+
+//新增体检建议引用弹框
+const innerSuggestVisible = ref(false)
+const suggestInnerTableData = ref([])
+const suggestNameSearch = ref('')
+const total = ref(0)
+const currentPage = ref(1)
+const pageSize = ref(20)
+const openInnerSuggest = () => {
+  innerSuggestVisible.value = true
+  pageSize.value = 20
+  currentPage.value = 1
+  suggestNameSearch.value = ''
+  suggestNameChange('')
+}
+const innerSuggestClose = () => {
+  innerSuggestVisible.value = false
+  suggestNameSearch.value = ''
+}
+//建议名称修改监听
+const suggestNameChange = async (suggestName, index) => {
+  const params = {
+    pageNo: index ? index : currentPage.value,
+    pageSize: pageSize.value,
+    suggestName: suggestName
+  }
+
+  await Api.getPeSuggestItem(params).then((res) => {
+    suggestInnerTableData.value = res.records || []
+    total.value = res.total || 0
+  })
+}
+const innerSuggestRowDblClick = (row) => {
+  perItemData.value.mleSuggest = row.suggestText
+  suggestNameSearch.value = ''
+  innerSuggestVisible.value = false
+}
+
+const handleCurrentChange = (val) => {
+  currentPage.value = val
+  suggestNameChange(suggestNameSearch.value)
 }
 </script>
 <style lang="scss" scoped>
