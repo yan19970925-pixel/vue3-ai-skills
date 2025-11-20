@@ -92,9 +92,16 @@
           class="back_t1"
           v-for="(item1, index1) in jsonData.deptResultItemsRespVoList"
           :key="item1.peDeptCode"
-          >{{ index1 + 1 }}、{{ item1.peDeptName ? item1.peDeptName + '：' : ''
-          }}{{ item1.content }}</div
-        >
+          ><span
+            v-html="
+              `${index1 + 1}、${item1.peDeptName ? item1.peDeptName + '：' : ''}${
+                item1.content && (item1.content.includes('\r\n') || item1.content.includes('\n'))
+                  ? item1.content.replace(/\r?\n/g, '<br />')
+                  : item1.content
+              }`
+            "
+          ></span
+        ></div>
         <!-- <div class="back_t1_c">建议控制饮食，加强运动，减轻体重。</div> -->
       </div>
       <div class="doc_con">
@@ -102,7 +109,9 @@
         <div class="con1">初审日期：{{ jsonData.peVisitListRespVo.chiefAuditDate }}</div>
       </div>
 
-      <div class="pagination">第{{ 1 }}页/共{{ newDeptResultA.length + 3 }}页</div>
+      <div class="pagination"
+        >第{{ 1 }}页/共{{ newDeptResultA.length + 2 + guideResultDOList.length }}页</div
+      >
     </div>
     <div class="report_jiben page">
       <div class="biaoti">
@@ -119,7 +128,7 @@
       </div>
       <div class="back_c">主检报告</div>
       <div class="back_t">终检结论</div>
-      <div class="back_for">
+      <div class="back_for" style="height: 792px; overflow: hidden">
         <div
           class="back_t1"
           v-html="
@@ -139,9 +148,15 @@
       <!-- <div class="ganxie_c">
           我们需要提示您注意的是：本次体检反映的是您当前的健康状况。因人体存在个体生物差异及您选择的检查项目并未涵盖全身所有脏器。因此医生所做的医学诊断和健康状况建议，是依据您的陈述和本次检查的结果综合分析评估而产生的。我们建议您对异常的结果进行相关的进一步检查或跟踪复查。
         </div> -->
-      <div class="pagination">第{{ 2 }}页/共{{ newDeptResultA.length + 3 }}页</div>
+      <div class="pagination"
+        >第{{ 2 }}页/共{{ newDeptResultA.length + 2 + guideResultDOList.length }}页</div
+      >
     </div>
-    <div class="report_jiben page">
+    <div
+      class="report_jiben page"
+      v-for="(guideResultDO, guideIndex) in guideResultDOList"
+      :key="guideIndex"
+    >
       <div class="biaoti">
         <!-- <div class="mr_20">中国人民解放军63710部队医院</div> -->
         <div>体检Id：{{ jsonData.peVisitListRespVo.peId }}</div>
@@ -157,8 +172,11 @@
       <div class="back_c">主检报告</div>
       <div class="jianyi">健康建议</div>
       <div style="max-height: 215mm; overflow: hidden">
-        <div class="jianyi_c" v-for="(item2, index2) in jsonData.guideResultDO" :key="index2">
-          <div>{{ index2 + 1 }}、{{ item2.guideTitle }}</div>
+        <div class="jianyi_c" v-for="(item2, index2) in guideResultDO" :key="index2">
+          <!-- index2 + 1 + (guideIndex != 0 ? guideResultDOList[guideIndex - 1].length : 0)  -->
+          <div class="jianyi_c1"
+            >{{ item2.index ? item2.index + '、' : '' }}{{ item2.guideTitle }}</div
+          >
           <div
             v-html="
               item2.guideContent &&
@@ -174,7 +192,11 @@
       <!-- <div class="ganxie_c">
           我们需要提示您注意的是：本次体检反映的是您当前的健康状况。因人体存在个体生物差异及您选择的检查项目并未涵盖全身所有脏器。因此医生所做的医学诊断和健康状况建议，是依据您的陈述和本次检查的结果综合分析评估而产生的。我们建议您对异常的结果进行相关的进一步检查或跟踪复查。
         </div> -->
-      <div class="pagination">第{{ 3 }}页/共{{ newDeptResultA.length + 3 }}页</div>
+      <div class="pagination"
+        >第{{ 3 + guideIndex }}页/共{{
+          newDeptResultA.length + 2 + guideResultDOList.length
+        }}页</div
+      >
     </div>
     <div class="report_jiben page" v-for="(itemValue, p) in newDeptResultA" :key="p">
       <div class="biaoti">
@@ -214,32 +236,27 @@
                 <td class="td5" :style="item.isJy ? '' : 'display:none'">单位</td>
               </tr>
               <tr v-if="item.itemAssemName || item.peId">
-                <td
-                  :class="!item.isJy ? 'td11' : 'td1'"
-                  v-if="item.peItemName"
-                  :style="
-                    item.peItemName && item.peItemName.length > 9
-                      ? 'font-size:12px;line-height:15px; overflow: hidden;'
-                      : ''
-                  "
-                  >{{ item.peItemName }}</td
-                >
-                <td
-                  :class="!item.isJy ? 'td22' : 'td2'"
-                  v-if="item.peItemName"
-                  :style="
-                    (item.peResult && item.peResult.length > 36 && !item.isJy) ||
-                    (item.peResult && item.peResult.length > 10 && item.isJy)
-                      ? 'font-size:12px;line-height:15px; display: -webkit-box;-webkit-line-clamp: 2;-webkit-box-orient: vertical;overflow: hidden;'
-                      : ''
-                  "
-                >
+                <!-- v-if="item.peItemName"
+                :style="
+                  item.peItemName && item.peItemName.length > 9
+                    ? 'font-size:12px;line-height:15px; overflow: hidden;'
+                    : ''
+                " -->
+                <td :class="!item.isJy ? 'td11' : 'td1'">{{ item.peItemName }}</td>
+                <!-- v-if="item.peItemName"
+                :style="
+                  (item.peResult && item.peResult.length > 36 && !item.isJy) ||
+                  (item.peResult && item.peResult.length > 10 && item.isJy)
+                    ? 'font-size:12px;line-height:15px; display: -webkit-box;-webkit-line-clamp: 2;-webkit-box-orient: vertical;overflow: hidden;'
+                    : ''
+                " -->
+                <td :class="!item.isJy ? 'td22' : 'td2'">
                   {{ item.peResult }}
                   <span v-if="!item.isJy && item.unit">{{ item.unit }}</span>
                 </td>
+                <!-- v-if="item.peItemName" -->
                 <td
                   class="td3"
-                  v-if="item.peItemName"
                   :style="[
                     item.isJy ? {} : { display: 'none' },
                     item.abnormalIndicator == 'H'
@@ -256,12 +273,12 @@
                       : ''
                   }}</td
                 >
-                <td class="td4" v-if="item.peItemName" :style="item.isJy ? '' : 'display:none'">{{
+                <!-- v-if="item.peItemName" -->
+                <td class="td4" :style="item.isJy ? '' : 'display:none'">{{
                   item.printContext
                 }}</td>
-                <td class="td5" v-if="item.peItemName" :style="item.isJy ? '' : 'display:none'">{{
-                  item.units
-                }}</td>
+                <!-- v-if="item.peItemName" -->
+                <td class="td5" :style="item.isJy ? '' : 'display:none'">{{ item.units }}</td>
               </tr>
             </table>
             <!-- <div class="xiaojie" v-if="item.xiaojie">小结</div>
@@ -273,7 +290,11 @@
           <!-- </div> -->
         </div>
       </div>
-      <div class="pagination">第{{ p + 4 }}页/共{{ newDeptResultA.length + 3 }}页</div>
+      <div class="pagination"
+        >第{{ p + 3 + guideResultDOList.length }}页/共{{
+          newDeptResultA.length + 2 + guideResultDOList.length
+        }}页</div
+      >
     </div>
   </div>
   <img ref="imgRef" style="display: none" />
@@ -327,7 +348,7 @@ const generateBarcode = () => {
     imgSrc.value = imgRef.value?.src || ''
   }
 }
-
+const guideResultDOList = ref<any>([])
 const processData = () => {
   if (!props.jsonData) return
 
@@ -415,6 +436,49 @@ const processData = () => {
   console.log(splitArrayByHeight(result.flat(Infinity), 1020), 'ssss')
   newDeptResultA.value = splitArrayByHeight(result.flat(Infinity), 1020)
   // buildPaginationGroups(result)
+  guideResultDOList.value = getGuideResultDO()
+}
+const getGuideResultDO = () => {
+  if (!props.jsonData.guideResultDO || !Array.isArray(props.jsonData.guideResultDO)) {
+    return []
+  }
+
+  // 为每一项添加自增的index属性
+  let lastIndex = 0
+  props.jsonData.guideResultDO.forEach((item) => {
+    if (item.guideTitle) {
+      lastIndex += 1
+      item.index = lastIndex
+    }
+  })
+
+  const MAX_LENGTH = 35 // 每页最大长度，可以根据实际需求调整
+  const result = []
+  let currentChunk = []
+  let currentLength = 0
+
+  for (const item of props.jsonData.guideResultDO) {
+    // 计算当前项的长度(1或2)
+    const itemLength = (item.guideTitle ? 1 : 0) + (item.guideContent ? 1 : 0)
+
+    if (currentLength + itemLength > MAX_LENGTH) {
+      // 当前块已满，添加到结果中
+      result.push(currentChunk)
+      currentChunk = [item]
+      currentLength = itemLength
+    } else {
+      // 添加到当前块
+      currentChunk.push(item)
+      currentLength += itemLength
+    }
+  }
+
+  // 添加最后一个块
+  if (currentChunk.length > 0) {
+    result.push(currentChunk)
+  }
+
+  return result
 }
 const splitArrayByHeight = (arr, maxHeight) => {
   const result = []

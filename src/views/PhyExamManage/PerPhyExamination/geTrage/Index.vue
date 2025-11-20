@@ -828,6 +828,7 @@
           <el-form-item label="建议名称">
             <el-input
               v-model="selfSuggestForm.suggestName"
+              v-trim="selfSuggestForm.suggestName"
               @change="suggestNameChange"
               placeholder="请输入"
             />
@@ -849,8 +850,20 @@
           <el-button type="primary" @click="addSelfSuggest">保存</el-button>
         </div>
       </template>
-      <Dialog v-model="innerSuggestVisible" title="建议指导" append-to-body width="740px">
+      <Dialog
+        v-model="innerSuggestVisible"
+        title="建议指导"
+        append-to-body
+        width="740px"
+        @close="innerSuggestClose"
+      >
         <div>
+          <el-input
+            v-model="suggestNameSearch"
+            @keyup.enter="suggestNameChange(suggestNameSearch)"
+            placeholder="请输入建议名称"
+            style="width: 300px; margin-bottom: 8px"
+          />
           <el-table
             :data="suggestInnerTableData"
             style="width: 100%"
@@ -1314,7 +1327,6 @@ const filteredTableData = computed(() => {
 watch([code, name, company], () => {
   // 这里可以添加防抖逻辑，避免频繁触发筛选
 })
-
 const print = () => {
   new VuePrintNext({
     el: printMe.value,
@@ -1598,6 +1610,7 @@ const getExaminePatList = async (row) => {
       diaseseList.value = res[0].diaseseList // 汇总审核
 
       knowledgeRecordList.value = res[0].knowledgeRecordList // 科普知识
+      mle_suggest.value = ''
 
       if (res[0].resultStatus == '5') {
         // isFenke.value = true
@@ -2317,7 +2330,15 @@ const selfSuggestForm = ref({
   suggestName: '',
   suggestText: ''
 })
-
+watch(
+  () => selfSuggestForm.value.suggestName,
+  (newVal) => {
+    if (newVal.includes(' ')) {
+      selfSuggestForm.value.suggestName = newVal.replace(/\s/g, '')
+    }
+  },
+  { immediate: true }
+)
 // 添加自填建议保存方法
 // 修改 addSelfSuggest 方法
 const addSelfSuggest = () => {
@@ -2381,6 +2402,7 @@ const addSelfSuggest = () => {
 //修改建议指导内部弹框
 const innerSuggestVisible = ref(false)
 const suggestInnerTableData = ref([])
+const suggestNameSearch = ref('')
 const quoteSuggest = async () => {
   await suggestNameChange(selfSuggestForm.value.suggestName)
   innerSuggestVisible.value = true
@@ -2400,6 +2422,10 @@ const suggestNameChange = async (suggestName) => {
 const innerSuggestRowDblClick = (row) => {
   selfSuggestForm.value.suggestText = row.suggestText
   innerSuggestVisible.value = false
+}
+const innerSuggestClose = () => {
+  innerSuggestVisible.value = false
+  suggestNameSearch.value = ''
 }
 // 添加选中的科普知识列表
 const selectedKnowledgeRows = ref([])

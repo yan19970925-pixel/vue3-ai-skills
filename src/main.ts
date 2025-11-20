@@ -97,6 +97,19 @@ const setupAll = async () => {
 
   setupAuth(app)
 
+  // 注册全局指令
+  app.directive('trim', {
+    mounted(el, binding) {
+      if (binding.value) {
+        el.value = binding.value.replace(/\s/g, '')
+      }
+    },
+    updated(el, binding) {
+      if (binding.value) {
+        el.value = binding.value.replace(/\s/g, '')
+      }
+    }
+  })
   await router.isReady()
 
   app.mount('#app')
