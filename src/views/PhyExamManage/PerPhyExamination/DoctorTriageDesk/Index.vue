@@ -535,11 +535,15 @@
                   >
                     <el-table-column
                       label="项目名称"
-                      prop="itemName"
                       align="center"
                       width="160px"
                       show-overflow-tooltip
-                    />
+                    >
+                      <template #default="scope">
+                        <span style="color: #ed2226">* </span>
+                        <span>{{ scope.row.itemName }}</span>
+                      </template>
+                    </el-table-column>
                     <el-table-column label="结果" align="center" show-overflow-tooltip>
                       <template #default="scope">
                         <el-input
@@ -652,6 +656,7 @@
                   type="textarea"
                   placeholder="请输入"
                   maxlength="200"
+                  :disabled="isCanDisableInput"
                 />
               </div>
               <div class="div1">
@@ -663,6 +668,7 @@
                   type="textarea"
                   placeholder="请输入"
                   maxlength="200"
+                  :disabled="isCanDisableInput"
                 />
               </div>
             </el-col>
@@ -677,6 +683,7 @@
                   type="textarea"
                   placeholder="请输入"
                   maxlength="200"
+                  :disabled="isCanDisableInput"
                 />
               </div>
               <div class="div1">
@@ -689,6 +696,7 @@
                   type="textarea"
                   placeholder="请输入"
                   maxlength="200"
+                  :disabled="isCanDisableInput"
                 />
               </div>
             </el-col>
@@ -705,6 +713,7 @@
                   type="textarea"
                   placeholder="请输入"
                   maxlength="200"
+                  :disabled="isCanDisableInput"
                 />
                 <el-button
                   type="primary"
@@ -716,6 +725,7 @@
                     border-color: #3263fe;
                     color: #3263fe;
                   "
+                  :disabled="isCanDisableInput"
                   @click="summary"
                   >总结</el-button
                 >
@@ -726,7 +736,7 @@
         <div class="right_btn">
           <el-button
             type="primary"
-            :disabled="everySearchData.resultStatus == '9'"
+            :disabled="everySearchData.resultStatus == '9' || isCanDisableInput"
             class="btn1"
             @click="save"
             >保存</el-button
@@ -1550,6 +1560,15 @@ const comfierSave = () => {
       ibChiefDoctor: '',
       unitCode: everySearchData.value.unitCode,
       unitVisitId: everySearchData.value.unitVisitId
+    }
+    if (params.itemResultList.length > 0) {
+      let isNoValue = params.itemResultList.some(
+        (item) => !item.value && item.resultClass == '字符'
+      )
+      if (isNoValue) {
+        ElMessage.warning('项目结果不能为空')
+        return
+      }
     }
     if (perItemData.value.doctor && perItemData.value.doctor != params.doctorName) {
       ElMessageBox.confirm(
