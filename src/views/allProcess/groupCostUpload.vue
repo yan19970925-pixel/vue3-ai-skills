@@ -266,7 +266,7 @@
       width="800"
       @close="costDetailsVisiable = false"
     >
-      <div class="costDetails_con">
+      <div class="costDetails_con" style="position: relative">
         <el-table :data="costDetailsList" border style="height: 400px" highlight-current-row>
           <el-table-column label="序号" type="index" width="60" align="center"></el-table-column>
           <el-table-column
@@ -294,6 +294,12 @@
         <div style="width: 100%; text-align: center; margin-top: 20px">
           <el-button type="primary" @click="submitCostDetails">确定并上传明细</el-button>
           <el-button @click="costDetailsVisiable = false">取消</el-button>
+        </div>
+        <div style="text-align: center; position: absolute; right: 10px; bottom: 26px">
+          <span>总费用：</span>
+          <span style="font-size: 16px; font-weight: bold">{{ totalAmount }}</span>
+          <span>元</span>
+          <!-- <el-button type="primary" @click="summaryMoney">汇总</el-button> -->
         </div>
       </div>
     </Dialog>
@@ -421,6 +427,9 @@ const emportData = async () => {
       .then((res) => {
         costDetailsList.value = res || []
         costDetailsVisiable.value = true
+        if (costDetailsList.value.length > 0) {
+          summaryMoney()
+        }
       })
       .catch((err) => {})
   }
@@ -428,6 +437,13 @@ const emportData = async () => {
 const handleNumChange = (index, row) => {
   console.log(index, row)
   row.sumcharges = ((Number(row.amount) * Number(row.charges) * 10000) / 10000).toFixed(2)
+  summaryMoney()
+}
+const totalAmount = ref(0)
+const summaryMoney = () => {
+  totalAmount.value = costDetailsList.value.reduce((acc, cur) => {
+    return acc + Number(cur.sumcharges)
+  }, 0)
 }
 const submitCostDetails = () => {
   if (costDetailsList.value.length === 0) return ElMessage.error('暂无可上传费用明细')
