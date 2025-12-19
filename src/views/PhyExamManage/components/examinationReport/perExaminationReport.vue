@@ -324,8 +324,36 @@ const props = defineProps({
 const newDeptResultA = ref<any>([])
 const arrGroupAll = ref<any>([])
 
+// const splitArrayById = (() => {
+//   const cache = new Map()
+//   return (arr, idKey) => {
+//     const key = JSON.stringify(arr.map((item) => item[idKey]))
+//     if (cache.has(key)) return cache.get(key)
+
+//     const result = arr.reduce((acc, cur) => {
+//       const index = acc.findIndex((item) => item[0][idKey] === cur[idKey])
+//       index === -1 ? acc.push([cur]) : acc[index].push(cur)
+//       return acc
+//     }, [])
+
+//     cache.set(key, result)
+//     return result
+//   }
+// })()
 const splitArrayById = (() => {
   const cache = new Map()
+  // 定义排序优先级
+  const sortOrder = [
+    '一般检查',
+    '医学检验科',
+    '特诊科',
+    '心电图',
+    '骨密度',
+    '医学影像科',
+    '内科检查',
+    '外科检查'
+  ]
+
   return (arr, idKey) => {
     const key = JSON.stringify(arr.map((item) => item[idKey]))
     if (cache.has(key)) return cache.get(key)
@@ -336,10 +364,34 @@ const splitArrayById = (() => {
       return acc
     }, [])
 
+    // 按照指定顺序排序，基于 peDeptName 字段
+    result.sort((a, b) => {
+      const aName = a[0].peDeptName || ''
+      const bName = b[0].peDeptName || ''
+
+      const aIndex = sortOrder.indexOf(aName)
+      const bIndex = sortOrder.indexOf(bName)
+
+      // 如果两个项都在排序列表中，按指定顺序排序
+      if (aIndex !== -1 && bIndex !== -1) {
+        return aIndex - bIndex
+      }
+
+      // 如果只有a在排序列表中，a排在前面
+      if (aIndex !== -1) return -1
+
+      // 如果只有b在排序列表中，b排在前面
+      if (bIndex !== -1) return 1
+
+      // 如果两个都不在排序列表中，保持原有相对顺序
+      return 0
+    })
+
     cache.set(key, result)
     return result
   }
 })()
+
 const imgSrc = ref<any>('')
 const imgRef = ref<any>(null)
 const generateBarcode = () => {
