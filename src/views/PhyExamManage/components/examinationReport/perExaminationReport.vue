@@ -170,7 +170,7 @@
         <div>{{ jsonData.peVisitListRespVo.hospitalname }}</div>
       </div>
       <div class="back_c">主检报告</div>
-      <div class="jianyi">健康建议</div>
+      <div class="jianyi" v-if="guideIndex == 0">健康建议</div>
       <div style="max-height: 215mm; overflow: hidden">
         <div class="jianyi_c" v-for="(item2, index2) in guideResultDO" :key="index2">
           <!-- index2 + 1 + (guideIndex != 0 ? guideResultDOList[guideIndex - 1].length : 0)  -->
@@ -178,6 +178,7 @@
             >{{ item2.index ? item2.index + '、' : '' }}{{ item2.guideTitle }}</div
           >
           <div
+            :style="item2.guideTitle ? 'padding-left:25px' : ''"
             v-html="
               item2.guideContent &&
               (item2.guideContent.includes('\r\n') || item2.guideContent.includes('\n'))
@@ -242,7 +243,12 @@
                     ? 'font-size:12px;line-height:15px; overflow: hidden;'
                     : ''
                 " -->
-                <td :class="!item.isJy ? 'td11' : 'td1'">{{ item.peItemName }}</td>
+                <td :class="!item.isJy ? 'td11' : 'td1'"
+                  ><span
+                    style="font-weight: 500; font-family: SimHei,\'Microsoft YaHei\',sans-serif"
+                    >{{ item.peItemName }}</span
+                  ></td
+                >
                 <!-- v-if="item.peItemName"
                 :style="
                   (item.peResult && item.peResult.length > 36 && !item.isJy) ||
@@ -849,6 +855,9 @@ watch(
       line-height: 24px;
       word-wrap: break-word; /* 允许在单词内换行 */
       font-family: 'SimSun', '宋体';
+    }
+    .jianyi_c1 {
+      font-weight: bold;
     }
     .ganxie {
       width: 100%;
