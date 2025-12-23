@@ -157,11 +157,11 @@
       v-for="(guideResultDO, guideIndex) in guideResultDOList"
       :key="guideIndex"
     >
+      <div class="logo_ti">
+        <!-- <img :src="avatar" alt="" /> -->
+        <div>{{ jsonData.peVisitListRespVo.hospitalname }}</div>
+      </div>
       <div class="biaoti">
-        <div class="logo_ti">
-          <!-- <img :src="avatar" alt="" /> -->
-          <div>{{ jsonData.peVisitListRespVo.hospitalname }}</div>
-        </div>
         <!-- <div class="mr_20">中国人民解放军63710部队医院</div> -->
         <div>体检Id：{{ jsonData.peVisitListRespVo.peId }}</div>
         <div>姓名：{{ jsonData.peVisitListRespVo.name }}</div>
@@ -230,11 +230,17 @@
           <div class="con_table">
             <table class="table">
               <tr v-if="item.isTableHeard" class="table-header">
-                <td :class="!item.isJy ? 'td11' : 'td1'">项目名称</td>
-                <td :class="!item.isJy ? 'td22' : 'td2'">检查结果</td>
-                <td class="td3" :style="item.isJy ? '' : 'display:none'">提示</td>
-                <td class="td4" :style="item.isJy ? '' : 'display:none'">参考范围</td>
-                <td class="td5" :style="item.isJy ? '' : 'display:none'">单位</td>
+                <td style="font-weight: bold" :class="!item.isJy ? 'td11' : 'td1'">项目名称</td>
+                <td style="font-weight: bold" :class="!item.isJy ? 'td22' : 'td2'">检查结果</td>
+                <td style="font-weight: bold" class="td3" :style="item.isJy ? '' : 'display:none'"
+                  >提示</td
+                >
+                <td style="font-weight: bold" class="td4" :style="item.isJy ? '' : 'display:none'"
+                  >参考范围</td
+                >
+                <td style="font-weight: bold" class="td5" :style="item.isJy ? '' : 'display:none'"
+                  >单位</td
+                >
               </tr>
               <tr v-if="item.itemAssemName || item.peId">
                 <!-- v-if="item.peItemName"
@@ -245,7 +251,7 @@
                 " -->
                 <td :class="!item.isJy ? 'td11' : 'td1'"
                   ><span
-                    style="font-weight: 500; font-family: SimHei,\'Microsoft YaHei\',sans-serif"
+                    style="font-weight: bold; font-family: SimHei,\'Microsoft YaHei\',sans-serif"
                     >{{ item.peItemName }}</span
                   ></td
                 >
@@ -757,12 +763,12 @@ watch(
       .dreess {
         font-size: 14px;
         font-family: 'SimSun', '宋体';
-        margin-top: 360px;
+        margin-top: 380px;
         position: relative;
         .position {
           text-align: center;
           position: absolute;
-          top: -4px;
+          top: -25px;
           right: 20px;
         }
       }
@@ -782,7 +788,7 @@ watch(
   }
   .report_jiben {
     background-color: #fff;
-    padding: 50px;
+    padding: 30px 50px;
     height: 294mm;
     width: 100%;
     margin: 0 auto;
@@ -846,20 +852,22 @@ watch(
       }
     }
     .logo_ti {
-      position: relative;
+      position: absolute;
+      right: 50px;
+      top: 4px;
       width: 100%;
       height: 70px;
-      font-size: 26px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      text-align: center;
-      img {
-        width: 60px;
-        height: 60px;
-        position: absolute;
-        left: 0;
-      }
+      font-size: 14px;
+      // display: flex;
+      // justify-content: center;
+      // align-items: center;
+      text-align: right;
+      // img {
+      //   width: 60px;
+      //   height: 60px;
+      //   position: absolute;
+      //   left: 0;
+      // }
     }
     .logo_miaoshu {
       font-size: 14px;
