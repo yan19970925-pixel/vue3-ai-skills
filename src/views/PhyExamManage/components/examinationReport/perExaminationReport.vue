@@ -40,14 +40,14 @@
           <div>体检日期：</div>
           <div class="d_border">{{ jsonData.peVisitListRespVo.pePreDate }}</div>
         </div>
-        <div class="info_flex">
+        <!-- <div class="info_flex">
           <div>单位部门：</div>
           <div class="d_border">{{ jsonData.peVisitListRespVo.print_date }}</div>
-        </div>
+        </div> -->
         <!-- <div class="bottom">{{ jsonData.peVisitListRespVo.hospitalname }}</div> -->
         <div class="dreess">
           <div>客服热线：0335-5363064（5363053）</div>
-          <div>中心网址：www.pla281.com</div>
+          <!-- <div>中心网址：www.pla281.com</div> -->
           <div>秦皇岛市北戴河区驼峰路4号</div>
           <div class="position">
             <img :src="imgSrc" />
@@ -67,6 +67,10 @@
       </div>
     </div>
     <div class="report_jiben page">
+      <div class="logo_ti">
+        <!-- <img :src="avatar" alt="" /> -->
+        <div>{{ jsonData.peVisitListRespVo.hospitalname }}</div>
+      </div>
       <div class="biaoti">
         <!-- <div class="mr_20">中国人民解放军63710部队医院</div> -->
         <div>体检Id：{{ jsonData.peVisitListRespVo.peId }}</div>
@@ -74,10 +78,6 @@
         <div>性别：{{ jsonData.peVisitListRespVo.sex }}</div>
         <div>年龄：{{ jsonData.peVisitListRespVo.age }}岁</div>
         <div>第{{ jsonData.peVisitListRespVo.peVisitId }}次体检</div>
-      </div>
-      <div class="logo_ti">
-        <!-- <img :src="avatar" alt="" /> -->
-        <div>{{ jsonData.peVisitListRespVo.hospitalname }}</div>
       </div>
       <div class="logo_miaoshu">
         <div>尊敬的客人：</div>
@@ -114,6 +114,10 @@
       >
     </div>
     <div class="report_jiben page">
+      <div class="logo_ti">
+        <!-- <img :src="avatar" alt="" /> -->
+        <div>{{ jsonData.peVisitListRespVo.hospitalname }}</div>
+      </div>
       <div class="biaoti">
         <!-- <div class="mr_20">中国人民解放军63710部队医院</div> -->
         <div>体检Id：{{ jsonData.peVisitListRespVo.peId }}</div>
@@ -121,10 +125,6 @@
         <div>性别：{{ jsonData.peVisitListRespVo.sex }}</div>
         <div>年龄：{{ jsonData.peVisitListRespVo.age }}岁</div>
         <div>第{{ jsonData.peVisitListRespVo.peVisitId }}次体检</div>
-      </div>
-      <div class="logo_ti">
-        <!-- <img :src="avatar" alt="" /> -->
-        <div>{{ jsonData.peVisitListRespVo.hospitalname }}</div>
       </div>
       <div class="back_c">主检报告</div>
       <div class="back_t">终检结论</div>
@@ -158,16 +158,16 @@
       :key="guideIndex"
     >
       <div class="biaoti">
+        <div class="logo_ti">
+          <!-- <img :src="avatar" alt="" /> -->
+          <div>{{ jsonData.peVisitListRespVo.hospitalname }}</div>
+        </div>
         <!-- <div class="mr_20">中国人民解放军63710部队医院</div> -->
         <div>体检Id：{{ jsonData.peVisitListRespVo.peId }}</div>
         <div>姓名：{{ jsonData.peVisitListRespVo.name }}</div>
         <div>性别：{{ jsonData.peVisitListRespVo.sex }}</div>
         <div>年龄：{{ jsonData.peVisitListRespVo.age }}岁</div>
         <div>第{{ jsonData.peVisitListRespVo.peVisitId }}次体检</div>
-      </div>
-      <div class="logo_ti">
-        <!-- <img :src="avatar" alt="" /> -->
-        <div>{{ jsonData.peVisitListRespVo.hospitalname }}</div>
       </div>
       <div class="back_c">主检报告</div>
       <div class="jianyi" v-if="guideIndex == 0">健康建议</div>
@@ -720,7 +720,7 @@ watch(
   background-color: #f1f1f1;
   .report_con {
     background-color: #fff;
-    padding: 30px;
+    padding: 50px;
     height: 294mm;
     width: 100%;
     margin: 0 auto;
@@ -782,7 +782,7 @@ watch(
   }
   .report_jiben {
     background-color: #fff;
-    padding: 30px;
+    padding: 50px;
     height: 294mm;
     width: 100%;
     margin: 0 auto;
@@ -983,7 +983,7 @@ watch(
           font-size: 16px;
           .table-header {
             td {
-              font-weight: bold;
+              font-weight: bold !important;
             }
           }
           tr {
