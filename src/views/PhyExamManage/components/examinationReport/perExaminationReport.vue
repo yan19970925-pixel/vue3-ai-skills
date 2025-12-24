@@ -250,10 +250,7 @@
                     : ''
                 " -->
                 <td :class="!item.isJy ? 'td11' : 'td1'"
-                  ><span
-                    style="font-weight: bold; font-family: SimHei,\'Microsoft YaHei\',sans-serif"
-                    >{{ item.peItemName }}</span
-                  ></td
+                  ><span>{{ item.peItemName }}</span></td
                 >
                 <!-- v-if="item.peItemName"
                 :style="
@@ -991,7 +988,8 @@ watch(
           font-size: 16px;
           .table-header {
             td {
-              font-weight: bold !important;
+              font-weight: bold;
+              font-family: SimHei,\'Microsoft YaHei\',sans-serif;
             }
           }
           tr {
