@@ -66,7 +66,7 @@
         <div> 本报告仅供体临床参考，不作为诊断依据，谢谢您的光临！ </div>
       </div>
     </div>
-    <div class="report_jiben page">
+    <div class="report_jiben page" v-for="(item, itemIndex) in guideResultDOList" :key="itemIndex">
       <div class="logo_ti">
         <!-- <img :src="avatar" alt="" /> -->
         <div>{{ jsonData.peVisitListRespVo.hospitalname }}</div>
@@ -79,19 +79,20 @@
         <div>年龄：{{ jsonData.peVisitListRespVo.age }}岁</div>
         <div>第{{ jsonData.peVisitListRespVo.peVisitId }}次体检</div>
       </div>
-      <div class="logo_miaoshu">
+      <div class="logo_miaoshu" v-if="itemIndex == 0">
         <div>尊敬的客人：</div>
         <div
-          >&nbsp;&nbsp;&nbsp;您好！感谢您光临北戴河康复疗养中心体检中心！健康体检的目的在于及时了解您自身的健康状况，现将您的体检结果报告如下，请您详阅。如果您对体检结果有异议，请于一周内到本中心查询或致电客服部（0335-5363064），我们将有专家为您答疑解惑。为了您的健康，我们建议您每年进行一次系统体检。欢迎您再次光临北戴河康复疗养中心体检中心！</div
+          >&nbsp;&nbsp;您好！感谢您光临北戴河康复疗养中心体检中心！健康体检的目的在于及时了解您自身的健康状况，现将您的体检结果报告如下，请您详阅。如果您对体检结果有异议，请于一周内到本中心查询或致电客服部（0335-5363064），我们将有专家为您答疑解惑。为了您的健康，我们建议您每年进行一次系统体检。欢迎您再次光临北戴河康复疗养中心体检中心！</div
         >
       </div>
-      <div class="back_c">主检报告</div>
-      <div class="back_t">体检汇总</div>
-      <div class="back_for">
-        <div
+      <div v-for="(guideItem, guideIndex) in item" :key="guideIndex">
+        <!-- <div class="back_c">主检报告</div> -->
+        <div class="back_t" v-if="guideItem.isTitle">{{ guideItem.titleContent }}</div>
+        <div class="back_for" v-if="guideItem.isDeptHead">
+          <!-- <div
+        v-for="(item1, index1) in jsonData.deptResultItemsRespVoList"
+        :key="item1.peDeptCode"
           class="back_t1"
-          v-for="(item1, index1) in jsonData.deptResultItemsRespVoList"
-          :key="item1.peDeptCode"
           ><span
             v-html="
               `${index1 + 1}、${item1.peDeptName ? item1.peDeptName + '：' : ''}${
@@ -101,25 +102,43 @@
               }`
             "
           ></span
-        ></div>
-        <!-- <div class="back_t1_c">建议控制饮食，加强运动，减轻体重。</div> -->
-      </div>
-      <div class="doc_con">
-        <div class="con1"> 初审医生：{{ jsonData.peVisitListRespVo.chiefDoctor }}</div>
-        <div class="con1">初审日期：{{ jsonData.peVisitListRespVo.chiefAuditDate }}</div>
+        ></div> -->
+          <div class="back_t1">{{
+            (guideItem.peDeptIndex ? guideItem.peDeptIndex + '、' : '') +
+            guideItem.peDeptName +
+            guideItem.content
+          }}</div>
+        </div>
+        <div class="back_for" v-if="guideItem.isSuggest">
+          <div class="back_t1">{{ guideItem.guideContent }}</div>
+        </div>
+        <div class="jianyi_c" v-if="guideItem.isGuideResultDO">
+          <div class="jianyi_c1" v-if="guideItem.index"
+            >{{ guideItem.index + '、' }}{{ guideItem.guideTitle }}</div
+          >
+          <div :style="guideItem.guideTitle ? 'padding-left:25px' : ''">
+            {{ guideItem.guideContent }}
+          </div>
+        </div>
+        <div class="doc_con" v-if="guideItem.chiefDoctor">
+          <div class="con1"> 初审医生：{{ guideItem.chiefDoctor }}</div>
+          <div class="con1"> 初审日期：{{ guideItem.chiefAuditDate }}</div>
+        </div>
+        <div class="doc_con" v-if="guideItem.auditDoctor">
+          <div class="con1"> 终审医生：{{ guideItem.auditDoctor }}</div>
+          <div class="con1"> 终审日期：{{ guideItem.lastAuditDate }}</div>
+        </div>
       </div>
 
       <div class="pagination"
-        >第{{ 1 }}页/共{{ newDeptResultA.length + 2 + guideResultDOList.length }}页</div
+        >第{{ itemIndex + 1 }}页/共{{ newDeptResultA.length + guideResultDOList.length }}页</div
       >
     </div>
-    <div class="report_jiben page">
+    <!-- <div class="report_jiben page">
       <div class="logo_ti">
-        <!-- <img :src="avatar" alt="" /> -->
         <div>{{ jsonData.peVisitListRespVo.hospitalname }}</div>
       </div>
       <div class="biaoti">
-        <!-- <div class="mr_20">中国人民解放军63710部队医院</div> -->
         <div>体检Id：{{ jsonData.peVisitListRespVo.peId }}</div>
         <div>姓名：{{ jsonData.peVisitListRespVo.name }}</div>
         <div>性别：{{ jsonData.peVisitListRespVo.sex }}</div>
@@ -138,16 +157,11 @@
               : jsonData.suggest
           "
         ></div>
-        <!-- <div class="back_t1_c">建议控制饮食，加强运动，减轻体重。</div> -->
       </div>
       <div class="doc_con">
         <div class="con1"> 终审医生：{{ jsonData.peVisitListRespVo.auditDoctor }}</div>
         <div class="con1">终审日期：{{ jsonData.peVisitListRespVo.lastAuditDate }}</div>
       </div>
-      <!-- <div class="ganxie"></div> -->
-      <!-- <div class="ganxie_c">
-          我们需要提示您注意的是：本次体检反映的是您当前的健康状况。因人体存在个体生物差异及您选择的检查项目并未涵盖全身所有脏器。因此医生所做的医学诊断和健康状况建议，是依据您的陈述和本次检查的结果综合分析评估而产生的。我们建议您对异常的结果进行相关的进一步检查或跟踪复查。
-        </div> -->
       <div class="pagination"
         >第{{ 2 }}页/共{{ newDeptResultA.length + 2 + guideResultDOList.length }}页</div
       >
@@ -158,11 +172,9 @@
       :key="guideIndex"
     >
       <div class="logo_ti">
-        <!-- <img :src="avatar" alt="" /> -->
         <div>{{ jsonData.peVisitListRespVo.hospitalname }}</div>
       </div>
       <div class="biaoti">
-        <!-- <div class="mr_20">中国人民解放军63710部队医院</div> -->
         <div>体检Id：{{ jsonData.peVisitListRespVo.peId }}</div>
         <div>姓名：{{ jsonData.peVisitListRespVo.name }}</div>
         <div>性别：{{ jsonData.peVisitListRespVo.sex }}</div>
@@ -173,7 +185,6 @@
       <div class="jianyi" v-if="guideIndex == 0">健康建议</div>
       <div style="max-height: 215mm; overflow: hidden">
         <div class="jianyi_c" v-for="(item2, index2) in guideResultDO" :key="index2">
-          <!-- index2 + 1 + (guideIndex != 0 ? guideResultDOList[guideIndex - 1].length : 0)  -->
           <div class="jianyi_c1"
             >{{ item2.index ? item2.index + '、' : '' }}{{ item2.guideTitle }}</div
           >
@@ -189,16 +200,12 @@
           </div>
         </div>
       </div>
-      <!-- <div class="ganxie"></div> -->
-      <!-- <div class="ganxie_c">
-          我们需要提示您注意的是：本次体检反映的是您当前的健康状况。因人体存在个体生物差异及您选择的检查项目并未涵盖全身所有脏器。因此医生所做的医学诊断和健康状况建议，是依据您的陈述和本次检查的结果综合分析评估而产生的。我们建议您对异常的结果进行相关的进一步检查或跟踪复查。
-        </div> -->
       <div class="pagination"
         >第{{ 3 + guideIndex }}页/共{{
           newDeptResultA.length + 2 + guideResultDOList.length
         }}页</div
       >
-    </div>
+    </div> -->
     <div class="report_jiben page" v-for="(itemValue, p) in newDeptResultA" :key="p">
       <div class="biaoti">
         <div>体检Id：{{ jsonData.peVisitListRespVo.peId }}</div>
@@ -300,8 +307,8 @@
         </div>
       </div>
       <div class="pagination"
-        >第{{ p + 3 + guideResultDOList.length }}页/共{{
-          newDeptResultA.length + 2 + guideResultDOList.length
+        >第{{ p + 1 + guideResultDOList.length }}页/共{{
+          newDeptResultA.length + guideResultDOList.length
         }}页</div
       >
     </div>
@@ -326,23 +333,6 @@ const props = defineProps({
 
 const newDeptResultA = ref<any>([])
 const arrGroupAll = ref<any>([])
-
-// const splitArrayById = (() => {
-//   const cache = new Map()
-//   return (arr, idKey) => {
-//     const key = JSON.stringify(arr.map((item) => item[idKey]))
-//     if (cache.has(key)) return cache.get(key)
-
-//     const result = arr.reduce((acc, cur) => {
-//       const index = acc.findIndex((item) => item[0][idKey] === cur[idKey])
-//       index === -1 ? acc.push([cur]) : acc[index].push(cur)
-//       return acc
-//     }, [])
-
-//     cache.set(key, result)
-//     return result
-//   }
-// })()
 const splitArrayById = (() => {
   const cache = new Map()
   // 定义排序优先级
@@ -398,7 +388,6 @@ const splitArrayById = (() => {
 const imgSrc = ref<any>('')
 const imgRef = ref<any>(null)
 const generateBarcode = () => {
-  // const canvas = document.getElementById('barcodeCanvas') as HTMLCanvasElement
   const peId = props.jsonData?.peVisitListRespVo?.peId
   if (peId) {
     JsBarcode(imgRef.value, peId, {
@@ -458,39 +447,36 @@ const processData = () => {
     })
   })
   if (result.length > 0) {
+    // 用于跟踪已出现的objectName
+    const seenObjectNames = new Set()
+
     result.forEach((item) => {
       item.forEach((items) => {
-        items.unshift(
-          { objectName: items[0].peDeptName, height: 30 },
-          {
-            objectAssemName: items[0].itemAssemName,
-            checkDoctor: items[0].doctor,
-            checkDate: items[0].peResultDate,
-            height: 30
-          },
-          {
-            isTableHeard: true,
-            isJy: items[0].isJy,
-            height: 30
-          }
-        )
+        const currentObjectName = items[0].peDeptName
+
+        // 检查当前objectName是否已经处理过
+        if (!seenObjectNames.has(currentObjectName)) {
+          items.unshift({ objectName: currentObjectName, height: 30 })
+          seenObjectNames.add(currentObjectName)
+        }
+
+        items.unshift({
+          objectAssemName: items[0].itemAssemName,
+          checkDoctor: items[0].doctor,
+          checkDate: items[0].peResultDate,
+          height: 30
+        })
+        items.unshift({
+          isTableHeard: true,
+          isJy: items[0].isJy,
+          height: 30
+        })
+
         items.forEach((its) => {
           if (!its.height) {
-            // if (its.peResult && 36 < its.peResult.length < 72 && !item.isJy) {
-            //   its.height = 60
-            // } else if (its.peResult && its.peResult.length > 72 && !item.isJy) {
-            //   its.height = 90
-            // } else {
             its.height = 30
-            // }
           }
         })
-        // items.push({ xiaojie: '小结', height: 30 })
-        // if (items[items.length - 2].content && items[items.length - 2].content.length > 0) {
-        //   items[items.length - 2].content.forEach((element) => {
-        //     items.push({ resultXiaoJie: element, height: 30 })
-        //   })
-        // }
       })
     })
   }
@@ -500,43 +486,183 @@ const processData = () => {
   guideResultDOList.value = getGuideResultDO()
 }
 const getGuideResultDO = () => {
-  if (!props.jsonData.guideResultDO || !Array.isArray(props.jsonData.guideResultDO)) {
+  let jsonData = JSON.parse(JSON.stringify(props.jsonData))
+  let suggest = []
+  if (jsonData.suggest) {
+    jsonData.suggest = jsonData.suggest.split('\n')
+    jsonData.suggest.forEach((item) => {
+      suggest.push({
+        isSuggest: true,
+        guideContent: item
+      })
+    })
+    suggest.push({
+      auditDoctor: jsonData.peVisitListRespVo.auditDoctor,
+      lastAuditDate: jsonData.peVisitListRespVo.lastAuditDate
+    })
+    suggest.unshift({
+      isTitle: true,
+      titleContent: '终检结论'
+    })
+  }
+
+  jsonData.guideResultDO.unshift({
+    isTitle: true,
+    titleContent: '健康建议'
+  })
+  jsonData.guideResultDO.forEach((item) => {
+    item.isGuideResultDO = true
+  })
+  if (!jsonData.guideResultDO || !Array.isArray(jsonData.guideResultDO)) {
     return []
   }
 
   // 为每一项添加自增的index属性
   let lastIndex = 0
-  props.jsonData.guideResultDO.forEach((item) => {
+  jsonData.guideResultDO.forEach((item) => {
     if (item.guideTitle) {
       lastIndex += 1
       item.index = lastIndex
     }
   })
+  suggest.forEach((item) => {
+    item.itemLength = 1
+  })
+  jsonData.guideResultDO.forEach((item) => {
+    item.itemLength = (item.guideTitle ? 1 : 0) + (item.guideContent ? 1 : 0)
+  })
+  let newResult = [
+    ...processDeptResultItemsWithIndex(jsonData.deptResultItemsRespVoList),
+    ...suggest,
+    ...jsonData.guideResultDO
+  ]
+  console.log(newResult, 'newResult')
+  // 使用拆分后的二维数组
+  const newResult2D = splitNewResult(newResult)
+  return newResult2D
+}
+// 处理 props.jsonData.deptResultItemsRespVoList 中的 content 字段，并为每个有 peDeptName 的对象添加序号
+const processDeptResultItemsWithIndex = () => {
+  if (
+    !props.jsonData.deptResultItemsRespVoList ||
+    !Array.isArray(props.jsonData.deptResultItemsRespVoList)
+  ) {
+    return []
+  }
 
-  const MAX_LENGTH = 34 // 每页最大长度，可以根据实际需求调整
   const result = []
-  let currentChunk = []
-  let currentLength = 0
+  let peDeptIndex = 0 // 用于跟踪 peDeptName 的序号
 
-  for (const item of props.jsonData.guideResultDO) {
-    // 计算当前项的长度(1或2)
-    const itemLength = (item.guideTitle ? 1 : 0) + (item.guideContent ? 1 : 0)
+  props.jsonData.deptResultItemsRespVoList.forEach((item) => {
+    if (item.content && typeof item.content === 'string' && item.content.includes('\n')) {
+      // 按换行符分割 content
+      const contentArray = item.content.split('\n')
 
-    if (currentLength + itemLength > MAX_LENGTH) {
-      // 当前块已满，添加到结果中
-      result.push(currentChunk)
-      currentChunk = [item]
-      currentLength = itemLength
+      // 创建多个数据项
+      contentArray.forEach((contentPart, index) => {
+        const newItem = { ...item } // 复制原对象
+        newItem.content = contentPart // 设置分割后的内容
+
+        // 只有第一个数据项保留 peDeptName，其他设为空字符串
+        if (index > 0) {
+          newItem.peDeptName = ''
+        }
+
+        // 如果有 peDeptName（即第一个分割项或原始项），则添加序号
+        if (index === 0 && item.peDeptName && item.peDeptName.trim() !== '') {
+          newItem.peDeptIndex = ++peDeptIndex
+        } else if (index === 0 && (!item.peDeptName || item.peDeptName.trim() === '')) {
+          // 如果原始项就没有 peDeptName，则不设置序号
+          newItem.peDeptIndex = undefined
+        }
+
+        result.push(newItem)
+      })
     } else {
-      // 添加到当前块
-      currentChunk.push(item)
-      currentLength += itemLength
+      // 如果没有换行符，直接添加原对象
+      const newItem = { ...item }
+
+      // 如果有 peDeptName，则添加序号
+      if (item.peDeptName && item.peDeptName.trim() !== '') {
+        newItem.peDeptIndex = ++peDeptIndex
+      }
+
+      result.push(newItem)
+    }
+  })
+  result.forEach((item) => {
+    item.isDeptHead = true
+  })
+  result.push({
+    chiefDoctor: props.jsonData.peVisitListRespVo.chiefDoctor,
+    chiefAuditDate: props.jsonData.peVisitListRespVo.chiefAuditDate
+  })
+  result.unshift({
+    isTitle: true,
+    titleContent: '体检汇总'
+  })
+  result.forEach((item) => {
+    item.itemLength = 1
+  })
+  return result
+}
+// 将newResult拆分为二维数组，第一个数组长度为30，其余为34
+const splitNewResult = (newResult) => {
+  if (!newResult || !Array.isArray(newResult)) {
+    return []
+  }
+
+  const result = []
+  let currentIndex = 0
+
+  // 处理第一个数组，以总和34长度分割
+  if (newResult.length > 0) {
+    let currentSum = 0
+    let firstChunk = []
+
+    while (currentIndex < newResult.length) {
+      const item = newResult[currentIndex]
+      const itemLength = item.itemLength || 0
+
+      // 检查加上当前项是否会超过限制
+      if (currentSum + itemLength <= 34) {
+        firstChunk.push(item)
+        currentSum += itemLength
+        currentIndex++
+      } else {
+        // 如果加上当前项会超过34，则当前项放入下一个数组
+        break
+      }
+    }
+
+    if (firstChunk.length > 0) {
+      result.push(firstChunk)
     }
   }
 
-  // 添加最后一个块
-  if (currentChunk.length > 0) {
-    result.push(currentChunk)
+  // 剩余数组按总和36长度分割
+  while (currentIndex < newResult.length) {
+    let currentSum = 0
+    const chunk = []
+
+    while (currentIndex < newResult.length) {
+      const item = newResult[currentIndex]
+      const itemLength = item.itemLength || 0
+
+      // 检查加上当前项是否会超过限制
+      if (currentSum + itemLength <= 42) {
+        chunk.push(item)
+        currentSum += itemLength
+        currentIndex++
+      } else {
+        // 如果加上当前项会超过36，则当前项放入下一个数组
+        break
+      }
+    }
+
+    if (chunk.length > 0) {
+      result.push(chunk)
+    }
   }
 
   return result
@@ -883,9 +1009,10 @@ watch(
       font-size: 20px;
       margin: 10px 0;
       font-weight: bold;
+      background-color: #9fc3e8;
     }
     .back_for {
-      margin-bottom: 20px;
+      /* margin-bottom: 20px; */
       .back_t1 {
         width: 100%;
         font-size: 16px;
