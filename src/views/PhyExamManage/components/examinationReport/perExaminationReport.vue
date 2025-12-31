@@ -85,8 +85,8 @@
           >&nbsp;&nbsp;您好！感谢您光临北戴河康复疗养中心体检中心！健康体检的目的在于及时了解您自身的健康状况，现将您的体检结果报告如下，请您详阅。如果您对体检结果有异议，请于一周内到本中心查询或致电客服部（0335-5363064），我们将有专家为您答疑解惑。为了您的健康，我们建议您每年进行一次系统体检。欢迎您再次光临北戴河康复疗养中心体检中心！</div
         >
       </div>
+      <div class="back_c" v-if="itemIndex == 0">主检健康评估</div>
       <div v-for="(guideItem, guideIndex) in item" :key="guideIndex">
-        <!-- <div class="back_c">主检报告</div> -->
         <div class="back_t" v-if="guideItem.isTitle">{{ guideItem.titleContent }}</div>
         <div class="back_for" v-if="guideItem.isDeptHead">
           <!-- <div
@@ -237,15 +237,42 @@
           <div class="con_table">
             <table class="table">
               <tr v-if="item.isTableHeard" class="table-header">
-                <td style="font-weight: bold" :class="!item.isJy ? 'td11' : 'td1'">项目名称</td>
-                <td style="font-weight: bold" :class="!item.isJy ? 'td22' : 'td2'">检查结果</td>
-                <td style="font-weight: bold" class="td3" :style="item.isJy ? '' : 'display:none'"
+                <td
+                  style="font-weight: bold"
+                  :class="
+                    !item.isJy || (item.isJy && item.peResultclass == '报告') ? 'td11' : 'td1'
+                  "
+                  >项目名称</td
+                >
+                <td
+                  style="font-weight: bold"
+                  :class="
+                    !item.isJy || (item.isJy && item.peResultclass == '报告') ? 'td22' : 'td2'
+                  "
+                  >检查结果</td
+                >
+                <td
+                  style="font-weight: bold"
+                  class="td3"
+                  :style="
+                    item.isJy || !(item.isJy && item.peResultclass == '报告') ? '' : 'display:none'
+                  "
                   >提示</td
                 >
-                <td style="font-weight: bold" class="td4" :style="item.isJy ? '' : 'display:none'"
+                <td
+                  style="font-weight: bold"
+                  class="td4"
+                  :style="
+                    item.isJy || !(item.isJy && item.peResultclass == '报告') ? '' : 'display:none'
+                  "
                   >参考范围</td
                 >
-                <td style="font-weight: bold" class="td5" :style="item.isJy ? '' : 'display:none'"
+                <td
+                  style="font-weight: bold"
+                  class="td5"
+                  :style="
+                    item.isJy || !(item.isJy && item.peResultclass == '报告') ? '' : 'display:none'
+                  "
                   >单位</td
                 >
               </tr>
@@ -256,7 +283,10 @@
                     ? 'font-size:12px;line-height:15px; overflow: hidden;'
                     : ''
                 " -->
-                <td :class="!item.isJy ? 'td11' : 'td1'"
+                <td
+                  :class="
+                    !item.isJy || (item.isJy && item.peResultclass == '报告') ? 'td11' : 'td1'
+                  "
                   ><span>{{ item.peItemName }}</span></td
                 >
                 <!-- v-if="item.peItemName"
@@ -266,7 +296,11 @@
                     ? 'font-size:12px;line-height:15px; display: -webkit-box;-webkit-line-clamp: 2;-webkit-box-orient: vertical;overflow: hidden;'
                     : ''
                 " -->
-                <td :class="!item.isJy ? 'td22' : 'td2'">
+                <td
+                  :class="
+                    !item.isJy || (item.isJy && item.peResultclass == '报告') ? 'td22' : 'td2'
+                  "
+                >
                   {{ item.peResult }}
                   <span v-if="!item.isJy && item.unit">{{ item.unit }}</span>
                 </td>
@@ -274,7 +308,9 @@
                 <td
                   class="td3"
                   :style="[
-                    item.isJy ? {} : { display: 'none' },
+                    item.isJy || !(item.isJy && item.peResultclass == '报告')
+                      ? {}
+                      : { display: 'none' },
                     item.abnormalIndicator == 'H'
                       ? { color: 'red', fontWeight: 'bold' }
                       : item.abnormalIndicator == 'L'
@@ -290,11 +326,21 @@
                   }}</td
                 >
                 <!-- v-if="item.peItemName" -->
-                <td class="td4" :style="item.isJy ? '' : 'display:none'">{{
-                  item.printContext
-                }}</td>
+                <td
+                  class="td4"
+                  :style="
+                    item.isJy || !(item.isJy && item.peResultclass == '报告') ? '' : 'display:none'
+                  "
+                  >{{ item.printContext }}</td
+                >
                 <!-- v-if="item.peItemName" -->
-                <td class="td5" :style="item.isJy ? '' : 'display:none'">{{ item.units }}</td>
+                <td
+                  class="td5"
+                  :style="
+                    item.isJy || !(item.isJy && item.peResultclass == '报告') ? '' : 'display:none'
+                  "
+                  >{{ item.units }}</td
+                >
               </tr>
             </table>
             <!-- <div class="xiaojie" v-if="item.xiaojie">小结</div>
@@ -456,21 +502,36 @@ const processData = () => {
 
         // 检查当前objectName是否已经处理过
         if (!seenObjectNames.has(currentObjectName)) {
-          items.unshift({ objectName: currentObjectName, height: 30 })
+          items.unshift(
+            { objectName: currentObjectName, height: 30 },
+            {
+              objectAssemName: items[0].itemAssemName,
+              checkDoctor: items[0].doctor,
+              checkDate: items[0].peResultDate,
+              height: 30
+            },
+            {
+              isTableHeard: true,
+              isJy: items[0].isJy,
+              height: 30
+            }
+          )
           seenObjectNames.add(currentObjectName)
+        } else {
+          items.unshift(
+            {
+              objectAssemName: items[0].itemAssemName,
+              checkDoctor: items[0].doctor,
+              checkDate: items[0].peResultDate,
+              height: 30
+            },
+            {
+              isTableHeard: true,
+              isJy: items[0].isJy,
+              height: 30
+            }
+          )
         }
-
-        items.unshift({
-          objectAssemName: items[0].itemAssemName,
-          checkDoctor: items[0].doctor,
-          checkDate: items[0].peResultDate,
-          height: 30
-        })
-        items.unshift({
-          isTableHeard: true,
-          isJy: items[0].isJy,
-          height: 30
-        })
 
         items.forEach((its) => {
           if (!its.height) {
@@ -625,7 +686,7 @@ const splitNewResult = (newResult) => {
       const itemLength = item.itemLength || 0
 
       // 检查加上当前项是否会超过限制
-      if (currentSum + itemLength <= 34) {
+      if (currentSum + itemLength <= 33) {
         firstChunk.push(item)
         currentSum += itemLength
         currentIndex++
@@ -650,7 +711,7 @@ const splitNewResult = (newResult) => {
       const itemLength = item.itemLength || 0
 
       // 检查加上当前项是否会超过限制
-      if (currentSum + itemLength <= 42) {
+      if (currentSum + itemLength <= 37) {
         chunk.push(item)
         currentSum += itemLength
         currentIndex++
@@ -1009,7 +1070,7 @@ watch(
       font-size: 20px;
       margin: 10px 0;
       font-weight: bold;
-      background-color: #9fc3e8;
+      /* background-color: #9fc3e8; */
     }
     .back_for {
       /* margin-bottom: 20px; */
