@@ -240,39 +240,33 @@
                 <td
                   style="font-weight: bold"
                   :class="
-                    !item.isJy || (item.isJy && item.peResultclass == '报告') ? 'td11' : 'td1'
+                    !item.isJy || (item.isJy && item.peResultClass == '报告') ? 'td11' : 'td1'
                   "
                   >项目名称</td
                 >
                 <td
                   style="font-weight: bold"
                   :class="
-                    !item.isJy || (item.isJy && item.peResultclass == '报告') ? 'td22' : 'td2'
+                    !item.isJy || (item.isJy && item.peResultClass == '报告') ? 'td22' : 'td2'
                   "
                   >检查结果</td
                 >
                 <td
                   style="font-weight: bold"
                   class="td3"
-                  :style="
-                    item.isJy || !(item.isJy && item.peResultclass == '报告') ? '' : 'display:none'
-                  "
+                  :style="item.isJy && item.peResultClass == '检验' ? '' : 'display:none'"
                   >提示</td
                 >
                 <td
                   style="font-weight: bold"
                   class="td4"
-                  :style="
-                    item.isJy || !(item.isJy && item.peResultclass == '报告') ? '' : 'display:none'
-                  "
+                  :style="item.isJy && item.peResultClass == '检验' ? '' : 'display:none'"
                   >参考范围</td
                 >
                 <td
                   style="font-weight: bold"
                   class="td5"
-                  :style="
-                    item.isJy || !(item.isJy && item.peResultclass == '报告') ? '' : 'display:none'
-                  "
+                  :style="item.isJy && item.peResultClass == '检验' ? '' : 'display:none'"
                   >单位</td
                 >
               </tr>
@@ -285,7 +279,7 @@
                 " -->
                 <td
                   :class="
-                    !item.isJy || (item.isJy && item.peResultclass == '报告') ? 'td11' : 'td1'
+                    !item.isJy || (item.isJy && item.peResultClass == '报告') ? 'td11' : 'td1'
                   "
                   ><span>{{ item.peItemName }}</span></td
                 >
@@ -298,7 +292,7 @@
                 " -->
                 <td
                   :class="
-                    !item.isJy || (item.isJy && item.peResultclass == '报告') ? 'td22' : 'td2'
+                    !item.isJy || (item.isJy && item.peResultClass == '报告') ? 'td22' : 'td2'
                   "
                 >
                   {{ item.peResult }}
@@ -308,9 +302,7 @@
                 <td
                   class="td3"
                   :style="[
-                    item.isJy || !(item.isJy && item.peResultclass == '报告')
-                      ? {}
-                      : { display: 'none' },
+                    item.isJy && item.peResultClass == '检验' ? {} : { display: 'none' },
                     item.abnormalIndicator == 'H'
                       ? { color: 'red', fontWeight: 'bold' }
                       : item.abnormalIndicator == 'L'
@@ -328,17 +320,13 @@
                 <!-- v-if="item.peItemName" -->
                 <td
                   class="td4"
-                  :style="
-                    item.isJy || !(item.isJy && item.peResultclass == '报告') ? '' : 'display:none'
-                  "
+                  :style="item.isJy && item.peResultClass == '检验' ? '' : 'display:none'"
                   >{{ item.printContext }}</td
                 >
                 <!-- v-if="item.peItemName" -->
                 <td
                   class="td5"
-                  :style="
-                    item.isJy || !(item.isJy && item.peResultclass == '报告') ? '' : 'display:none'
-                  "
+                  :style="item.isJy && item.peResultClass == '检验' ? '' : 'display:none'"
                   >{{ item.units }}</td
                 >
               </tr>
@@ -513,6 +501,7 @@ const processData = () => {
             {
               isTableHeard: true,
               isJy: items[0].isJy,
+              peResultClass: items[0].peResultClass || '',
               height: 30
             }
           )
@@ -528,6 +517,7 @@ const processData = () => {
             {
               isTableHeard: true,
               isJy: items[0].isJy,
+              peResultClass: items[0].peResultClass || '',
               height: 30
             }
           )
