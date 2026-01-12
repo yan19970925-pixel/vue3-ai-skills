@@ -106,6 +106,7 @@
           <div class="back_t1">{{
             (guideItem.peDeptIndex ? guideItem.peDeptIndex + '、' : '') +
             guideItem.peDeptName +
+            '：' +
             guideItem.content
           }}</div>
         </div>
