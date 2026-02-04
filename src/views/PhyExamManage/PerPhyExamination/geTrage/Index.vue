@@ -122,7 +122,7 @@
           class="heard_title"
           style="display: flex; justify-content: space-between; align-items: center"
         >
-          <span>人员列表</span>
+          <span>人员列表 （共{{ filteredTableData.length }}人）</span>
           <div style="color: #333333; padding-right: 10px" v-show="itemDetail.peId"
             >当前体检人员: {{ itemDetail.peId || '' }} | {{ itemDetail.name || '' }}
           </div>

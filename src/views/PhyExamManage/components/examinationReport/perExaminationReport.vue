@@ -46,9 +46,9 @@
         </div> -->
         <!-- <div class="bottom">{{ jsonData.peVisitListRespVo.hospitalname }}</div> -->
         <div class="dreess">
-          <div>客服热线：0335-5363064（5363053）</div>
+          <div>客服热线：0335-5360036</div>
           <!-- <div>中心网址：www.pla281.com</div> -->
-          <div>秦皇岛市北戴河区驼峰路4号</div>
+          <div>秦皇岛市北戴河区西海滩路4号</div>
           <div class="position">
             <img :src="imgSrc" />
           </div>
@@ -105,8 +105,7 @@
         ></div> -->
           <div class="back_t1">{{
             (guideItem.peDeptIndex ? guideItem.peDeptIndex + '、' : '') +
-            guideItem.peDeptName +
-            '：' +
+            (guideItem.peDeptName ? guideItem.peDeptName + '：' : '') +
             guideItem.content
           }}</div>
         </div>

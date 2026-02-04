@@ -52,6 +52,7 @@
             filterable
             clearable
             default-first-option
+            @change="reportChange"
           >
             <el-option
               v-for="item in doctorList"
@@ -715,7 +716,7 @@
                   maxlength="200"
                   :disabled="isCanDisableInput"
                 />
-                <el-button
+                <!-- <el-button
                   type="primary"
                   style="
                     position: absolute;
@@ -728,7 +729,7 @@
                   :disabled="isCanDisableInput"
                   @click="summary"
                   >总结</el-button
-                >
+                > -->
               </div>
             </el-col>
           </el-row>
@@ -1321,6 +1322,8 @@ const comfier = async (row) => {
   }
 }
 const checkCodesChange = async (val) => {
+  doctorCode.value = ''
+  await getDoctorList()
   await reportChange()
   reportType.value = '1'
   searchParams.peId = ''
@@ -1333,7 +1336,7 @@ const doctorList = ref([])
 const doctorCode = ref('')
 const getDoctorList = () => {
   let params = {
-    peDeptCode: checkCodes.value
+    peDeptCode: checkCodes.value || ''
   }
   getPeDoctorByPeDeptCode(params).then((res) => {
     // console.log(res, '医生列表')
@@ -1404,7 +1407,10 @@ const reportChange = () => {
     endDate: searchParams.endDate,
     peDeptCode: checkCodes.value,
     name: searchParams.name,
-    peId: searchParams.peId
+    peId: searchParams.peId,
+    doctor: doctorCode.value
+      ? doctorList.value.find((item) => item.dbUser == doctorCode.value).userName
+      : ''
   }
   // if (val == '1') {
   //   params.startDate = formatDate(new Date(), 'YYYY-MM-DD')
@@ -1878,6 +1884,7 @@ onMounted(async () => {
     })
     .catch((err) => {})
   doctorCode.value = dbUser
+  await getDoctorList()
   // 优先从 sessionStorage 获取
   const storedQueryInfo = sessionStorage.getItem('doctorTriageQueryInfo')
 

@@ -51,12 +51,23 @@
           </div>
           <div class="base-cont">
             <span class="cont-span">体检科室：</span>
-            <el-input
+            <el-select
+              v-model="formInfo.peDeptCode"
+              placeholder="请选择"
               style="width: 18%"
-              v-model="formInfo.peDeptName"
-              placeholder="请输入"
               class="select-item"
-            />
+              filterable
+              clearable
+              default-first-option
+              @change="peDeptChange"
+            >
+              <el-option
+                v-for="item in peDeptList"
+                :label="item.peDeptName"
+                :value="item.peDeptCode"
+                :key="item.peDeptCode"
+              />
+            </el-select>
             <span class="cont-span">体检权限：</span>
             <el-select
               v-model="formInfo.peRole"
@@ -478,6 +489,14 @@ const addPeDoctor = async () => {
   }
   addFlag.value = true
 }
+const peDeptList = ref([])
+const peDeptChange = (val) => {
+  if (val) {
+    formInfo.value.peDeptName = peDeptList.value.find((item) => item.peDeptCode === val).peDeptName
+  } else {
+    formInfo.value.peDeptName = ''
+  }
+}
 // 监听页面加载
 onMounted(async () => {
   peDocPermList.value = await queryDictByConfig({
@@ -486,6 +505,11 @@ onMounted(async () => {
   })
   await getPeDoctorList()
   dbDoctorList.value = await Api.getDbUserList()
+  await Api.getToSelectDept({
+    dbUser: ''
+  }).then((res) => {
+    peDeptList.value = res || []
+  })
 })
 </script>
 
