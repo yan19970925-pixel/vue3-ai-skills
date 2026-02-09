@@ -200,6 +200,7 @@
             <div class="crisis-item-top-l">姓名</div>
             <div class="crisis-item-top-l">危急值</div>
             <div class="crisis-item-top-l">提示</div>
+            <div class="crisis-item-top-l">操作</div>
           </div>
           <div style="flex: 1; overflow: auto" v-if="crisisData.length > 0">
             <div
@@ -232,6 +233,9 @@
                     ? '⬇ 偏低'
                     : ''
                 }}
+              </div>
+              <div class="crisis-item-content">
+                <el-button type="primary" size="small" @click="notify(item)">通知</el-button>
               </div>
             </div>
           </div>
@@ -295,7 +299,8 @@ import { formatDate } from '@/utils/formatTime'
 import {
   homePageCountInfo,
   getPeAbnormalItemList,
-  nofinishedItemCount
+  nofinishedItemCount,
+  receivePeAbnormalItem
 } from '@/api/PerPhyExamination/perExamination/index'
 import { it } from 'node:test'
 const userStore = useUserStore()
@@ -331,6 +336,19 @@ const getWeiJiZhiList = () => {
     crisisData.value = res
   })
 }
+const notify = (item: any) => {
+  console.log(item)
+  let params = {
+    peId: item.peId,
+    peVisitId: item.peVisitId,
+    itemAssemCode: item.itemAssemCode,
+    peItemCode: item.peItemCode
+  }
+  receivePeAbnormalItem(params).then((res) => {
+    ElMessage.success('通知成功')
+  })
+}
+
 const checkupRef = ref<HTMLDivElement | null>(null)
 const showCheckupChart = () => {
   let xdata = []
@@ -1077,16 +1095,19 @@ defineExpose({
             overflow: hidden;
           }
           .crisis-item-top-l:nth-child(1) {
-            width: 200px;
+            width: 150px;
           }
           .crisis-item-top-l:nth-child(2) {
-            width: 100px;
+            width: 90px;
           }
           .crisis-item-top-l:nth-child(3) {
-            width: 100px;
+            width: 90px;
           }
           .crisis-item-top-l:nth-child(4) {
-            width: 100px;
+            width: 90px;
+          }
+          .crisis-item-top-l:nth-child(5) {
+            width: 80px;
           }
         }
         .crisis-item-row {
@@ -1107,18 +1128,21 @@ defineExpose({
             margin-right: 1px;
           }
           .crisis-item-content:nth-child(1) {
-            width: 200px;
+            width: 150px;
           }
           .crisis-item-content:nth-child(2) {
-            width: 100px;
+            width: 90px;
           }
           .crisis-item-content:nth-child(3) {
             text-align: center;
             color: #ff0b0b !important;
-            width: 100px;
+            width: 90px;
           }
           .crisis-item-content:nth-child(4) {
-            width: 100px;
+            width: 90px;
+          }
+          .crisis-item-content:nth-child(5) {
+            width: 80px;
           }
         }
       }

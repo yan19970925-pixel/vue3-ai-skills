@@ -317,48 +317,39 @@
                   </div>
                 </div>
                 <div class="con2_table">
-                  <el-table
-                    :data="diaseseList"
-                    style="width: 100%; height: 100%"
-                    border
-                    @selection-change="handleDiaseseSelectionChange"
-                  >
-                    <!-- 添加选择列 -->
-                    <el-table-column type="selection" width="60" />
-                    <el-table-column type="index" label="序号" width="60" align="center" />
-                    <el-table-column label="疾病诊断阳性体征" width="200" align="center">
-                      <template #default="scope">
-                        <span
-                          :style="scope.row.isdisease == 1 ? 'color:#ed2226' : 'color:#3473d1'"
-                          >{{ scope.row.name }}</span
-                        >
-                      </template>
-                    </el-table-column>
-                    <el-table-column
-                      prop="suggest"
-                      label="对应指导建议"
-                      align="center"
-                      width="200"
-                    ></el-table-column>
-                    <el-table-column prop="isdisease" label="疾病诊断" align="center" width="120">
-                      <template #default="scope">
-                        {{ scope.row.isdisease === 0 ? '否' : '是' }}
-                      </template>
-                    </el-table-column>
-                    <!-- 添加可操作列 -修改 -->
-                    <el-table-column label="操作" width="80px" fixed="right">
-                      <template #default="scope">
-                        <el-button
-                          size="small"
-                          type="primary"
-                          @click="handleEdit(scope.$index, scope.row)"
-                          :disabled="itemDetail.resultStatus == '9'"
-                        >
-                          修改
-                        </el-button>
-                      </template>
-                    </el-table-column>
-                  </el-table>
+                  <table class="custom-table" border="1">
+                    <thead>
+                      <tr>
+                        <th width="60">序号</th>
+                        <th width="200">疾病诊断阳性体征</th>
+                        <th width="200">对应指导建议</th>
+                        <th width="120">疾病诊断</th>
+                        <th width="80">操作</th>
+                      </tr>
+                    </thead>
+                    <tbody id="draggable-tbody">
+                      <tr v-for="(row, index) in diaseseList" :key="index">
+                        <td align="center" class="row-number"></td>
+                        <td align="center">
+                          <span :style="row.isdisease == 1 ? 'color:#ed2226' : 'color:#3473d1'">
+                            {{ row.name }}
+                          </span>
+                        </td>
+                        <td align="center">{{ row.suggest }}</td>
+                        <td align="center">{{ row.isdisease === 0 ? '否' : '是' }}</td>
+                        <td align="center">
+                          <el-button
+                            size="small"
+                            type="primary"
+                            @click="handleEdit(index, row)"
+                            :disabled="itemDetail.resultStatus == '9'"
+                          >
+                            修改
+                          </el-button>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
                 </div>
               </div>
             </div>
@@ -1202,6 +1193,7 @@ import shang from '@/assets/imgs/shang.png'
 import xia from '@/assets/imgs/xia.png'
 import * as echarts from 'echarts'
 import { da } from 'element-plus/es/locale'
+import Sortable from 'sortablejs'
 
 const router = useRouter()
 interface User {
@@ -1382,7 +1374,9 @@ const shenhe = () => {
   })
 }
 
+const activeTab = ref(0)
 const tabChanges = (val: number) => {
+  activeTab.value = val
   console.log(val)
 }
 const duibiData = ref([])
@@ -1542,6 +1536,38 @@ onMounted(() => {
   // ExaminePatListInfo.value.queueStartDate = '2025-07-16'
   ExaminePatListInfo.value.queueEndDate = getCurrentDate()
   getPePatList()
+
+  // 持续尝试初始化拖拽，直到成功
+  const initTimer = setInterval(() => {
+    if (diaseseList.value && diaseseList.value.length > 0) {
+      // 直接通过 ID 获取 tbody
+      const el = document.getElementById('draggable-tbody')
+      console.log('查找 tbody 元素:', el)
+      if (el && !sortableInited.value) {
+        console.log('开始初始化 Sortable')
+        const sortable = Sortable.create(el, {
+          animation: 150,
+          ghostClass: 'sortable-ghost',
+          chosenClass: 'sortable-chosen',
+          dragClass: 'sortable-drag',
+          onEnd: (evt) => {
+            const { oldIndex, newIndex } = evt
+            if (oldIndex !== newIndex) {
+              // 更新数据数组顺序
+              const movedItem = diaseseList.value.splice(oldIndex, 1)[0]
+              diaseseList.value.splice(newIndex, 0, movedItem)
+
+              console.log('数据已更新')
+              saveAudit()
+            }
+          }
+        })
+        sortableInited.value = true
+        clearInterval(initTimer)
+        console.log('拖拽初始化成功', sortable)
+      }
+    }
+  }, 500)
 })
 
 const tableData = ref<Array>([])
@@ -1608,6 +1634,12 @@ const getExaminePatList = async (row) => {
       suggestList.value = res[0].suggestList // 建议
 
       diaseseList.value = res[0].diaseseList // 汇总审核
+      // 初始化序号
+      if (diaseseList.value) {
+        diaseseList.value.forEach((item, index) => {
+          item.sortNo = index + 1
+        })
+      }
 
       knowledgeRecordList.value = res[0].knowledgeRecordList // 科普知识
       mle_suggest.value = ''
@@ -2051,6 +2083,26 @@ const peDeptResultDictDOList = ref()
 const peDeptResultDictRespVoList = ref()
 const suggestList = ref()
 const diaseseList = ref()
+
+// 表格拖拽排序
+const sortableInited = ref(false)
+
+watch(
+  () => diaseseList.value,
+  (newVal) => {
+    if (newVal && newVal.length > 0) {
+      sortableInited.value = false
+    }
+  }
+)
+
+// 切换到汇总审核选项卡时重置初始化状态
+watch(activeTab, (val) => {
+  if ((val === 1 || val === '1') && diaseseList.value && diaseseList.value.length > 0) {
+    sortableInited.value = false
+  }
+})
+
 const mle_suggest = ref('')
 const knowledgeRecordList = ref([])
 const itemInfo = ref({
@@ -2822,6 +2874,65 @@ onUnmounted(() => {
 })
 </script>
 <style lang="scss" scoped>
+/* 自定义表格样式 */
+.custom-table {
+  width: 100%;
+  border-collapse: collapse;
+  border-spacing: 0;
+  background-color: #fff;
+  font-size: 14px;
+  color: #606266;
+
+  th {
+    background-color: #eef1f5;
+    color: #000;
+    font-weight: 500;
+    padding: 2px 0;
+    border: 1px solid #ebeef5;
+    text-align: center;
+  }
+
+  td {
+    padding: 8px 0;
+    border: 1px solid #ebeef5;
+    text-align: center;
+  }
+
+  tbody {
+    counter-reset: row-num;
+  }
+
+  tbody tr {
+    cursor: move;
+    user-select: none;
+    transition: background-color 0.2s;
+    counter-increment: row-num;
+
+    &:hover {
+      background-color: #f5f7fa;
+    }
+  }
+
+  .row-number::before {
+    content: counter(row-num);
+  }
+}
+
+/* 表格拖拽样式 */
+.sortable-ghost {
+  opacity: 0.6;
+  background-color: #e3f2fd !important;
+}
+
+.sortable-chosen {
+  background-color: #bbdefb !important;
+}
+
+.sortable-drag {
+  opacity: 0.8;
+  background-color: #90caf9 !important;
+}
+
 .per_trage {
   background-color: #f5f7f9;
   font-size: 14px;

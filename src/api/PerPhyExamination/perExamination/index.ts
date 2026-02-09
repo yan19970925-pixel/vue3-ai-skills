@@ -77,3 +77,15 @@ export const getPeAbnormalItemList = (data) => {
 export const nofinishedItemCount = (data) => {
   return request.post({ url: '/health-api/health/countReport/nofinishedItemCount', data })
 }
+// 通知
+export const receivePeAbnormalItem = (data) => {
+  return request.post({ url: '/health-api/health/peDoctorCheck/receivePeAbnormalItem', data })
+}
+// 通知率查询
+export const countAbnormalReceive = (data) => {
+  return request.post({ url: '/health-api/health/peDoctorCheck/countAbnormalReceive', data })
+}
+//工作量统计
+export const docWorkloadCount = (data) => {
+  return request.post({ url: '/health-api/health/countReport/docWorkloadCount', data })
+}

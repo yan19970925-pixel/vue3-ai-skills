@@ -1,114 +1,179 @@
 <template>
   <div class="main">
-    <div class="base-box">
-      <div class="form">
-        <div
-          class="info mt-12px"
-          style="display: flex; align-items: center; gap: 16px; flex-wrap: wrap"
-        >
-          <div class="form-item">
-            <span class="cont-span">预约时间:</span>
-            <el-date-picker
-              style="width: 12vw"
-              v-model="value1"
-              type="date"
-              placeholder="请选择"
-              :default-value="new Date()"
-            />
-            <el-radio-group v-model="radio">
-              <el-radio :label="1">医生工作量</el-radio>
-              <el-radio :label="2">护士工作量</el-radio>
-              <el-radio :label="3">终检工作量</el-radio>
-              <el-radio :label="4">项目完成工作量</el-radio>
-            </el-radio-group>
+    <!-- 表格 -->
+    <div
+      class="mt-4px"
+      style="
+        padding: 10px;
+        background-color: #fff;
+        height: calc(100vh - 106px);
+        display: flex;
+        justify-content: space-between;
+      "
+    >
+      <div style="width: 29%">
+        <div class="base-box">
+          <div
+            style="
+              width: 100px;
+              font-size: 16px;
+              font-weight: 700;
+              margin-bottom: 12px;
+              color: #333;
+              border-bottom: 2px solid #3473d1;
+            "
+            >工作量统计</div
+          >
+          <div class="form">
+            <div
+              class="info mt-12px"
+              style="display: flex; align-items: center; gap: 16px; flex-wrap: wrap"
+            >
+              <div class="form-item">
+                <span class="cont-span">预约时间:</span>
+                <el-date-picker
+                  style="width: 250px"
+                  v-model="dateRange"
+                  type="daterange"
+                  range-separator="至"
+                  start-placeholder="开始日期"
+                  end-placeholder="结束日期"
+                  :default-value="[new Date(), new Date()]"
+                  value-format="YYYY-MM-DD"
+                />
+                <!-- <el-radio-group v-model="radio">
+                  <el-radio :label="1">医生工作量</el-radio>
+                  <el-radio :label="2">护士工作量</el-radio>
+                  <el-radio :label="3">终检工作量</el-radio>
+                  <el-radio :label="4">项目完成工作量</el-radio>
+                </el-radio-group> -->
+              </div>
+              <el-button type="primary" @click="handleQuery">查询</el-button>
+              <!-- <el-button class="resetBtn" @click="printData">
+                <img
+                  src="@/assets/imgs/print2x.png"
+                  alt="打印"
+                  style="width: 16px; height: 16px; margin-right: 4px"
+                />
+                打印
+              </el-button>
+              <el-button class="resetBtn" @click="exportData">
+                <img
+                  src="@/assets/imgs/Export2x.png"
+                  alt="导出"
+                  style="width: 16px; height: 16px; margin-right: 4px"
+                />
+                导出
+              </el-button> -->
+            </div>
           </div>
-          <el-button type="primary" @click="handleSaveDocument">查询</el-button>
-          <el-button class="resetBtn" @click="printData">
-            <img
-              src="@/assets/imgs/print2x.png"
-              alt="打印"
-              style="width: 16px; height: 16px; margin-right: 4px"
-            />
-            打印
-          </el-button>
-          <el-button class="resetBtn" @click="exportData">
-            <img
-              src="@/assets/imgs/Export2x.png"
-              alt="导出"
-              style="width: 16px; height: 16px; margin-right: 4px"
-            />
-            导出
-          </el-button>
+        </div>
+        <el-table
+          ref="adviceTableRef"
+          :data="paginatedData"
+          border
+          :row-class-name="setAdviceRowClass"
+          style="width: 100%; height: calc(100% - 116px); min-height: 300px"
+          highlight-current-row
+        >
+          <el-table-column
+            v-for="item in allColumns"
+            :key="item.prop"
+            :label="item.label"
+            :prop="item.prop"
+            :align="item.align"
+            :width="item.width"
+            show-overflow-tooltip
+          >
+          </el-table-column>
+        </el-table>
+        <div
+          class="pagination-container mt-12px mb-12px"
+          style="display: flex; justify-content: space-between"
+        >
+          <!-- 合计 -->
+          <!-- <div style="color: #3473d1; margin-right: 20px; font-size: 16px; font-weight: 700">
+            <span>
+              总合计：完成人次：{{
+                filteredAddList.filter((i) => !i._isSummary && i.completionStatus === '检中')
+                  .length
+              }}人
+            </span>
+          </div> -->
+          <!-- <el-pagination
+            background
+            layout="prev, pager, next"
+            :total="filteredAddList.length"
+            :page-size="pageSize"
+            @current-change="handleCurrentChange"
+          /> -->
         </div>
       </div>
-    </div>
-
-    <!-- 表格 -->
-    <div class="mt-4px" style="padding: 10px; background-color: #fff; height: calc(100vh - 176px)">
-      <el-table
-        ref="adviceTableRef"
-        :data="paginatedData"
-        border
-        :row-class-name="setAdviceRowClass"
-        style="width: 100%; height: calc(100% - 116px); min-height: 300px"
-        highlight-current-row
-        stripe
-        :span-method="spanUnitNameMethod"
-      >
-        <el-table-column
-          v-for="item in visibleColumns"
-          :key="item.prop"
-          :label="item.label"
-          :prop="item.prop"
-          :align="item.align"
-          :width="item.width"
-          show-overflow-tooltip
-        >
-          <template v-slot="{ row }">
-            <div v-if="row._isSummary" v-html="row.unitName" style="text-align: left"></div>
-            <div v-else>{{ row[item.prop] }}</div>
-          </template>
-        </el-table-column>
-      </el-table>
-      <div
-        class="pagination-container mt-12px mb-12px"
-        style="display: flex; justify-content: space-between"
-      >
-        <!-- 合计 -->
-        <div style="color: #3473d1; margin-right: 20px; font-size: 16px; font-weight: 700">
-          <span>
-            总合计：完成人次：{{
-              filteredAddList.filter((i) => !i._isSummary && i.completionStatus === '检中').length
-            }}人
-          </span>
+      <div style="width: 69%">
+        <div class="base-box">
+          <div
+            style="
+              width: 120px;
+              font-size: 16px;
+              font-weight: 700;
+              margin-bottom: 12px;
+              color: #333;
+              border-bottom: 2px solid #3473d1;
+            "
+            >异常结果通知率</div
+          >
         </div>
-        <el-pagination
-          background
-          layout="prev, pager, next"
-          :total="filteredAddList.length"
-          :page-size="pageSize"
-          @current-change="handleCurrentChange"
-        />
+        <el-table
+          :data="notificationRateList"
+          border
+          :row-class-name="setAdviceRowClass"
+          style="width: 100%; height: 40%; min-height: 300px"
+          highlight-current-row
+        >
+          <el-table-column
+            v-for="item in notificationRateColumns"
+            :key="item.prop"
+            :label="item.label"
+            :prop="item.prop"
+            :align="item.align"
+            :width="item.width"
+            show-overflow-tooltip
+          >
+            <!-- <template v-slot="{ row }">
+              <div v-if="row._isSummary" v-html="row.unitName" style="text-align: left"></div>
+              <div v-else>{{ row[item.prop] }}</div>
+            </template> -->
+          </el-table-column>
+        </el-table>
+        <!-- 柱状图 -->
+        <div
+          ref="chartContainer"
+          style="width: 100%; height: 50%; min-height: 300px; margin-top: 10px"
+        ></div>
       </div>
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { ref, computed } from 'vue'
-
+import { ref, computed, onMounted, watch, nextTick } from 'vue'
+import {
+  docWorkloadCount,
+  countAbnormalReceive
+} from '@/api/PerPhyExamination/perExamination/index'
+import * as echarts from 'echarts'
 // ===================== 响应式数据 =====================
-const value1 = ref<Date | null>(new Date())
+const dateRange = ref<[string, string]>(['', ''])
 const radio = ref(1)
 const currentPage = ref(1)
 const pageSize = 20
 
 // 列定义
 const allColumns = [
-  { prop: 'unitName', label: '医生', align: 'center', width: '120px' },
-  { prop: 'projectName', label: '项目名称', align: 'center', width: '120px' },
-  { prop: 'completedCount', label: '完成人次', align: 'center', width: '120px' },
-  { prop: 'amount', label: '项目完成金额', align: 'center', width: '120px' }
+  { prop: 'doctor', label: '医生', align: 'center', width: '120px' },
+  { prop: 'itemAssemCode', label: '项目代码', align: 'center' },
+  { prop: 'sumCount', label: '完成人次', align: 'center', width: '120px' },
+  { prop: 'totalCharges', label: '总数', align: 'center', width: '120px' }
 ]
 const allColumns1 = [
   { prop: 'unitName', label: '医生', align: 'center', width: '120px' },
@@ -279,11 +344,7 @@ const filteredAddList = computed(() => {
 })
 
 // 分页数据
-const paginatedData = computed(() => {
-  const start = (currentPage.value - 1) * pageSize
-  const end = start + pageSize
-  return filteredAddList.value.slice(start, end)
-})
+const paginatedData = ref<any[]>([])
 
 // 合并单元格逻辑
 const spanUnitNameMethod = (() => {
@@ -344,9 +405,144 @@ const exportData = () => {
 const printData = () => {
   console.log('打印')
 }
+//通知率列表
+const notificationRateList = ref<any[]>([])
+const notificationRateColumns = ref<any[]>([
+  { prop: 'peItemName', label: '项目名称', align: 'center', width: '200px' },
+  { prop: 'peItemCode', label: '项目代码', align: 'center', width: '120px' },
+  { prop: 'abnormalItemCount', label: '通知数', align: 'center', width: '120px' },
+  { prop: 'abnormalItemPercent', label: '通知率', align: 'center', width: '120px' }
+])
 
+// 图表相关
+const chartContainer = ref<HTMLDivElement | null>(null)
+let chartInstance: echarts.ECharts | null = null
+
+// 生成随机颜色
+const getRandomColor = () => {
+  const colors = [
+    '#5470c6',
+    '#91cc75',
+    '#fac858',
+    '#ee6666',
+    '#73c0de',
+    '#3ba272',
+    '#fc8452',
+    '#9a60b4',
+    '#ea7ccc',
+    '#2ab7ca'
+  ]
+  return colors[Math.floor(Math.random() * colors.length)]
+}
+
+// 初始化图表
+const initChart = () => {
+  if (!chartContainer.value) return
+
+  // 销毁之前的实例
+  if (chartInstance) {
+    chartInstance.dispose()
+  }
+
+  chartInstance = echarts.init(chartContainer.value)
+
+  const option = {
+    tooltip: {
+      trigger: 'axis',
+      axisPointer: {
+        type: 'shadow'
+      },
+      formatter: (params: any) => {
+        const item = params[0]
+        return `${item.name}<br/>通知数: ${item.value}<br/>通知率: ${item.data.rate}`
+      }
+    },
+    grid: {
+      left: '3%',
+      right: '4%',
+      bottom: '15%',
+      containLabel: true
+    },
+    xAxis: {
+      type: 'category',
+      data: notificationRateList.value.map((item) => item.peItemName),
+      axisLabel: {
+        rotate: 45,
+        interval: 0
+      }
+    },
+    yAxis: {
+      type: 'value',
+      name: '通知数'
+    },
+    series: [
+      {
+        name: '通知数',
+        type: 'bar',
+        barWidth: '60%',
+        data: notificationRateList.value.map((item) => ({
+          value: item.abnormalItemCount,
+          rate: item.abnormalItemPercent,
+          itemStyle: {
+            color: getRandomColor()
+          }
+        })),
+        label: {
+          show: true,
+          position: 'top',
+          formatter: (params: any) => params.data.rate
+        }
+      }
+    ],
+    dataZoom: [
+      {
+        type: 'slider',
+        start: 0,
+        end: 100
+      }
+    ]
+  }
+
+  chartInstance.setOption(option)
+
+  // 监听窗口大小变化
+  window.addEventListener('resize', () => {
+    chartInstance?.resize()
+  })
+}
+
+//通知率查询
+const handleNotificationRateQuery = () => {
+  countAbnormalReceive().then((res) => {
+    notificationRateList.value = res
+    nextTick(() => {
+      initChart()
+    })
+  })
+}
+// 查询方法
+const handleQuery = () => {
+  const [beginDate, endDate] = dateRange.value
+  handleWorkloadQuery(beginDate, endDate)
+  handleNotificationRateQuery()
+}
+
+// 获取工作量统计数据
+const handleWorkloadQuery = (beginDate?: string, endDate?: string) => {
+  const params = {
+    beginDate,
+    endDate
+  }
+  docWorkloadCount(params).then((res) => {
+    console.log('工作量统计:', res)
+    paginatedData.value = res
+  })
+}
 onMounted(() => {
-  handleSaveDocument()
+  // 初始化日期范围为今天
+  const today = new Date().toISOString().split('T')[0]
+  dateRange.value = [today, today]
+  handleQuery()
 })
 </script>
 

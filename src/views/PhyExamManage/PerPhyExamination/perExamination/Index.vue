@@ -283,7 +283,16 @@
                   </template>
                 </el-input>
               </div>
-
+              <div class="left_form">
+                <span>
+                  <!-- <b style="color: #ed2226">*</b> -->
+                  是否特勤：</span
+                >
+                <el-radio-group v-model="formInfo.isSpecial">
+                  <el-radio :label="1">是</el-radio>
+                  <el-radio :label="0">否</el-radio>
+                </el-radio-group>
+              </div>
               <div class="left_form" v-show="formInfo.peTypeName == '婚检'">
                 <span
                   ><b style="color: #ed2226" v-show="formInfo.peTypeName == '婚检'">*</b
@@ -1301,6 +1310,7 @@ const formInfo = reactive({
   peLevel: '',
   country: '',
   nation: '',
+  isSpecial: 0,
   birthPlace: '',
   // workno: '',
   address: '',
