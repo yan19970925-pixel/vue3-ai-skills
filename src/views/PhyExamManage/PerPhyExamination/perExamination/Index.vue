@@ -2256,6 +2256,7 @@ const perListRowClick = (row) => {
       country: row.country || '',
       nation: row.nation || '',
       birthPlace: row.birthPlace || '',
+      isSpecial: row.isSpecial || '',
       address: row.address || '',
       phoneNumberHome: row.phoneNumberHome || '',
       appointPeExam: row.appointPeExam || '',
@@ -2270,6 +2271,7 @@ const perListRowClick = (row) => {
     formInfo.nation = res.nation //民族
     formInfo.idType = res.idType //证件类型
     formInfo.birthPlace = res.birthPlace //出生地
+    formInfo.isSpecial = res.isSpecial //是否特勤
     formInfo.totalCharges = res.totalCharges //价格
     xuanzhongData.value = res.selectedSets[0] ? res.selectedSets[0] : {} //套餐信息
     allDataSelected.value = res.selectedItems //选中项目

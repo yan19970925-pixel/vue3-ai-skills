@@ -261,6 +261,14 @@
             align="center"
             width="120"
           />
+          <el-table-column show-overflow-tooltip label="是否特勤" width="120">
+            <template #default="scope">
+              <el-radio-group v-model="scope.row.isSpecial">
+                <el-radio label="1">是</el-radio>
+                <el-radio label="0">否</el-radio>
+              </el-radio-group>
+            </template>
+          </el-table-column>
           <el-table-column
             show-overflow-tooltip
             prop="visitStatus"
